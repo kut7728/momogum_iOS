@@ -13,8 +13,18 @@ struct AppointCreate2View: View {
     
     @Binding var path: [String]
     
+    private func selectCard(_ value: String) {
+        if appointViewModel.pickedImage != value {
+            appointViewModel.pickedImage = value
+        } else {
+            appointViewModel.pickedImage = ""
+        }
+    }
+    
     var body: some View {
         @Bindable var viewModel = appointViewModel
+        
+        
 
         ApmBackgroundView(path: $path) {
             VStack {
@@ -86,7 +96,7 @@ struct AppointCreate2View: View {
                 .padding(.leading, 20)
 
             }
-            if true {
+            if viewModel.pickedImage != "" {
                 ApmHoveringNavButton(navLinkValue: "create3")
             }
         }

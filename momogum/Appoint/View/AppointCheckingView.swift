@@ -138,7 +138,7 @@ struct AppointCheckingView: View {
                             .padding(.top, 20)
                         
                         
-                        Text(appoint.note ?? "")
+                        Text(appoint.note)
                             .font(.mmg(.subheader4))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
