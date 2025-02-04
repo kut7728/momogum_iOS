@@ -18,7 +18,7 @@ struct ApmTextFieldModifier: ViewModifier {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(.black_5)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            .padding(.vertical, 20)
+//            .padding(.vertical, 20)
 //            .border(.black)
     }
 }

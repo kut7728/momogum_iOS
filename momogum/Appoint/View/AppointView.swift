@@ -74,7 +74,17 @@ struct AppointView: View {
                         
                         
                         if (viewModel.appoints.isEmpty) {
-                            
+                            Rectangle()
+                                .foregroundStyle(.black_5)
+                                .frame(width: 336, height: 156)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .frame(maxWidth: .infinity)
+                                .overlay {
+                                    Text("약속 초대를 받으면 여기에 표시됩니다.")
+                                        .font(.mmg(.subheader4))
+                                        .foregroundStyle(.black_3)
+                                }
+                                .padding(.vertical, 20)
                         } else {
                             Text("당신의 결정을 기다리는 약속이 있어요!")
                                 .font(.mmg(.subheader4))
@@ -99,19 +109,32 @@ struct AppointView: View {
                             .font(.mmg(.subheader3))
                             .padding(.leading, 30)
                         
-                        
-                        ScrollView (.horizontal, showsIndicators: true) {
-                            HStack {
-                                Spacer()
-                                    .frame(width: 30)
-                                
-                                ForEach(viewModel.appoints) { appoint in
-                                    WaitingConfirmCellView(isPresented: $isPresented, appoint: appoint)
+                        if (viewModel.appoints.isEmpty) {
+                            Rectangle()
+                                .foregroundStyle(.black_5)
+                                .frame(width: 336, height: 156)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .frame(maxWidth: .infinity)
+                                .overlay {
+                                    Text("다가오는 식사 약속은 여기에 표시됩니다.")
+                                        .font(.mmg(.subheader4))
+                                        .foregroundStyle(.black_3)
+                                }
+                                .padding(.vertical, 20)
+                        } else {
+                            ScrollView (.horizontal, showsIndicators: true) {
+                                HStack {
+                                    Spacer()
+                                        .frame(width: 30)
+                                    
+                                    ForEach(viewModel.appoints) { appoint in
+                                        WaitingConfirmCellView(isPresented: $isPresented, appoint: appoint)
+                                    }
                                 }
                             }
+                            .padding(.vertical, 10)
+                            .scrollIndicators(.hidden)
                         }
-                        .padding(.vertical, 10)
-                        .scrollIndicators(.hidden)
                         
                         Spacer()
                             .frame(height: 100)

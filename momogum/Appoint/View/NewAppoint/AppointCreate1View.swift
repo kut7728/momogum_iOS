@@ -14,6 +14,8 @@ struct AppointCreate1View: View {
     
     @State var searchText = ""
     @State var isEditing: Bool = false
+    @State var buttonShowing: Bool = false
+
     
     var filteredFriends: [String] {
         if searchText.isEmpty {
@@ -48,16 +50,37 @@ struct AppointCreate1View: View {
                 
                 /// 검색바
                 HStack {
-                    Image("search")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .padding(.horizontal, 10)
+                    if !isEditing {
+                        Image("search")
+                            .resizable()
+                            .frame(width: 20, height: 20)
+                            .padding(.horizontal, 10)
+                    }
                     
-                    TextField("닉네임 or 유저 아이디로 검색", text: $searchText)
+                    TextField("닉네임 or 유저 아이디로 검색", text: $searchText) { _ in
+                        isEditing = true
+                    }
                         .font(.mmg(.subheader4))
+                        .onSubmit {
+                            withAnimation {
+                                isEditing = false
+                            }
+                        }
                     
+                    if isEditing {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image("close_cc")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                                .padding(.horizontal, 10)
+                        }
+                    }
                 }
                 .modifier(ApmTextFieldModifier())
+                .padding(.top, 20)
+                
                 
                 /// 친구 목록
                 ScrollView {
@@ -65,7 +88,7 @@ struct AppointCreate1View: View {
                         Text("친구")
                             .font(.mmg(.subheader3))
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.bottom, 15)
+                            .padding(.vertical, 15)
                         
                         /// 선택된 친구 상단 표시
                         ForEach(filteredFriends.filter { viewModel.pickedFriends.contains($0) },
@@ -106,7 +129,7 @@ struct AppointCreate1View: View {
             
             
             /// '다음 버튼'
-            if !viewModel.pickedFriends.isEmpty {
+            if buttonShowing {
                 ApmHoveringNavButton(navLinkValue: "create2")
             }
         }
@@ -116,9 +139,19 @@ struct AppointCreate1View: View {
         if appointViewModel.pickedFriends.contains(friend) {
             // 이미 선택된 친구라면 리스트에서 제거
             appointViewModel.pickedFriends.removeAll { $0 == friend }
+            
+            if (appointViewModel.pickedFriends.isEmpty) {
+                withAnimation {
+                    buttonShowing = false
+                }
+            }
         } else {
             // 선택되지 않은 친구라면 리스트에 추가
             appointViewModel.pickedFriends.append(friend)
+            
+            withAnimation {
+                buttonShowing = true
+            }
         }
     }
 }

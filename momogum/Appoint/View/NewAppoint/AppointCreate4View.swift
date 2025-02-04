@@ -92,7 +92,7 @@ struct AppointCreate4View: View {
                 
                 
                 
-                VStack (spacing: 0) {
+                VStack (spacing: 20) {
                     Text("식사 모임명")
                         .font(.mmg(.Body3))
                         .foregroundStyle(.black_2)

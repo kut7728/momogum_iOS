@@ -15,7 +15,7 @@ struct AppointPickedFriendCellView: View {
         @Bindable var viewModel = appointViewModel
         
         ZStack {
-            Image(systemName: "person.circle.fill")
+            Image("emptyAvatar")
                 .resizable()
                 .frame(width: 50, height: 50)
                 .foregroundStyle(.gray.opacity(0.2))

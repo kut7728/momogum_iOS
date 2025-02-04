@@ -10,14 +10,21 @@ import SwiftUI
 /// 약속생성의 2단계, 식사카드를 고르는 뷰
 struct AppointCreate2View: View {
     @Environment(NewAppointViewModel.self) var appointViewModel
+    @State var isPicked: Bool = false
     
     @Binding var path: [String]
     
     private func selectCard(_ value: String) {
         if appointViewModel.pickedImage != value {
             appointViewModel.pickedImage = value
+            withAnimation {
+                isPicked = true
+            }
         } else {
             appointViewModel.pickedImage = ""
+            withAnimation {
+                isPicked = false
+            }
         }
     }
     
@@ -43,7 +50,19 @@ struct AppointCreate2View: View {
                             ForEach(0..<5) { i in
                                 Rectangle()
                                     .frame(width: 170, height: 120)
-                                    .foregroundStyle(.gray.opacity(0.2))
+                                    .foregroundStyle(.black_5)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .overlay{
+                                        if appointViewModel.pickedImage == String(i) {
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(lineWidth: 3)
+                                                .foregroundStyle(.Red_2)
+                                        }
+                                    }
+                                    .onTapGesture {
+                                        selectCard(String(i))
+                                    }
+                                    .padding(1)
                             }
                         }
                     }
@@ -56,17 +75,23 @@ struct AppointCreate2View: View {
                     
                     ScrollView (.horizontal, showsIndicators: false) {
                         HStack {
-                            Rectangle()
-                                .frame(width: 170, height: 120)
-                                .foregroundStyle(.gray.opacity(0.2))
-                            
-                            Rectangle()
-                                .frame(width: 170, height: 120)
-                                .foregroundStyle(.gray.opacity(0.2))
-                            
-                            Rectangle()
-                                .frame(width: 170, height: 120)
-                                .foregroundStyle(.gray.opacity(0.2))
+                            ForEach(6..<10) { i in
+                                Rectangle()
+                                    .frame(width: 170, height: 120)
+                                    .foregroundStyle(.black_5)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .overlay{
+                                        if appointViewModel.pickedImage == String(i) {
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(lineWidth: 3)
+                                                .foregroundStyle(.Red_2)
+                                        }
+                                    }
+                                    .onTapGesture {
+                                        selectCard(String(i))
+                                    }
+                                    .padding(1)
+                            }
                         }
                     }
                     
@@ -78,17 +103,23 @@ struct AppointCreate2View: View {
                     
                     ScrollView (.horizontal, showsIndicators: false) {
                         HStack {
-                            Rectangle()
-                                .frame(width: 170, height: 120)
-                                .foregroundStyle(.gray.opacity(0.2))
-                            
-                            Rectangle()
-                                .frame(width: 170, height: 120)
-                                .foregroundStyle(.gray.opacity(0.2))
-                            
-                            Rectangle()
-                                .frame(width: 170, height: 120)
-                                .foregroundStyle(.gray.opacity(0.2))
+                            ForEach(10..<15) { i in
+                                Rectangle()
+                                    .frame(width: 170, height: 120)
+                                    .foregroundStyle(.black_5)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .overlay{
+                                        if appointViewModel.pickedImage == String(i) {
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(lineWidth: 3)
+                                                .foregroundStyle(.Red_2)
+                                        }
+                                    }
+                                    .onTapGesture {
+                                        selectCard(String(i))
+                                    }
+                                    .padding(1)
+                            }
                         }
                     }
                     Spacer()
@@ -96,7 +127,7 @@ struct AppointCreate2View: View {
                 .padding(.leading, 20)
 
             }
-            if viewModel.pickedImage != "" {
+            if isPicked {
                 ApmHoveringNavButton(navLinkValue: "create3")
             }
         }

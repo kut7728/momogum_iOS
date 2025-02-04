@@ -23,11 +23,13 @@ struct AppointCreate3View: View {
         
         ApmBackgroundView(path: $path) {
             ScrollView {
-                VStack (spacing: 20) {
-                    VStack (spacing: 0) {
+                VStack (spacing: 40) {
+                    VStack {
                         Text("식사 모임 이름을 알려주세요.")
                             .font(.mmg(.subheader3))
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, 20)
+                        
                         
                         TextField("ex. 더술 출발, 돈까스 먹방", text: $viewModel.appointName)
                             .modifier(ApmTextFieldModifier())
@@ -44,6 +46,8 @@ struct AppointCreate3View: View {
                             Text("식사 메뉴를 알려주세요.")
                                 .font(.mmg(.subheader3))
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.bottom, 20)
+
                             
                             TextField("ex. 더술 닭한마리, 투파피 파스타", text: $viewModel.menuName)
                                 .modifier(ApmTextFieldModifier())
@@ -83,6 +87,8 @@ struct AppointCreate3View: View {
                             Text("어디서 만날까요?")
                                 .font(.mmg(.subheader3))
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.bottom, 20)
+
                             
                             TextField("ex. 중앙동 다이소 앞, 학교 쪽문 앞", text: $viewModel.placeName)
                                 .modifier(ApmTextFieldModifier())
@@ -100,6 +106,8 @@ struct AppointCreate3View: View {
                             Text("특별한 소식이 있나요?")
                                 .font(.mmg(.subheader3))
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.bottom, 20)
+
                             
                             TextField("ex. 꾸밈단계 2단계", text: $viewModel.note)
                                 .modifier(ApmTextFieldModifier())
