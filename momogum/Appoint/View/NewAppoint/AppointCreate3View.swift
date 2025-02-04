@@ -111,6 +111,6 @@ struct AppointCreate3View: View {
 }
 
 #Preview {
-    AppointCreate3View(path: AppointView().$path)
+    AppointCreate3View(path: AppointView(isTabBarHidden: .constant(true)).$path)
         .environment(NewAppointViewModel())
 }

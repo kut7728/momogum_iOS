@@ -70,5 +70,5 @@ struct AppointSentView: View {
 }
 
 #Preview {
-    AppointSentView(path: AppointView().$path)
+    AppointSentView(path: AppointView(isTabBarHidden: .constant(true)).$path)
 }

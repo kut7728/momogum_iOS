@@ -124,6 +124,6 @@ struct AppointCreate1View: View {
 }
 
 #Preview {
-    AppointCreate1View(path: AppointView().$path)
+    AppointCreate1View(path: AppointView(isTabBarHidden: .constant(true)).$path)
         .environment(NewAppointViewModel())
 }

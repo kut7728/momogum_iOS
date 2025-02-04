@@ -25,7 +25,7 @@ struct MainTabView: View {
                 GalleryPickerView(tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden)
                     .tag(1)
 
-                AppointView()
+                AppointView(isTabBarHidden: $isTabBarHidden)
                     .tag(2)
 
                 MyProfileView(isTabBarHidden: $isTabBarHidden)
