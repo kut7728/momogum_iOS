@@ -19,6 +19,8 @@ struct MyProfileView: View {
     
     @State var viewModel: ProfileViewModel = ProfileViewModel()
     
+    @Binding var isTabBarHidden: Bool
+    
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
     var body: some View {
@@ -107,6 +109,7 @@ struct MyProfileView: View {
                             Button(action: {
                                 showFollowList = 0
                                 navigateToFollowView = true
+                                isTabBarHidden = true
                             }) {
                                 VStack(alignment: .center, spacing: 0){
                                     Text("팔로워")
@@ -125,6 +128,7 @@ struct MyProfileView: View {
                             Button(action: {
                                 showFollowList = 1
                                 navigateToFollowView = true
+                                isTabBarHidden = true
                             }) {
                                 VStack(alignment: .center, spacing: 0){
                                     Text("팔로잉")
@@ -142,6 +146,7 @@ struct MyProfileView: View {
                             // 프로필 편집 버튼
                             Button {
                                 navigationPath.append("EditProfileView")
+                                isTabBarHidden = true
                             }label: {
                                 RoundedRectangle(cornerRadius: 8)
                                     .frame(width: 86, height: 52)
@@ -247,6 +252,9 @@ struct MyProfileView: View {
                     }
                     
                     
+                }
+                .onAppear {
+                    isTabBarHidden = false
                 }
             }
             .disabled(showPopup) // 팝업이 보일 때 메인 화면 비활성화

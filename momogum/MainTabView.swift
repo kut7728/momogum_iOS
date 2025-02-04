@@ -28,7 +28,7 @@ struct MainTabView: View {
                 AppointView()
                     .tag(2)
 
-                MyProfileView()
+                MyProfileView(isTabBarHidden: $isTabBarHidden)
                     .tag(3)
             }
 
