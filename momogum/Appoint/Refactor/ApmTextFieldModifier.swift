@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ApmTextFieldModifier: ViewModifier {
+    var target: String
+    
     func body(content: Content) -> some View {
         content
             .font(.mmg(.Body3))
@@ -23,5 +25,11 @@ struct ApmTextFieldModifier: ViewModifier {
                     .stroke(lineWidth: 1)
                     .foregroundStyle(.black_4)
             }
+            .onChange(of: target) { oldValue, newValue in
+                if oldValue != "" && newValue == "" {
+                    
+                }
+            }
+        
     }
 }

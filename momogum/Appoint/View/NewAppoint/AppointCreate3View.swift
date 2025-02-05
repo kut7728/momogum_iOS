@@ -32,7 +32,7 @@ struct AppointCreate3View: View {
                         
                         
                         TextField("ex. 더술 출발, 돈까스 먹방", text: $viewModel.appointName)
-                            .modifier(ApmTextFieldModifier())
+                            .modifier(ApmTextFieldModifier(target: viewModel.appointName))
                             .onSubmit {
                                 withAnimation {
                                     menuShowing = true
@@ -73,6 +73,11 @@ struct AppointCreate3View: View {
                                 .environment(\.locale, Locale(identifier: String(Locale.preferredLanguages[0])))
                                 .background(.black_5)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(content: {
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(lineWidth: 1)
+                                        .foregroundStyle(.black_4)
+                                })
                                 .onAppear {
                                     withAnimation {
                                         placeShowing = true
