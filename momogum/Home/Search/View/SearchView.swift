@@ -103,8 +103,23 @@ struct SearchView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
+                        
+                        //각 버튼 셀뷰
+                        if selectedButton == "계정" {
+                            VStack(spacing: 16) {
+                                ForEach(0..<5, id: \.self) { _ in
+                                    AccountCell(userID: "사용자아이디", name: "이름") // SearchCell 사용
+                                }
+                            }
+                            .padding(.top, 34)
+                        }
+                        if selectedButton == "키워드" {
+                            KeywordCell()
+                                .padding(.top, 34)
+                        }
+
                     }
-                    .transition(.opacity) // 부드럽게 사라지는 효과 추가
+                    .transition(.opacity)
                 }
             }
             Spacer()
