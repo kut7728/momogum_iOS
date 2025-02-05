@@ -58,7 +58,9 @@ struct AppointCreate1View: View {
                     }
                     
                     TextField("닉네임 or 유저 아이디로 검색", text: $searchText) { _ in
-                        isEditing = true
+                        withAnimation {
+                            isEditing = true
+                        }
                     }
                         .font(.mmg(.subheader4))
                         .onSubmit {
