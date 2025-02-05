@@ -24,6 +24,15 @@ struct LoginView: View {
             Spacer()
 
             Button{
+                KakaoAuthViewModel().handleKakaoLogin()
+                //만약 카카오 최초로그인이라면, SignupStep1View로 넘긴다
+            }
+            label: {
+                Image("KakaoLogin")
+            }
+
+            
+            Button{
                 KakaoAuthViewModel().handleKakaoLogout()
                 print("카카오 로그아웃 성공") // 로그인 성공시 메인탭뷰로 넘어가게
             }
@@ -36,14 +45,7 @@ struct LoginView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20))
             }
            
-            Button{
-                KakaoAuthViewModel().handleKakaoLogin()
-                //만약 카카오 최초로그인이라면, SignupStep1View로 넘긴다
-            }
-            label: {
-                Image("KakaoLogin")
-            }
-            
+
             //회원가입뷰
             NavigationLink(value: "SignupStep1View"){
              
