@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Binding var tabIndex: Int
+    @Binding var isTabBarHidden: Bool
     @State private var selectedButtonIndex: Int? = nil // 선택된 버튼의 인덱스
     @State private var userInput: String = ""
     
@@ -157,7 +158,7 @@ struct HomeView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVGrid(columns: columns, spacing: 16) { // columns는 이미 정의된 GridItem 배열
                             ForEach(0..<6) { index in
-                                NavigationLink(destination: OtherCardView(tabIndex: $tabIndex)) {
+                                NavigationLink(destination: OtherCardView(isTabBarHidden: $isTabBarHidden)) {
                                     VStack(spacing: 0) {
                                         // 상단 이미지 부분
                                         Rectangle()
@@ -221,5 +222,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(tabIndex: .constant(0))
+    HomeView(tabIndex: .constant(0), isTabBarHidden: .constant(false))
 }
