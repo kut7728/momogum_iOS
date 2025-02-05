@@ -34,7 +34,7 @@ struct MyProfileView: View {
                             Spacer().frame(width: 24, height: 24)
                             
                             // 내 유저 아이디
-                            Text("\(viewModel.userID)")
+                            Text(viewModel.userID)
                                 .frame(height: 20)
                                 .fontWeight(.semibold)
                             
@@ -87,11 +87,11 @@ struct MyProfileView: View {
                             VStack(alignment: .leading){
                                 VStack(alignment: .leading){
                                     // 이름
-                                    Text("\(viewModel.userName)")
+                                    Text(viewModel.userName)
                                         .font(.mmg(.subheader4))
                                         .padding(.bottom, 13)
                                     
-                                    Text("\(viewModel.userBio)")
+                                    Text(viewModel.userBio)
                                         .font(.mmg(.Caption2))
                                         .foregroundStyle(Color.black_2)
                                 }
@@ -107,8 +107,10 @@ struct MyProfileView: View {
                         HStack(alignment: .center, spacing: 0){
                             // 팔로워
                             Button(action: {
-                                showFollowList = 0
-                                navigateToFollowView = true
+                                DispatchQueue.main.async {
+                                    showFollowList = 0
+                                    navigateToFollowView = true
+                                }
                                 isTabBarHidden = true
                             }) {
                                 VStack(alignment: .center, spacing: 0){
@@ -126,9 +128,11 @@ struct MyProfileView: View {
                             
                             // 팔로잉
                             Button(action: {
-                                showFollowList = 1
-                                navigateToFollowView = true
-                                isTabBarHidden = true
+                                DispatchQueue.main.async {
+                                    showFollowList = 1
+                                    navigateToFollowView = true
+                                }
+                                    isTabBarHidden = true
                             }) {
                                 VStack(alignment: .center, spacing: 0){
                                     Text("팔로잉")
@@ -145,8 +149,10 @@ struct MyProfileView: View {
                             
                             // 프로필 편집 버튼
                             Button {
-                                navigationPath.append("EditProfileView")
-                                isTabBarHidden = true
+                                DispatchQueue.main.async {
+                                    navigationPath.append("EditProfileView")
+                                    isTabBarHidden = true
+                                }
                             }label: {
                                 RoundedRectangle(cornerRadius: 8)
                                     .frame(width: 86, height: 52)
@@ -254,7 +260,9 @@ struct MyProfileView: View {
                     
                 }
                 .onAppear {
-                    isTabBarHidden = false
+                    if isTabBarHidden {
+                        isTabBarHidden = false
+                    }
                 }
             }
             .disabled(showPopup) // 팝업이 보일 때 메인 화면 비활성화
