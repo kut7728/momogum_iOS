@@ -11,13 +11,15 @@ struct MyProfileView: View {
     @State private var navigationPath = NavigationPath()
     @State private var selectedSegment = 0
     @State private var showFollowList = 0
-    @State private var isActive = false // 화면 전환 제어
+    @State private var navigateToFollowView = false // 화면 전환 제어
     // 팝업창 제어
     @State private var showPopup = false
     @State private var showLogoutPopup = false
     @State private var showDelPopup = false
     
     @State var viewModel: ProfileViewModel = ProfileViewModel()
+    
+    @Binding var isTabBarHidden: Bool
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -51,7 +53,7 @@ struct MyProfileView: View {
                         .padding(.top, 23)
                         .padding(.bottom, 20)
                         
-                        HStack(spacing: 0){
+                        HStack(alignment: .center, spacing: 0){
                             // 프로필 이미지
                             if let profileImage = viewModel.profileImage {
                                 Image(uiImage: profileImage)
@@ -65,7 +67,7 @@ struct MyProfileView: View {
                                             .stroke(lineWidth: 4)
                                             .foregroundStyle(Color.black_4)
                                     )
-                                    .padding(.trailing, 35)
+                                    .padding(.trailing, 38)
                             } else {
                                 Image("defaultProfile")
                                     .resizable()
@@ -78,7 +80,7 @@ struct MyProfileView: View {
                                             .stroke(lineWidth: 4)
                                             .foregroundStyle(Color.black_4)
                                     )
-                                    .padding(.trailing, 35)
+                                    .padding(.trailing, 38)
                             }
                             
                             // 이름 / 한 줄 소개
@@ -86,90 +88,108 @@ struct MyProfileView: View {
                                 VStack(alignment: .leading){
                                     // 이름
                                     Text("\(viewModel.userName)")
-                                        .frame(height: 16, alignment: .leading)
-                                        .fontWeight(.semibold)
+                                        .font(.mmg(.subheader4))
+                                        .padding(.bottom, 13)
                                     
                                     Text("\(viewModel.userBio)")
-                                        .font(.system(size: 13))
-                                        .fontWeight(.semibold)
+                                        .font(.mmg(.Caption2))
                                         .foregroundStyle(Color.black_2)
                                 }
-                                .padding(.bottom, 16)
-                                
-                                // 팔로워, 팔로잉
-                                HStack{
-                                    Button(action: {
-                                        showFollowList = 0
-                                        isActive = true // 팔로워 버튼 클릭 시 화면 전환
-                                    }) {
-                                        Text("팔로워 17")
-                                            .frame(height: 13, alignment: .leading)
-                                            .fontWeight(.semibold)
-                                            .foregroundStyle(Color.black)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    Button(action: {
-                                        showFollowList = 1
-                                        isActive = true // 팔로잉 버튼 클릭 시 화면 전환
-                                    }) {
-                                        Text("팔로잉 14")
-                                            .frame(height: 13, alignment: .leading)
-                                            .fontWeight(.semibold)
-                                            .foregroundStyle(Color.black)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    NavigationLink(destination: FollowView(viewModel: viewModel, selectedSegment: $showFollowList), isActive: $isActive) {
-                                        EmptyView()
-                                    }
-                                    
-                                }
-                                
                             }
+                            
+                            Spacer()
+                            
                         }
                         .edgesIgnoringSafeArea(.all)
-                        .frame(maxWidth: .infinity)
-                        .padding(.leading, 35)
-                        .padding(.trailing, 37)
-                    }
-                    
-                    // 프로필 편집 버튼
-                    Button {
-                        navigationPath.append("EditProfileView")
-                    }label: {
-                        RoundedRectangle(cornerRadius: 12)
-                            .frame(width: 315, height: 36)
-                            .foregroundStyle(Color(red: 235 / 255, green: 232 / 255, blue: 232 / 255))
-                            .overlay(
-                                Text("프로필 편집")
-                                    .frame(height: 10)
-                                    .fontWeight(.semibold)
-                                    .foregroundStyle(.black)
-                            )
-                            .contentShape(Rectangle())
-                    }
-                    .padding(.top, 45)
-                    .padding(.bottom, 49)
-                    .navigationDestination(for: String.self) { value in
-                        switch value {
-                        case "EditProfileView":
-                            EditProfileView(navigationPath: $navigationPath, viewModel: viewModel)
-                        case "GalleryProfileView":
-                            GalleryProfileView(navigationPath: $navigationPath, viewModel: viewModel)
-                        case "EditImageView":
-                            EditImageView(navigationPath: $navigationPath, viewModel: viewModel)
-                        case "EditNameView":
-                            EditNameView(navigationPath: $navigationPath, viewModel: viewModel)
-                        case "EditIDView":
-                            EditIDView(navigationPath: $navigationPath, viewModel: viewModel)
-                        case "EditBioView":
-                            EditBioView(navigationPath: $navigationPath, viewModel: viewModel)
-                        default:
-                            EmptyView()                            
+                        .padding(.horizontal, 32)
+                        .padding(.bottom, 24)
+                        
+                        HStack(alignment: .center, spacing: 0){
+                            // 팔로워
+                            Button(action: {
+                                showFollowList = 0
+                                navigateToFollowView = true
+                                isTabBarHidden = true
+                            }) {
+                                VStack(alignment: .center, spacing: 0){
+                                    Text("팔로워")
+                                        .font(.mmg(.subheader4))
+                                        .foregroundStyle(Color.black_1)
+                                        .padding(.bottom, 16)
+                                    
+                                    Text("\(viewModel.followerCount.formattedFollowerCount())")
+                                        .font(.mmg(.subheader4))
+                                        .foregroundStyle(Color.black_1)
+                                }
+                            }
+                            .padding(.trailing, 67)
+                            
+                            // 팔로잉
+                            Button(action: {
+                                showFollowList = 1
+                                navigateToFollowView = true
+                                isTabBarHidden = true
+                            }) {
+                                VStack(alignment: .center, spacing: 0){
+                                    Text("팔로잉")
+                                        .font(.mmg(.subheader4))
+                                        .foregroundStyle(Color.black_1)
+                                        .padding(.bottom, 16)
+                                    
+                                    Text("\(viewModel.followingCount.formattedFollowerCount())")
+                                        .font(.mmg(.subheader4))
+                                        .foregroundStyle(Color.black_1)
+                                }
+                            }
+                            .padding(.trailing, 67)
+                            
+                            // 프로필 편집 버튼
+                            Button {
+                                navigationPath.append("EditProfileView")
+                                isTabBarHidden = true
+                            }label: {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .frame(width: 86, height: 52)
+                                    .foregroundStyle(Color.black_5)
+                                    .overlay(
+                                        VStack{
+                                            Image("user_circle")
+                                                .resizable()
+                                                .frame(width: 27, height: 27)
+                                                .padding(.bottom, 3)
+                                            
+                                            
+                                            Text("프로필 편집")
+                                                .font(.system(size: 10))
+                                                .fontWeight(.semibold)
+                                                .foregroundStyle(Color.black_2)
+                                        }
+                                    )
+                                    .contentShape(Rectangle())
+                            }
+                            .navigationDestination(isPresented: $navigateToFollowView) {
+                                FollowView(viewModel: viewModel, selectedSegment: $showFollowList)
+                            }
+                            .navigationDestination(for: String.self) { value in
+                                switch value {
+                                case "EditProfileView":
+                                    EditProfileView(navigationPath: $navigationPath, viewModel: viewModel)
+                                case "GalleryProfileView":
+                                    GalleryProfileView(navigationPath: $navigationPath, viewModel: viewModel)
+                                case "EditImageView":
+                                    EditImageView(navigationPath: $navigationPath, viewModel: viewModel)
+                                case "EditNameView":
+                                    EditNameView(navigationPath: $navigationPath, viewModel: viewModel)
+                                case "EditIDView":
+                                    EditIDView(navigationPath: $navigationPath, viewModel: viewModel)
+                                case "EditBioView":
+                                    EditBioView(navigationPath: $navigationPath, viewModel: viewModel)
+                                default:
+                                    EmptyView()
+                                }
+                            }
                         }
+                        .padding(.bottom, 23)
                     }
                     
                     
@@ -233,6 +253,9 @@ struct MyProfileView: View {
                     
                     
                 }
+                .onAppear {
+                    isTabBarHidden = false
+                }
             }
             .disabled(showPopup) // 팝업이 보일 때 메인 화면 비활성화
             
@@ -266,8 +289,5 @@ struct MyProfileView: View {
             
         }
     }
-}
-#Preview{
-    MyProfileView()
 }
 

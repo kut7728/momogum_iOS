@@ -10,6 +10,7 @@ import SwiftUI
 struct EditBioView: View {
     @Binding var navigationPath: NavigationPath
     @Bindable var viewModel: ProfileViewModel
+    @State private var keyboardHeight: CGFloat = 0
     
     private let maxLength = 40
     
@@ -51,7 +52,7 @@ struct EditBioView: View {
                         .font(.mmg(.Body3))
                         .frame(width: 320, height: 126)
                         .background(Color.clear)
-                        .onChange(of: viewModel.draftUserBio) { newValue in
+                        .onChange(of: viewModel.draftUserBio) { _, newValue in
                             if newValue.count > maxLength {
                                 viewModel.draftUserBio = String(newValue.prefix(maxLength)) // 초과 글자 제거
                             }
@@ -71,10 +72,11 @@ struct EditBioView: View {
                 
             }
             .padding(.horizontal, 37)
-            .padding(.bottom, 330)
             .onAppear {
                 viewModel.draftUserBio = ""
             }
+            
+            Spacer()
             
             HStack(spacing: 0){
                 Spacer()
@@ -87,11 +89,36 @@ struct EditBioView: View {
                 }
             }
             .padding(.trailing, 62.5)
-            
-            Spacer()
+            .padding(.bottom, keyboardHeight > 0 ? keyboardHeight : 116) // 키보드 높이만큼 올리기
+            .animation(.easeInOut(duration: 0.3), value: keyboardHeight) // 부드럽게 애니메이션 적용
         }
         .edgesIgnoringSafeArea(.all)
         .toolbar(.hidden, for: .tabBar)
         .navigationBarBackButtonHidden()
+        .onAppear {
+            addKeyboardObservers()
+        }
+        .onDisappear {
+            removeKeyboardObservers()
+        }
+    }
+    
+    // MARK: - 키보드 이벤트 감지
+    
+    private func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+            if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                keyboardHeight = keyboardFrame.height - 110
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+            keyboardHeight = 0
+        }
+    }
+    
+    private func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 }
