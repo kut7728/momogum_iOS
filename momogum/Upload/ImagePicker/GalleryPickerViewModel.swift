@@ -46,7 +46,7 @@ class GalleryPickerViewModel: ObservableObject {
         let fetchResult: PHFetchResult<PHAsset> = PHAsset.fetchAssets(with: .image, options: fetchOptions)
 
         let imageManager = PHCachingImageManager()
-        let targetSize = CGSize(width: 200, height: 200)
+        let targetSize = CGSize(width: 400, height: 400)
 
         fetchResult.enumerateObjects { asset, _, _ in
             let options = PHImageRequestOptions()
