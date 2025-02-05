@@ -156,7 +156,7 @@ struct MyCardView: View {
             }
 
             if viewModel.showPopup {
-                PopupMenuView(showPopup: $viewModel.showPopup)
+                PopupMenuView(showPopup: $viewModel.showPopup, isTabBarHidden: .constant(false), showSavedPopup: .constant(false))
             }
 
             if viewModel.showDeleted {
