@@ -12,9 +12,11 @@ struct EditNameView: View {
     @Bindable var viewModel: ProfileViewModel
     
     @State private var showCloseButton = false
-    private let maxLength = 12
     @State private var underBarColor: Color = Color.black_4
     @State private var showerrorMessage = false
+    @State private var keyboardHeight: CGFloat = 0
+    
+    private let maxLength = 12
     
     var body: some View {
         VStack(alignment: .center, spacing: 0){
@@ -63,14 +65,14 @@ struct EditNameView: View {
                             .frame(width: 268, height: 39)
                             .font(.mmg(.subheader4))
                             .padding(.leading, 12)
-                            .onChange(of: viewModel.draftUserName) { newValue in
+                            .onChange(of: viewModel.draftUserName) { _, newValue in
                                 if newValue.count > maxLength { // 길이 제한
                                     viewModel.draftUserName = String(newValue.prefix(maxLength))
                                 }
                                 
-                                // 숫자 입력 제한
-                                let containsNumber = newValue.contains(where: { $0.isNumber })
-                                if containsNumber {
+                                // 숫자 및 특수문자 입력 제한
+                                let hasInvalidChar = newValue.rangeOfCharacter(from: CharacterSet.letters.union(.whitespaces).inverted) != nil
+                                if hasInvalidChar {
                                     underBarColor = Color.Red_1
                                     showerrorMessage = true
                                 } else {
@@ -90,7 +92,7 @@ struct EditNameView: View {
                                 viewModel.draftUserName = ""
                                 showCloseButton = false
                             }label:{
-                                Image("close_cc")
+                                Image("close_black3")
                                     .resizable()
                                     .frame(width: 24, height: 24)
                             }
@@ -114,10 +116,11 @@ struct EditNameView: View {
                 }
             }
             .padding(.horizontal, 47)
-            .padding(.bottom, 323)
             .onAppear {
                 viewModel.draftUserName = ""
             }
+            
+            Spacer()
             
             HStack(spacing: 0){
                 Spacer()
@@ -134,11 +137,36 @@ struct EditNameView: View {
                 }
             }
             .padding(.trailing, 62.5)
-            
-            Spacer()
+            .padding(.bottom, keyboardHeight > 0 ? keyboardHeight : 116) // 키보드 높이만큼 올리기
+            .animation(.easeInOut(duration: 0.3), value: keyboardHeight) // 부드럽게 애니메이션 적용
         }
         .edgesIgnoringSafeArea(.all)
         .toolbar(.hidden, for: .tabBar)
         .navigationBarBackButtonHidden()
+        .onAppear {
+            addKeyboardObservers()
+        }
+        .onDisappear {
+            removeKeyboardObservers()
+        }
+    }
+    
+    // MARK: - 키보드 이벤트 감지
+    
+    private func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+            if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                keyboardHeight = keyboardFrame.height - 90
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+            keyboardHeight = 0
+        }
+    }
+    
+    private func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 }

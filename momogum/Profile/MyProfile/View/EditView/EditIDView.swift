@@ -16,6 +16,8 @@ struct EditIDView: View {
     @State private var isIDAvailable = false // 중복확인
     @State private var checkCircle1 = false // 최소 5자 ~ 최대 20자
     @State private var checkCircle2 = false // 영어 소문자, 숫자, 특수문자( “.”, “_”) 사용 가능
+    @State private var keyboardHeight: CGFloat = 0
+    
     private let maxLength = 20
     
     var body: some View {
@@ -63,7 +65,7 @@ struct EditIDView: View {
                             .frame(width: 268, height: 39)
                             .font(.mmg(.subheader4))
                             .padding(.leading, 12)
-                            .onChange(of: viewModel.draftUserID) { newValue in
+                            .onChange(of: viewModel.draftUserID) { _, newValue in
                                 let allowedCharacters = CharacterSet.lowercaseLetters
                                     .union(.decimalDigits) // 영문 소문자 + 숫자
                                     .union(CharacterSet(charactersIn: "._")) // 특수문자 . 과 _
@@ -97,7 +99,7 @@ struct EditIDView: View {
                                 viewModel.draftUserID = ""
                                 showCloseButton = false
                             }label:{
-                                Image("close_cc")
+                                Image("close_black3")
                                     .resizable()
                                     .frame(width: 24, height: 24)
                             }
@@ -139,10 +141,11 @@ struct EditIDView: View {
                 }
             }
             .padding(.horizontal, 47)
-            .padding(.bottom, 344)
             .onAppear {
                 viewModel.draftUserID = ""
             }
+            
+            Spacer()
             
             HStack(spacing: 0){
                 Spacer()
@@ -158,11 +161,36 @@ struct EditIDView: View {
                 }
             }
             .padding(.trailing, 62.5)
-            
-            Spacer()
+            .padding(.bottom, keyboardHeight > 0 ? keyboardHeight : 116) // 키보드 높이만큼 올리기
+            .animation(.easeInOut(duration: 0.3), value: keyboardHeight) // 부드럽게 애니메이션 적용
         }
         .edgesIgnoringSafeArea(.all)
         .toolbar(.hidden, for: .tabBar)
         .navigationBarBackButtonHidden()
+        .onAppear {
+            addKeyboardObservers()
+        }
+        .onDisappear {
+            removeKeyboardObservers()
+        }
+    }
+    
+    // MARK: - 키보드 이벤트 감지
+    
+    private func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+            if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                keyboardHeight = keyboardFrame.height - 110
+            }
+        }
+        
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+            keyboardHeight = 0
+        }
+    }
+    
+    private func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 }
