@@ -43,7 +43,7 @@ struct DonePostView: View {
 
             Spacer().frame(height: 90)
 
-            NavigationLink(destination: MyCardView()) {
+
                 Text("바로 확인하기")
                     .font(.system(size: 20, weight: .bold))
                     .frame(width: 340, height: 58)
@@ -52,7 +52,7 @@ struct DonePostView: View {
                         RoundedRectangle(cornerRadius: 24)
                             .stroke(Color(hex: 0xE05A55), lineWidth: 2)
                     )
-            }
+
             .padding(.bottom, 40)
 
             Spacer()

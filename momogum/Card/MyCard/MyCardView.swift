@@ -8,13 +8,19 @@
 import SwiftUI
 
 struct MyCardView: View {
+    @Environment(\.dismiss) var dismiss
+    @Binding var isTabBarHidden: Bool
+
     @StateObject private var viewModel = MyCardViewModel()
 
     var body: some View {
         ZStack(alignment: .top) {
             VStack(spacing: 0) {
                 HStack {
-                    Button(action: {}) {
+                    Button(action: {
+                        isTabBarHidden = false
+                        dismiss()
+                    }) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
                             .font(.title2)
@@ -175,5 +181,5 @@ struct MyCardView: View {
 }
 
 #Preview {
-    MyCardView()
+    MyCardView(isTabBarHidden: .constant(false))
 }
