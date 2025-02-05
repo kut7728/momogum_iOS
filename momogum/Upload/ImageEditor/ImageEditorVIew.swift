@@ -110,6 +110,7 @@ struct ImageEditorView: View {
             .navigationDestination(for: UIImage.self) { image in
                 NewPostView(
                     tabIndex: $tabIndex,
+                    isTabBarHidden: .constant(false),
                     editedImage: image,
                     onReset: { viewModel.resetToOriginalImage() }
                 )
