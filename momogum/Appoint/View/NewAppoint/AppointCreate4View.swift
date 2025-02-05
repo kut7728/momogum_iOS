@@ -12,6 +12,12 @@ struct AppointCreate4View: View {
     @Environment(\.dismiss) var dismiss
     @Environment(NewAppointViewModel.self) var appointViewModel
     
+    @State var menuNecessary: Bool = false
+    @State var titleNecessary: Bool = false
+    @State var placeNecessary: Bool = false
+    
+    var isButtonShowing: Bool {!self.menuNecessary && !self.titleNecessary && !self.placeNecessary}
+    
     @Binding var path: [String]
     
     let dateFormatter = {
@@ -93,20 +99,37 @@ struct AppointCreate4View: View {
                 
                 
                 VStack (spacing: 20) {
-                    Text("식사 모임명")
-                        .font(.mmg(.Body3))
-                        .foregroundStyle(.black_2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack {
+                        Text("식사 모임명")
+                            .font(.mmg(.Body3))
+                            .foregroundStyle(.black_2)
+                        
+                        Spacer()
+                        
+                        if titleNecessary {
+                            Text("*필수입력")
+                                .font(.mmg(.Caption2))
+                                .foregroundStyle(.Red_1)
+                        }
+                    }
                     
-                    ApmEditingTextFieldView(target: $viewModel.appointName)
+                    ApmEditingTextFieldView(target: $viewModel.appointName, isNecessary: $titleNecessary)
                     
-                    Text("식사 메뉴")
-                        .font(.mmg(.Body3))
-                        .foregroundStyle(.black_2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
+                    HStack {
+                        Text("식사 메뉴")
+                            .font(.mmg(.Body3))
+                            .foregroundStyle(.black_2)
+                        
+                        Spacer()
+                        
+                        if menuNecessary {
+                            Text("*필수입력")
+                                .font(.mmg(.Caption2))
+                                .foregroundStyle(.Red_1)
+                        }
+                    }
                     
-                    ApmEditingTextFieldView(target: $viewModel.menuName)
+                    ApmEditingTextFieldView(target: $viewModel.menuName, isNecessary: $menuNecessary)
                     
                     Text("식사 일정")
                         .font(.mmg(.Body3))
@@ -115,7 +138,7 @@ struct AppointCreate4View: View {
                     
                     ZStack {
                         Text("\(viewModel.pickedDate, formatter: dateFormatter())")
-                            .modifier(ApmTextFieldModifier())
+                            .modifier(ApmTextFieldViewModifier())
                         HStack {
                             Spacer()
                             Button {
@@ -132,19 +155,28 @@ struct AppointCreate4View: View {
                     }
                     
                     
-                    Text("만나는 장소")
-                        .font(.mmg(.Body3))
-                        .foregroundStyle(.black_2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack {
+                        Text("만나는 장소")
+                            .font(.mmg(.Body3))
+                            .foregroundStyle(.black_2)
+                        
+                        Spacer()
+                        
+                        if placeNecessary {
+                            Text("*필수입력")
+                                .font(.mmg(.Caption2))
+                                .foregroundStyle(.Red_1)
+                        }
+                    }
                     
-                    ApmEditingTextFieldView(target: $viewModel.placeName)
+                    ApmEditingTextFieldView(target: $viewModel.placeName, isNecessary: $placeNecessary)
                     
                     Text("추가 메모")
                         .font(.mmg(.Body3))
                         .foregroundStyle(.black_2)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    ApmEditingTextFieldView(target: $viewModel.note)
+                    ApmEditingTextFieldView(target: $viewModel.note, isNecessary: .constant(false))
                     
                     Button {
                         viewModel.createAppoint()
@@ -154,7 +186,7 @@ struct AppointCreate4View: View {
                             .font(.mmg(.subheader3))
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(.Red_2)
+                            .background(isButtonShowing ? .Red_2 : .black_4)
                             .foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 24))
                     }

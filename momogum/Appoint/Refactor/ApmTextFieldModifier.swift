@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ApmTextFieldModifier: ViewModifier {
     var target: String
+    @Binding var isNecessary: Bool
     
     func body(content: Content) -> some View {
         content
@@ -21,13 +22,22 @@ struct ApmTextFieldModifier: ViewModifier {
             .background(.black_5)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay {
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(lineWidth: 1)
-                    .foregroundStyle(.black_4)
+                if !isNecessary {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(lineWidth: 1)
+                        .foregroundStyle(.black_4)
+                } else {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(lineWidth: 1)
+                        .foregroundStyle(.Red_1)
+                }
+                
             }
             .onChange(of: target) { oldValue, newValue in
                 if oldValue != "" && newValue == "" {
-                    
+                    isNecessary = true
+                } else if newValue != "" {
+                    isNecessary = false
                 }
             }
         

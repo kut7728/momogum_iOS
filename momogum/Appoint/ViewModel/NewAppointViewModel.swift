@@ -22,7 +22,7 @@ class NewAppointViewModel {
     var menuName: String = ""
     var pickedDate: Date = Date()
     var placeName: String = ""
-    var note: String = "특별한 소식이 있다면 남겨주세요 :)"
+    var note: String = ""
     
     var pickedFriends: [String] = []
     var pickedImage: String = ""

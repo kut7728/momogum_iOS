@@ -11,18 +11,21 @@ import SwiftUI
 struct ApmEditingTextFieldView: View {
     @State var isEditing = false
     @Binding var target: String
+    @Binding var isNecessary: Bool
+
+    private let addingNote = "특별한 소식이 있다면 남겨주세요 :)"
     
     var body: some View {
         if isEditing {
             TextField(target, text: $target)
-                .modifier(ApmTextFieldModifier())
+                .modifier(ApmTextFieldModifier(target: target, isNecessary: $isNecessary))
                 .onSubmit {
                     isEditing = false
                 }
         } else {
             ZStack {
-                Text(target)
-                    .modifier(ApmTextFieldModifier())
+                Text(target == "" ? addingNote : target)
+                    .modifier(ApmTextFieldModifier(target: target, isNecessary: $isNecessary))
 
                 
                 HStack {
@@ -43,5 +46,5 @@ struct ApmEditingTextFieldView: View {
 }
 
 #Preview {
-    ApmEditingTextFieldView(target: .constant("something"))
+    ApmEditingTextFieldView(target: .constant("something"), isNecessary: .constant(false))
 }

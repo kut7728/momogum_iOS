@@ -16,7 +16,12 @@ struct AppointCreate3View: View {
     @State var dateShowing: Bool = false
     @State var placeShowing: Bool = false
     @State var noteShowing: Bool = false
-    @State var buttonShowing: Bool = false
+    
+    @State var menuNecessary: Bool = false
+    @State var titleNecessary: Bool = false
+    @State var placeNecessary: Bool = false
+    
+    var isButtonShowing: Bool {self.noteShowing && !self.menuNecessary && !self.titleNecessary && !self.placeNecessary}
     
     var body: some View {
         @Bindable var viewModel = appointViewModel
@@ -25,14 +30,23 @@ struct AppointCreate3View: View {
             ScrollView {
                 VStack (spacing: 40) {
                     VStack {
-                        Text("식사 모임 이름을 알려주세요.")
-                            .font(.mmg(.subheader3))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.bottom, 20)
+                        HStack {
+                            Text("식사 모임 이름을 알려주세요.")
+                                .font(.mmg(.subheader3))
+                            
+                            Spacer()
+                            
+                            if titleNecessary {
+                                Text("*필수입력")
+                                    .font(.mmg(.Caption1))
+                                    .foregroundStyle(.Red_1)
+                            }
+                        }
+                        .padding(.bottom, 20)
                         
                         
                         TextField("ex. 더술 출발, 돈까스 먹방", text: $viewModel.appointName)
-                            .modifier(ApmTextFieldModifier(target: viewModel.appointName))
+                            .modifier(ApmTextFieldModifier(target: viewModel.appointName, isNecessary: $titleNecessary))
                             .onSubmit {
                                 withAnimation {
                                     menuShowing = true
@@ -43,14 +57,23 @@ struct AppointCreate3View: View {
                     
                     if (menuShowing) {
                         VStack (spacing: 0) {
-                            Text("식사 메뉴를 알려주세요.")
-                                .font(.mmg(.subheader3))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.bottom, 20)
+                            HStack {
+                                Text("식사 메뉴를 알려주세요.")
+                                    .font(.mmg(.subheader3))
+                                
+                                Spacer()
+                                
+                                if menuNecessary {
+                                    Text("*필수입력")
+                                        .font(.mmg(.Caption1))
+                                        .foregroundStyle(.Red_1)
+                                }
+                            }
+                            .padding(.bottom, 20)
 
                             
                             TextField("ex. 더술 닭한마리, 투파피 파스타", text: $viewModel.menuName)
-                                .modifier(ApmTextFieldModifier())
+                                .modifier(ApmTextFieldModifier(target: viewModel.menuName, isNecessary: $menuNecessary))
                                 .onSubmit {
                                     withAnimation {
                                         dateShowing = true
@@ -89,14 +112,23 @@ struct AppointCreate3View: View {
                     
                     if (placeShowing) {
                         VStack (spacing: 0) {
-                            Text("어디서 만날까요?")
-                                .font(.mmg(.subheader3))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.bottom, 20)
+                            HStack {
+                                Text("어디서 만날까요?")
+                                    .font(.mmg(.subheader3))
+                                
+                                Spacer()
+                                
+                                if placeNecessary {
+                                    Text("*필수입력")
+                                        .font(.mmg(.Caption1))
+                                        .foregroundStyle(.Red_1)
+                                }
+                            }
+                            .padding(.bottom, 20)
 
                             
                             TextField("ex. 중앙동 다이소 앞, 학교 쪽문 앞", text: $viewModel.placeName)
-                                .modifier(ApmTextFieldModifier())
+                                .modifier(ApmTextFieldModifier(target: viewModel.placeName, isNecessary: $placeNecessary))
                                 .onSubmit {
                                     withAnimation {
                                         noteShowing = true
@@ -115,7 +147,7 @@ struct AppointCreate3View: View {
 
                             
                             TextField("ex. 꾸밈단계 2단계", text: $viewModel.note)
-                                .modifier(ApmTextFieldModifier())
+                                .modifier(ApmTextFieldModifier(target: "", isNecessary: .constant(false)))
                         }
                         .padding(.bottom, 60)
                     }
@@ -127,7 +159,7 @@ struct AppointCreate3View: View {
             
             
             /// 다음 호버 버튼
-            if (noteShowing) {
+            if (isButtonShowing) {
                 VStack {
                     Spacer()
                     HStack {

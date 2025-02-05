@@ -214,7 +214,7 @@ struct AppointCheckingView: View {
                         Image("back")
                             .resizable()
                             .frame(width: 24, height: 24)
-                            .padding(.trailing, 5)
+                            .padding(.leading, 5)
                             .foregroundStyle(.black)
                     }
                 }

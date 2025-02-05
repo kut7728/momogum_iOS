@@ -80,7 +80,7 @@ struct AppointCreate1View: View {
                         }
                     }
                 }
-                .modifier(ApmTextFieldModifier())
+                .modifier(ApmTextFieldViewModifier())
                 .padding(.top, 20)
                 
                 
