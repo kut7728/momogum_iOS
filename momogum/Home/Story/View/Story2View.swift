@@ -26,19 +26,23 @@ struct Story2View: View {
                     .padding(.leading, 24)
                     .padding(.top, 22)
                     .foregroundColor(Color(red: 207 / 255, green: 207 / 255, blue: 207 / 255))
-                VStack {
-                    Text("유저아이디")
-                        .font(.mmg(.subheader4))
-                        .bold()
-                        .padding(.top, 22)
-                        .padding(.leading, 12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                VStack{
+                    HStack{
+                        Text("유저아이디")
+                            .font(.mmg(.subheader4))
+                            .bold()
+                            .padding(.top, 22)
+                            .padding(.leading, 12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text("n분")
+                            .padding(.top, 22)
+                    }
                     Text("식당이름")
                         .font(.mmg(.Caption3))
                         .padding(.leading, 12)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                
+            
                 Image("exclamation")
                     .resizable()
                     .frame(width:30, height:30)
@@ -60,9 +64,10 @@ struct Story2View: View {
             }
         }
         Rectangle() //게시글 프레임
-            .frame(width:360, height: 360)
+            .frame(width:360, height: 534)
             .foregroundColor(Color(red: 247 / 255, green: 247 / 255, blue: 247 / 255))
             .padding(.top, 44)
+        
         Spacer()
             .sheet(isPresented: $showReportSheet) {
                 ReportView()
