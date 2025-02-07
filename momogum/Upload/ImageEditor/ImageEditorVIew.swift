@@ -9,13 +9,15 @@ import SwiftUI
 
 struct ImageEditorView: View {
     @StateObject private var viewModel: ImageEditorViewModel
-    @Binding var tabIndex: Int 
+    @Binding var isTabBarHidden: Bool
+    @Binding var tabIndex: Int
     @Environment(\.dismiss) var dismiss
     @State private var navigationPath = NavigationPath()
 
-    init(image: UIImage, tabIndex: Binding<Int>) {
+    init(image: UIImage, tabIndex: Binding<Int>, isTabBarHidden: Binding<Bool>) {
         _viewModel = StateObject(wrappedValue: ImageEditorViewModel(image: image))
         _tabIndex = tabIndex
+        _isTabBarHidden = isTabBarHidden
     }
 
     var body: some View {
@@ -68,9 +70,10 @@ struct ImageEditorView: View {
                             Spacer()
 
                             Button(action: {
-                                viewModel.resetToOriginalImage()
-                                tabIndex = 0
                                 dismiss()
+                                tabIndex = 0
+                                isTabBarHidden = false
+                                viewModel.resetToOriginalImage()
                             }) {
                                 Image(systemName: "xmark")
                                     .foregroundColor(.black)
@@ -107,6 +110,7 @@ struct ImageEditorView: View {
             .navigationDestination(for: UIImage.self) { image in
                 NewPostView(
                     tabIndex: $tabIndex,
+                    isTabBarHidden: .constant(false),
                     editedImage: image,
                     onReset: { viewModel.resetToOriginalImage() }
                 )
@@ -125,5 +129,5 @@ struct ImageEditorView: View {
 }
 
 #Preview {
-    ImageEditorView(image: UIImage(systemName: "photo") ?? UIImage(), tabIndex: .constant(0))
+    ImageEditorView(image: UIImage(systemName: "photo") ?? UIImage(), tabIndex: .constant(0), isTabBarHidden: .constant(false))
 }

@@ -12,6 +12,7 @@ class MyCardViewModel: ObservableObject {
     @Published var showPopup = false
     @Published var showDeleteConfirm = false
     @Published var showDeleted = false
+    @Published var showHeartBottomSheet = false
 
     func togglePopup() {
         withAnimation {
@@ -41,5 +42,9 @@ class MyCardViewModel: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             self.showDeleted = false
         }
+    }
+    
+    func toggleHeartBottomSheet() {
+        showHeartBottomSheet.toggle()
     }
 }
