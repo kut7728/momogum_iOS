@@ -14,10 +14,10 @@ class AuthManager {
     
 //    var currentuserSession :
     
-    func creatUser(username: String, ID: String) {
-        print("username : " , username)
-        print("ID : ", ID)
-        
+    func creatUser(name : String, nickname : String){
+        print("name",name)
+        print("nickname",nickname)
+    }
         
         //usersession
     }
@@ -28,4 +28,3 @@ class AuthManager {
         //
     }
     
-}

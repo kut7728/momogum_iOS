@@ -14,10 +14,9 @@ struct SplashView: View {
         ZStack {
             Color.momogumRed
                 .edgesIgnoringSafeArea(.all)
-            Image("Momogum")
+            Image("SplashLogo")
                 .resizable()
                 .frame(width: 160, height: 160)
-                .padding(.bottom, 212)
         }
     }
 }

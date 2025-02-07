@@ -41,7 +41,15 @@ class KakaoAuthViewModel : ObservableObject {
                     print("loginWithKakaoTalk() success.")
                     
                     // 성공 시 동작 구현
-                    _ = oauthToken
+                    // 받아온 토큰 값을 서버로 넘김
+                    
+                    if let oauthToken = oauthToken {
+                        //isNewUser가 true 값인 경우 -> SignupStartView로 전환
+                        //false 인 경우 -> maintab으로 전환
+                        
+                        
+                    }
+
                 }
             }
         } else{ //설치되어있지 않을 때
@@ -54,6 +62,8 @@ class KakaoAuthViewModel : ObservableObject {
                         print("loginWithKakaoAccount() success.")
 
                         // 성공 시 동작 구현
+                        // 받아온 토큰 값을 서버로 넘김
+
                         _ = oauthToken
                     }
                 }
