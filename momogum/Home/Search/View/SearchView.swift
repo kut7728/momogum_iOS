@@ -12,12 +12,49 @@ struct SearchView: View {
     @State private var isEditing: Bool = false // 텍스트 필드 편집 상태를 추적
     @State private var selectedButton: String = "계정" // 초기 선택된 버튼
     @Environment(\.presentationMode) var presentationMode // 뒤로가기 기능을 위해 사용
+
+    // 더미 데이터 추가
+    let dummyAccounts = [
+        Account(userID: "momogum._.", name: "머머금"),
+        Account(userID: "john_doe", name: "John Doe"),
+        Account(userID: "jane_smith", name: "Jane Smith")
+    ]
+
+    let dummyKeywords = [
+        Keyword(title: "한식"),
+        Keyword(title: "중식"),
+        Keyword(title: "일식"),
+        Keyword(title: "양식"),
+        Keyword(title: "패스트푸드"),
+        Keyword(title: "디저트")
+    ]
     
+    // 검색된 결과 필터링
+    var filteredAccounts: [Account] {
+        if searchQuery.isEmpty {
+            return dummyAccounts
+        } else {
+            return dummyAccounts.filter {
+                $0.userID.localizedCaseInsensitiveContains(searchQuery) ||
+                $0.name.localizedCaseInsensitiveContains(searchQuery)
+            }
+        }
+    }
+    
+    var filteredKeywords: [Keyword] {
+        if searchQuery.isEmpty {
+            return dummyKeywords
+        } else {
+            return dummyKeywords.filter {
+                $0.title.localizedCaseInsensitiveContains(searchQuery)
+            }
+        }
+    }
+
     var body: some View {
         VStack {
             VStack {
                 HStack {
-                    // 텍스트 필드 왼쪽의 검색 아이콘
                     if !isEditing {
                         Image(systemName: "magnifyingglass")
                             .frame(width: 48, height: 48)
@@ -25,24 +62,23 @@ struct SearchView: View {
                             .padding(.leading, 8)
                     }
                     
-                    // 텍스트 필드
                     TextField("계정 및 키워드 검색", text: $searchQuery, onEditingChanged: { editing in
                         withAnimation {
-                            isEditing = editing // 편집 상태 업데이트 (애니메이션 효과 추가)
+                            isEditing = editing
                         }
                     })
                     .font(.mmg(.subheader4))
                     .foregroundColor(.primary)
                     .padding(8)
+                    .textInputAutocapitalization(.never)
                     
-                    // 텍스트 필드 오른쪽 끝에 'close_cc' 버튼
                     if isEditing {
                         Button(action: {
                             withAnimation {
-                                searchQuery = "" // 입력 초기화
-                                isEditing = false // 편집 상태 종료
+                                searchQuery = ""
+                                isEditing = false
                             }
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) // 키보드 닫기
+                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                         }) {
                             Image("close_cc")
                                 .resizable()
@@ -59,7 +95,6 @@ struct SearchView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 24)
                 
-                // 사용자가 입력 중일 때만 보이도록 설정
                 if isEditing {
                     VStack {
                         Divider()
@@ -103,17 +138,42 @@ struct SearchView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
+                        
+                        // 🔹 검색 결과 표시
+                        if selectedButton == "계정" {
+                            VStack(spacing: 16) {
+                                ForEach(filteredAccounts) { account in
+                                    AccountCell(account: account)
+                                }
+                            }
+                            .padding(.top, 34)
+                        }
+                        
+                        if selectedButton == "키워드" {
+                            ScrollView(.vertical, showsIndicators: false) {
+                                LazyVGrid(columns: [
+                                    GridItem(.flexible(), spacing: 16),
+                                    GridItem(.flexible(), spacing: 16)
+                                ], spacing: 16) {
+                                    ForEach(filteredKeywords) { keyword in
+                                        KeywordCell(keyword: keyword)
+                                    }
+                                }
+                                .padding(.horizontal, 16)
+                            }
+                            .padding(.top, 34)
+                        }
+
                     }
-                    .transition(.opacity) // 부드럽게 사라지는 효과 추가
+                    .transition(.opacity)
                 }
             }
             Spacer()
         }
-        .navigationBarBackButtonHidden(true) // 기본 백 버튼 숨기기
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack(spacing: 0) {
-                    // 뒤로가기 버튼
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
                     }) {
@@ -122,7 +182,7 @@ struct SearchView: View {
                     }
                     
                     Spacer()
-                        .frame(width: 130) // 쉐브론과 텍스트 간격
+                        .frame(width: 130)
                     
                     Text("검색하기")
                         .font(.mmg(.subheader3))
