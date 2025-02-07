@@ -15,7 +15,8 @@ struct NotReadCell: View {
     
     var body: some View {
         HStack {
-            Circle()
+            Image("pixelsImage")
+                .resizable()
                 .frame(width: 48, height: 48)
                 .foregroundColor(.gray)
             

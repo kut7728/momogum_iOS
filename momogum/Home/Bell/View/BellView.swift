@@ -11,39 +11,43 @@ struct BellView: View {
     @Environment(\.presentationMode) var presentationMode // 뒤로가기 기능
     @State private var unreadCount: Int = 2 // 알림 개수 (예제 데이터)
 
+    // 목록 관리
+    @State private var notifications: [ReadNotification] = [
+        ReadNotification(id: UUID(), title: "@@님이 회원님의 게시물을 좋아합니다.", message: "n일 전", time: "2일 전", type: .like, isFollowing: false),
+        ReadNotification(id: UUID(), title: "@@님이 댓글을 남겼습니다.", message: "웨이팅 많이 걸리나요?!!!!", time: "n일 전", type: .comment, isFollowing: false),
+        ReadNotification(id: UUID(), title: "@@님이 회원님을 팔로우하기 시작했습니다.", message: "n일 전", time: "n일 전", type: .follow, isFollowing: false),
+        ReadNotification(id: UUID(), title: "@@님이 댓글을 남겼습니다.", message: "완전 맛있어보인다...🤤", time: "n분 전", type: .comment, isFollowing: false),
+        ReadNotification(id: UUID(), title: "@@님이 회원님을 팔로우하기 시작했습니다.", message: "n일 전", time: "n일 전", type: .follow, isFollowing: false)
+    ]
+
     var body: some View {
         VStack {
-            // 읽지 않은 알림 섹션
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     Text("읽지않음")
                         .font(.mmg(.subheader4))
                         .foregroundColor(.black)
                         .padding(.leading, 26)
-                    
-                    // 읽지 않은 알림이 있으면 배지 표시
+
                     if unreadCount > 0 {
                         ZStack {
                             Circle()
                                 .fill(.Red_2)
                                 .frame(width: 6, height: 6)
-                            
                         }
-                        .offset(x: 0, y: -10) // 텍스트의 오른쪽 상단에 배치
+                        .offset(x: 0, y: -10)
                     }
                     
                     Spacer()
                 }
                 .padding(.bottom, 27)
-                
-                // 읽지 않은 알림 셀 리스트
+
                 ForEach(0..<unreadCount, id: \.self) { _ in
                     NotReadCell(title: "새 댓글", message: "당신의 게시글에 새로운 댓글이 달렸습니다.", time: "5분 전")
                 }
             }
             .padding(.bottom, 52)
-            
-            // 읽은 알림 섹션
+
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     Text("최근30일")
@@ -53,16 +57,22 @@ struct BellView: View {
                     Spacer()
                 }
                 .padding(.bottom, 27)
-                
-                // 읽은 알림 셀 리스트
-                ForEach(0..<3, id: \.self) { _ in
-                    ReadCell(title: "게시글 좋아요", message: "당신의 게시글이 좋아요를 받았습니다.", time: "2일 전")
+
+                // 개별 셀 분리
+                ForEach($notifications, id: \.id) { $notification in
+                    ReadCell(
+                        title: notification.title,
+                        message: notification.message,
+                        time: notification.time,
+                        type: notification.type,
+                        isFollowing: $notification.isFollowing
+                    )
                 }
             }
-            
+
             Spacer()
         }
-        .navigationBarBackButtonHidden(true) // 기본 백 버튼 숨기기
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack(spacing: 0) {
@@ -83,6 +93,16 @@ struct BellView: View {
             }
         }
     }
+}
+
+// 데이터 모델
+struct ReadNotification: Identifiable {
+    var id: UUID
+    var title: String
+    var message: String
+    var time: String
+    var type: NotificationType
+    var isFollowing: Bool
 }
 
 #Preview {
