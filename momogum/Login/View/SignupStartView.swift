@@ -9,7 +9,8 @@ import SwiftUI
 
 struct SignupStartView: View {
     @Binding var path: [String]
-    
+    @State private var GoStep1 = false
+
     var body: some View {
         
         VStack{
@@ -48,6 +49,21 @@ struct SignupStartView: View {
         }
         .padding(.top, 130)
         Spacer()
+        
+        NavigationLink(value: "SignupStep1View") {
+            EmptyView()
+        }
+        .navigationDestination(for: String.self) { value in
+            if value == "SignupStep1View" {
+                SignupStep2View(path: $path)
+            }
+        }
+        .onAppear {
+            // 2초 후에 3View로 전환
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                GoStep1 = true
+            }
+     }
     }
 }
 

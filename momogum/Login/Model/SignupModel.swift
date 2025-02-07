@@ -13,10 +13,6 @@ struct SignupModel: Codable {
 }
 
 
-// 로그인시 신규유저인지 아닌지 판별
-struct KakaoLoginModel: Codable {
-    let provider, accessToken: String
-}
 
 // MARK: - ResponseModel
 struct SignupResponseModel: Codable {

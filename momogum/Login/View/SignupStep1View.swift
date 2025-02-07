@@ -25,25 +25,25 @@ struct SignupStep1View: View {
 //        @Bindable var signupDataModel = signupDataModel
         ZStack (alignment: .bottomTrailing) {
             VStack{
-//                HStack{
-//                    Button {
-//                        path = []
-//                    }label:{
-//                        Image(systemName: "xmark")
-//                    }
-//                    .foregroundStyle(Color.black)
-//                    .padding(.leading, 28)
-//                    .frame(width: 24, height: 24)
-//                    
-//                    Text("정보 입력")
-//                        .font(.system(size:20))
-//                        .fontWeight(.semibold)
-//                        .frame(maxWidth: .infinity,alignment: .top)
-//                        .padding(.leading, 107)
-//                        .padding(.trailing,159)
-//                        .padding(.bottom,5)
-//                    
-//                }
+                HStack{
+                    Button {
+                        path = []
+                    }label:{
+                        Image(systemName: "xmark")
+                    }
+                    .foregroundStyle(Color.black)
+                    .padding(.leading, 28)
+                    .frame(width: 24, height: 24)
+                    
+                    Text("정보 입력")
+                        .font(.system(size:20))
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity,alignment: .top)
+                        .padding(.leading, 107)
+                        .padding(.trailing,159)
+                        .padding(.bottom,5)
+                    
+                }
                
                 VStack{
                     
@@ -120,7 +120,7 @@ struct SignupStep1View: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading,43)
                         }
-                        else if !showError && isFocused && validateInput(inputText/*signupDataModel.name*/)  {
+                        else if !showError  && validateInput(inputText/*signupDataModel.name*/)  {
                             Text("사용 가능한 이름이에요 :)")
                                 .foregroundColor(.green)
                                 .font(.mmg(.Caption1))
@@ -147,22 +147,21 @@ struct SignupStep1View: View {
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.bottom ,93)
                     .disabled(showError || !validateInput(inputText/*signupDataModel.name*/))
-                    .foregroundStyle(showError || !isFocused || !validateInput(inputText/*signupDataModel.name*/) ? .gray : . momogumRed)
+                    .foregroundStyle(showError  || !validateInput(inputText/*signupDataModel.name*/) ? .gray : .Red_2)
                     
                 }
-                .navigationTitle("정보 입력")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                                ToolbarItem(placement: .navigationBarLeading) {
-                                    Button(action: { path = [] }) {
-                                        Image(systemName: "xmark")
-                                            .foregroundColor(.black)
-                                    }
-                                }
-                            }
+//                .navigationTitle("정보 입력")
+//                .navigationBarTitleDisplayMode(.inline)
+//                .toolbar {
+//                                ToolbarItem(placement: .navigationBarLeading) {
+//                                    Button(action: { path = [] }) {
+//                                        Image(systemName: "xmark")
+//                                            .foregroundColor(.black)
+//                                    }
+//                                }
+//                            }
 
                 .navigationBarBackButtonHidden()
-                .border(Color.gray)
             }
         }
         .onAppear {

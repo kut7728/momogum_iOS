@@ -15,8 +15,9 @@ struct SignupStep2View: View {
     @FocusState private var isFocused: Bool
     @State private var lengthCheck: Bool = false
     @State private var hasAllowedCharactersOnly: Bool = false
-    @State private var isDuplicated: Bool = false
-     private var isButtonEnabled: Bool {
+    @State private var isDuplicated: Bool = true
+
+    private var isButtonEnabled: Bool {
            return lengthCheck && hasAllowedCharactersOnly
        }
     @Binding var path: [String]
@@ -91,37 +92,69 @@ struct SignupStep2View: View {
                             
                             Button{
                                 //                            print(signupDataModel.creatUser())
+                                if !isDuplicated{
+                                    isDuplicated = true
+                                    
+                                }
+                                
                             }label:{
                                 Text("중복확인")
                             }
                             .fontWeight(.semibold)
-                            .foregroundStyle(isButtonEnabled ? Color.momogumRed : Color.signupDescriptionGray)
+                            .foregroundStyle(isButtonEnabled ? Color.Red_2 : Color.signupDescriptionGray)
                             .disabled(!isButtonEnabled)
+                            .disabled(isDuplicated)
                             .padding(.top,142)
                             .padding(.trailing,32)
                         }
                         // Divider의 색상을 TextField 상태에 따라 변경
                         Divider()
                             .frame(height: 2)
-                            .background(isFocused ? Color.black : Color.placeholderGray2)
+//                            .background(isFocused ? Color.black : Color.placeholderGray2)
+                            .background{
+                                if isFocused{
+                                    Color.black
+                                    if isButtonEnabled{
+                                        Color.green
+                                    }
+                                    else if lengthCheck && !hasAllowedCharactersOnly{
+                                        Color.Red_2
+                                    }
+                                    
+                                }
+                                else {
+                                    Color.placeholderGray2
+                                }
+                            }
                             .padding(.horizontal,32)
-                        HStack{
-                            
-                            validationText("최소 5자~ 20자",isValid: lengthCheck)
-                                .font(.system(size:16))
-                                .fontWeight(.regular)
-                            
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading,34)
                         
-                        HStack{
-                            validationText("영어소문자,숫자,'.','_'사용가능", isValid: hasAllowedCharactersOnly)
-                                .font(.system(size:16))
-                                .fontWeight(.regular)
+                        
+                        VStack{
+                            if isButtonEnabled{
+                                Text("사용 가능한 아이디입니다:)")
+                                    .font(.system(size:16))
+                                    .fontWeight(.regular)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.leading,34)
+                                    .foregroundStyle(Color.green)
+                            }
+                            else {
+                                validationText("최소 5자~ 20자",isValid: lengthCheck)
+                                    .font(.system(size:16))
+                                    .fontWeight(.regular)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.leading,34)
+                                
+                                validationText("영어소문자,숫자,'.','_'사용가능", isValid: hasAllowedCharactersOnly)
+                                    .font(.system(size:16))
+                                    .fontWeight(.regular)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.leading,34)
+                            }
+
+                         
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.leading,34)
+                     
                     }
                     Spacer()
                     HStack{
@@ -129,7 +162,6 @@ struct SignupStep2View: View {
                             dismiss()
                         } label:{
                             Text("이전단계")
-                                .tint(Color.black)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.bottom, 93)
