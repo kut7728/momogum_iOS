@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NewPostView: View {
     @Binding var tabIndex: Int
+    @Binding var isTabBarHidden: Bool
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel = NewPostViewModel()
 
@@ -42,7 +43,14 @@ struct NewPostView: View {
                             Spacer()
 
                             Button(action: {
-                                tabIndex = 0
+                                isTabBarHidden = false
+                                dismiss()  // 현재 NewPostView 닫기
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    dismiss()  // ImageEditorView 닫기
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                                    tabIndex = 0  // 홈뷰로 이동
+                                }
                             }) {
                                 Image(systemName: "xmark")
                                     .foregroundColor(.black)
@@ -156,6 +164,12 @@ struct NewPostView: View {
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
+        .onAppear {
+            UITabBar.appearance().isHidden = true
+        }
+        .onDisappear {
+            UITabBar.appearance().isHidden = false
+        }
     }
 }
 
@@ -163,6 +177,7 @@ struct NewPostView: View {
     NavigationView {
         NewPostView(
             tabIndex: .constant(0),
+            isTabBarHidden: .constant(false),
             editedImage: UIImage(systemName: "photo") ?? UIImage(),
             onReset: {}
         )
