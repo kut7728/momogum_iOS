@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SignupStartView: View {
     @Binding var path: [String]
-    @State private var GoStep1 = false
 
     var body: some View {
         
@@ -48,22 +47,15 @@ struct SignupStartView: View {
                 .padding(.horizontal, 55)
         }
         .padding(.top, 130)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                path.append("SignupStep1View") // path를 변경하여 화면 이동
+            }
+        }
+        .navigationBarBackButtonHidden()
+   
         Spacer()
         
-        NavigationLink(value: "SignupStep1View") {
-            EmptyView()
-        }
-        .navigationDestination(for: String.self) { value in
-            if value == "SignupStep1View" {
-                SignupStep2View(path: $path)
-            }
-        }
-        .onAppear {
-            // 2초 후에 3View로 전환
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                GoStep1 = true
-            }
-     }
     }
 }
 
