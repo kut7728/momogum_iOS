@@ -8,113 +8,81 @@
 import SwiftUI
 
 struct ReportView: View {
-    @State private var selectedReason: String? = nil // 선택된 신고 사유
-    @State private var showPopup: Bool = false // 팝업 표시 상태
-
+    @Binding var showReportSheet: Bool // Story2View에서 모달 제어
+    @Binding var showPopup: Bool // Story2View에서 팝업 제어
+    
     var body: some View {
-        ZStack {
-            VStack {
-                // 헤더
-                Text("신고하기")
-                    .font(.headline)
-                    .padding(.top, 12)
-                
-                Rectangle()
-                    .frame(width: 300, height: 1)
-                    .padding(.top, 24)
-                    .foregroundColor(.gray)
-                
-                Text("이 게시물을 신고하는 사유를 선택해주세요.")
-                    .font(.mmg(.subheader4))
-                    .padding(.top, 50)
-                
-                Text("신고는 익명으로 처리됩니다")
-                    .font(.mmg(.Body4))
-                    .padding(.top, 20)
-                
-                Rectangle()
-                    .frame(width: 300, height: 1)
-                    .padding(.top, 64)
-                    .foregroundColor(.gray)
-                
-                VStack(spacing: 8) {
-                    ReportCellView(title: "잘못된 정보", isSelected: selectedReason == "가") {
-                        selectedReason = "가"
-                        showPopup = true
-                    }
-                    Rectangle()
-                        .frame(width: 300, height: 1)
-                        .foregroundColor(.gray)
-
-                    ReportCellView(title: "상업적 광고", isSelected: selectedReason == "나") {
-                        selectedReason = "나"
-                        showPopup = true
-                    }
-                    Rectangle()
-                        .frame(width: 300, height: 1)
-                        .foregroundColor(.gray)
-
-                    ReportCellView(title: "음란물", isSelected: selectedReason == "다") {
-                        selectedReason = "다"
-                        showPopup = true
-                    }
-                    Rectangle()
-                        .frame(width: 300, height: 1)
-                        .foregroundColor(.gray)
-
-                    ReportCellView(title: "폭력성", isSelected: selectedReason == "라") {
-                        selectedReason = "라"
-                        showPopup = true
-                    }
-                    Rectangle()
-                        .frame(width: 300, height: 1)
-                        .foregroundColor(.gray)
-                }
-                
-                Spacer()
-            }
-            .padding()
+        VStack {
+            // 헤더
+            Text("신고하기")
+                .font(.headline)
+                .padding(.top, 12)
             
-            // ✅ 팝업 (중앙에 표시)
-            if showPopup {
-                VStack {
-                    Text("신고가 접수되었습니다.\n검토는 최대 24시간 소요됩니다.")
-                        .font(.mmg(.Body3))
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 20)
-
-                    Rectangle()
-                        .frame(width: 300, height: 1)
-                        .foregroundColor(.gray)
-                        .padding(.top, 20)
-
-                    Button(action: {
-                        showPopup = false
-                    }) {
-                        Text("확인")
-                            .font(.mmg(.subheader4))
-                            .foregroundColor(.blue)
-                            .frame(maxWidth: .infinity, maxHeight: 44)
-                            .background(Color.white)
-                    }
+            Rectangle()
+                .frame(width: 300, height: 1)
+                .padding(.top, 24)
+                .foregroundColor(.gray)
+            
+            Text("이 게시물을 신고하는 사유를 선택해주세요.")
+                .font(.mmg(.subheader4))
+                .padding(.top, 50)
+            
+            Text("신고는 익명으로 처리됩니다")
+                .font(.mmg(.Body4))
+                .padding(.top, 20)
+            
+            Rectangle()
+                .frame(width: 300, height: 1)
+                .padding(.top, 64)
+                .foregroundColor(.gray)
+            
+            VStack(spacing: 8) {
+                ReportCellView(title: "잘못된 정보") {
+                    closeModalAndShowPopup()
                 }
-                .frame(width: 319, height: 185)
-                .background(Color.white)
-                .cornerRadius(10)
-                .shadow(radius: 5)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.gray, lineWidth: 1)
-                )
+                Rectangle()
+                    .frame(width: 300, height: 1)
+                    .foregroundColor(.gray)
+
+                ReportCellView(title: "상업적 광고") {
+                    closeModalAndShowPopup()
+                }
+                Rectangle()
+                    .frame(width: 300, height: 1)
+                    .foregroundColor(.gray)
+
+                ReportCellView(title: "음란물") {
+                    closeModalAndShowPopup()
+                }
+                Rectangle()
+                    .frame(width: 300, height: 1)
+                    .foregroundColor(.gray)
+
+                ReportCellView(title: "폭력성") {
+                    closeModalAndShowPopup()
+                }
+                Rectangle()
+                    .frame(width: 300, height: 1)
+                    .foregroundColor(.gray)
             }
+            
+            Spacer()
+        }
+        .padding()
+    }
+
+    // 신고 셀을 누르면 모달을 닫고 팝업을 표시하는 함수
+    private func closeModalAndShowPopup() {
+        showReportSheet = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { // 모달이 닫힌 후 팝업 표시 (0.3초 딜레이)
+            showPopup = true
         }
     }
 }
 
-// ✅ 신고 사유 셀 뷰 (배경 X)
+// 신고 사유 셀 뷰
 struct ReportCellView: View {
     let title: String
-    let isSelected: Bool
     let onTap: () -> Void
     
     var body: some View {
@@ -130,8 +98,4 @@ struct ReportCellView: View {
             onTap()
         }
     }
-}
-
-#Preview {
-    ReportView()
 }
