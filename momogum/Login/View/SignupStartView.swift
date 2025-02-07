@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SignupStartView: View {
+    @Binding var path: [String]
+    
     var body: some View {
         
         VStack{
@@ -50,5 +52,5 @@ struct SignupStartView: View {
 }
 
 #Preview {
-    SignupStartView()
+    SignupStartView(path: .constant([]))
 }

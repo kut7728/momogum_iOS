@@ -12,20 +12,30 @@ struct LoginView: View {
     @FocusState private var isFocused: Bool // TextField의 포커스 상태
     @FocusState private var isFocusedPWD: Bool
     @State private var path: [String] = [] //path 설정
+    
     var body: some View {
         
         NavigationStack(path: $path){
+            
+            Text("머머금과 함께 밥일기를 공유하고, 식사고민을 해결해요!")
+                .font(.mmg(.subheader1))
+                .foregroundStyle(.momogumRed)
+                .padding(.top, 127)
+                .padding(.leading, 46)
+                .padding(.trailing, 22)
+            
+            
             Image("Momogum")
                 .resizable()
-                .frame(width: 112, height: 112)
-                .padding(.horizontal,126)
-                .padding(.top, 100)
-                .padding(.bottom, 30)
-            Spacer()
+                .frame(width: 160, height: 160)
+                .padding(.horizontal,116)
+                .padding(.top, 72)
+                .padding(.bottom, 61)
+         
 
             Button{
                 KakaoAuthViewModel().handleKakaoLogin()
-                //만약 카카오 최초로그인이라면, SignupStep1View로 넘긴다
+               
             }
             label: {
                 Image("KakaoLogin")
@@ -34,15 +44,12 @@ struct LoginView: View {
             
             Button{
                 KakaoAuthViewModel().handleKakaoLogout()
-                print("카카오 로그아웃 성공") // 로그인 성공시 메인탭뷰로 넘어가게
+                print("카카오 로그아웃 성공") 
             }
             label: {
-                Text("카카오 로그아웃")
-                    .fontWeight(.semibold)
-                    .frame(width: 340, height: 58)
-                    .foregroundStyle(.white)
-                    .background(Color.momogumRed)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                Image("appleSignin")
+                    .resizable()
+                    .frame(width: 300 ,height: 45)
             }
            
 
