@@ -9,35 +9,74 @@ import SwiftUI
 
 struct BellView: View {
     @Environment(\.presentationMode) var presentationMode // 뒤로가기 기능
-    
+    @State private var unreadCount: Int = 2 // 읽지 않은 알림 개수
+
+    // 더미 데이터 가져오기
+    @State private var notifications: [NotificationModel] = NotificationModel.dummyNotifications
+
     var body: some View {
-        VStack{
-            HStack {
-                Text("읽지않음")
-                    .font(.mmg(.subheader4))
-                    .foregroundColor(.black)
-                    .padding(.leading, 26)
-                    .padding(.top, 21)
-                Spacer()
-                
+        VStack {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("읽지않음")
+                        .font(.mmg(.subheader4))
+                        .foregroundColor(.black)
+                        .padding(.leading, 26)
+
+                    if unreadCount > 0 {
+                        ZStack {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 6, height: 6)
+                        }
+                        .offset(x: 0, y: -10)
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.bottom, 12)
+
+  
+                    VStack(spacing: 16) {
+                        ForEach(0..<unreadCount, id: \.self) { _ in
+                            NotReadCell(title: "새 댓글", message: "당신의 게시글에 새로운 댓글이 달렸습니다.", time: "5분 전")
+                        }
+                    }
             }
-            .padding(.bottom, 52)
-            HStack{
-                Text("최근30일")
-                    .font(.mmg(.subheader4))
-                    .foregroundColor(.black_2)
-                    .padding(.leading, 26)
-                    .padding(.top, 125)
-                Spacer()
-                
-            }
+            .padding(.top, 45)
+            .padding(.bottom, 12)
+
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("최근 30일")
+                        .font(.mmg(.subheader4))
+                        .foregroundColor(.black_2)
+                        .padding(.leading, 26)
+                    Spacer()
+                }
+                .padding(.top, unreadCount > 0 ? 52 : 52) // 알림 여부에 따라.
+
+                    LazyVStack(spacing: 16) {
+                        ForEach($notifications, id: \.id) { $notification in
+                            ReadCell(
+                                title: notification.title,
+                                message: notification.message,
+                                time: notification.time,
+                                type: notification.type,
+                                isFollowing: $notification.isFollowing
+                            )
+                        }
+                    }
+                    .padding(.bottom, 24)
+                }
+
+
+            Spacer()
         }
-        Spacer()
-        .navigationBarBackButtonHidden(true) // 기본 백 버튼 숨기기
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
-                HStack(spacing: 0) { // 쉐브론과 텍스트를 나란히 배치
-                    // 쉐브론 아이콘
+                HStack(spacing: 0) {
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
                     }) {
@@ -46,11 +85,10 @@ struct BellView: View {
                     }
                     
                     Spacer()
-                        .frame(width: 143) // 쉐브론과 텍스트 사이 간격
+                        .frame(width: 130)
                     
-                    // "알림" 텍스트
                     Text("알림")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.mmg(.subheader3))
                         .foregroundColor(.black)
                 }
             }

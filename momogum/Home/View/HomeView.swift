@@ -12,6 +12,7 @@ struct HomeView: View {
     @Binding var isTabBarHidden: Bool
     @State private var selectedButtonIndex: Int? = nil // 선택된 버튼의 인덱스
     @State private var userInput: String = ""
+    @State private var unreadNotificationCount: Int = 2 // 예제 데이터 (읽지 않은 알림 수)
     
     // 그리드 형식 게시물
     let columns = [
@@ -20,8 +21,8 @@ struct HomeView: View {
     ]
     
     // 버튼 색상
-    let normalButtonColor = Color(.systemGray5)
-    let selectedButtonColor = Color(red: 224 / 255, green: 90 / 255, blue: 85 / 255) // E05A55
+    let normalButtonColor = Color(.black_5)
+    let selectedButtonColor = Color(.Red_2)
     
     var body: some View {
         NavigationView {
@@ -38,7 +39,9 @@ struct HomeView: View {
                     Spacer()
                         .frame(width: 124)
                     
-                    NavigationLink(destination: SearchView()) {
+                    NavigationLink(destination: SearchView()
+                        .onAppear { isTabBarHidden = true }
+                        .onDisappear { isTabBarHidden = false }) {
                         Image(systemName: "magnifyingglass")
                             .imageScale(.large)
                             .foregroundStyle(.black)
@@ -49,12 +52,26 @@ struct HomeView: View {
                     Spacer()
                         .frame(width: 20)
                     
-                    NavigationLink(destination: BellView()) {
-                        Image(systemName: "bell")
-                            .imageScale(.large)
-                            .foregroundStyle(.black)
-                            .padding(.trailing, 27)
-                            .padding(.top, 20)
+                    ZStack {
+                        NavigationLink(destination: BellView()
+                            .onAppear { isTabBarHidden = true }
+                            .onDisappear { isTabBarHidden = false }) {
+                            Image(systemName: "bell")
+                                .imageScale(.large)
+                                .foregroundStyle(.black)
+                                .padding(.trailing, 27)
+                                .padding(.top, 20)
+                        }
+                        
+                        // 읽지 않은 알림이 있으면 배지 표시
+                        if unreadNotificationCount > 0 {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 6, height: 6)
+                            }
+                            .offset(x: 0, y: -5)
+                        }
                     }
                 }
                 .background(Color.clear)
@@ -63,12 +80,13 @@ struct HomeView: View {
                 
                 Spacer()
                     .frame(height: 40)
-                
-                // ✅ 기존 코드 유지 + 스토리 테두리 추가
+
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
                         VStack {
-                            NavigationLink(destination: StoryView(userID: "", tabIndex: $tabIndex)) {
+                            NavigationLink(destination: StoryView(userID: "", tabIndex: $tabIndex)
+                                .onAppear { isTabBarHidden = true }
+                                .onDisappear { isTabBarHidden = false }) {
                                 ZStack {
                                     // 테두리 추가 (스토리가 있으면 그라데이션, 없으면 회색)
                                     Circle()
@@ -79,8 +97,8 @@ struct HomeView: View {
                                         .frame(width: 90, height: 90)
                                     
                                     // 기존 원 (프로필 이미지)
-                                    Circle()
-                                        .foregroundColor(Color(red: 207 / 255, green: 207 / 255, blue: 207 / 255))
+                                    Image("pixelsImage")
+                                        .resizable()
                                         .frame(width: 76, height: 76)
                                 }
                             }
@@ -91,22 +109,24 @@ struct HomeView: View {
                         .padding(.leading, 24)
                         
                         VStack {
-                            NavigationLink(destination: Story2View(userID: "")) {
+                            NavigationLink(destination: Story2View(userID: "")
+                                .onAppear { isTabBarHidden = true }
+                                .onDisappear { isTabBarHidden = false }) {
                                 ZStack {
                                     // 스토리가 있으면 그라데이션 테두리, 없으면 회색 테두리
                                     Circle()
                                         .strokeBorder(
                                             LinearGradient(gradient: Gradient(colors: [
-                                                Color(red: 249 / 255, green: 143 / 255, blue: 140 / 255),
-                                                Color(red: 224 / 255, green: 90 / 255, blue: 85 / 255)
+                                                Color(.Red_3),
+                                                Color(.momogumRed)
                                             ]), startPoint: .topLeading, endPoint: .bottomTrailing),
                                             lineWidth: 6
                                         )
                                         .frame(width: 90, height: 90)
                                     
                                     // 기존 원 (프로필 이미지)
-                                    Circle()
-                                        .foregroundColor(Color(red: 207 / 255, green: 207 / 255, blue: 207 / 255))
+                                    Image("pixelsImage")
+                                        .resizable()
                                         .frame(width: 76, height: 76)
                                 }
                             }
@@ -191,6 +211,7 @@ struct HomeView: View {
                                         RoundedRectangle(cornerRadius: 10) // 테두리를 추가
                                             .stroke(Color.gray, lineWidth: 1) // 테두리 색상과 두께
                                     )
+                                    
                                 }
                             }
                         }
