@@ -59,7 +59,8 @@ class ImageEditorViewModel: ObservableObject {
     }
 
     func finalizeImage(frameSize: CGFloat) -> UIImage? {
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: frameSize, height: frameSize))
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: frameSize, height: frameSize), format: UIGraphicsImageRendererFormat())
+        
         return renderer.image { context in
             let scaledImageSize = CGSize(
                 width: frameSize * scale,
@@ -73,7 +74,12 @@ class ImageEditorViewModel: ObservableObject {
                 height: scaledImageSize.height
             )
 
-            image.draw(in: drawingRect)
+            if let cgImage = image.cgImage {
+                let uiImage = UIImage(cgImage: cgImage, scale: 0.5, orientation: .up) // 크기 줄이기
+                uiImage.draw(in: drawingRect)
+            } else {
+                image.draw(in: drawingRect)
+            }
         }
     }
 

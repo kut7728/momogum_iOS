@@ -12,6 +12,7 @@ struct MyProfileView: View {
     @State private var selectedSegment = 0
     @State private var showFollowList = 0
     @State private var navigateToFollowView = false // 화면 전환 제어
+    @State private var navigateToMyCardView = false
     // 팝업창 제어
     @State private var showPopup = false
     @State private var showLogoutPopup = false
@@ -237,26 +238,25 @@ struct MyProfileView: View {
                     }
                     .padding(.bottom, 41)
                     .padding(.horizontal, 10)
-                    
-                    // 게시물 Grid
-                    ScrollView{
-                        if selectedSegment == 0 {
-                            LazyVGrid(columns: columns, spacing: 20) {
-                                ForEach(0..<30, id: \.self) { index in
-                                    CardPostCell(selectedSegment: $selectedSegment)
-                                }
-                            }
-                            .padding(.horizontal, 20)
-                        } else if selectedSegment == 1 {
-                            LazyVGrid(columns: columns, spacing: 20) {
-                                ForEach(0..<30, id: \.self) { index in
-                                    CardPostCell(selectedSegment: $selectedSegment)
-                                }
-                            }
-                            .padding(.horizontal, 20)
-                        }
+                    .navigationDestination(isPresented: $navigateToMyCardView) {
+                        MyCardView(isTabBarHidden: $isTabBarHidden)
+                            .onAppear { isTabBarHidden = true }
+                            .onDisappear { isTabBarHidden = false }
                     }
-                    
+                                        
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 20) {
+                            ForEach(0..<30, id: \.self) { index in
+                                NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
+                                    .onAppear { isTabBarHidden = true }
+                                    .onDisappear { isTabBarHidden = false }
+                                ) {
+                                    CardPostCell(selectedSegment: $selectedSegment)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                    }
                     
                 }
                 .onAppear {
