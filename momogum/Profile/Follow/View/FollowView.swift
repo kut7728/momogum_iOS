@@ -10,6 +10,7 @@ import SwiftUI
 struct FollowView: View {
     @Environment(\.dismiss) var dismiss
     @Bindable var viewModel: ProfileViewModel
+    @Bindable var followViewModel: FollowViewModel
     
     @Binding var selectedSegment: Int
     
@@ -41,7 +42,7 @@ struct FollowView: View {
             HStack(alignment: .center, spacing: 0) {
                 // 팔로워 segment
                 VStack(alignment: .center, spacing: 0) {
-                    Text("\(viewModel.followerCount.formattedFollowerCount())   팔로워")
+                    Text("\(followViewModel.followerCount.formattedFollowerCount())   팔로워")
                         .font(.mmg(.subheader4))
                         .foregroundColor(selectedSegment == 0 ? Color.black_1 : Color.black_3)
                         .onTapGesture {
@@ -58,7 +59,7 @@ struct FollowView: View {
                 
                 // 팔로잉 segment
                 VStack(alignment: .center, spacing: 0) {
-                    Text("\(viewModel.followingCount.formattedFollowerCount())   팔로잉")
+                    Text("\(followViewModel.followingCount.formattedFollowerCount())   팔로잉")
                         .font(.mmg(.subheader4))
                         .foregroundColor(selectedSegment == 1 ? Color.black_1 : Color.black_3)
                         .onTapGesture {
@@ -76,9 +77,9 @@ struct FollowView: View {
             
             // 팔로워 / 팔로잉 목록
             if selectedSegment == 0 {
-                MyFollower(viewModel: viewModel)
+                MyFollower(followViewModel: followViewModel)
             } else if selectedSegment == 1 {
-                MyFollowing(viewModel: viewModel)
+                MyFollowing(followViewModel: followViewModel)
             }
         }
         .navigationBarBackButtonHidden()
@@ -86,9 +87,4 @@ struct FollowView: View {
         .toolbar(.hidden, for: .tabBar)
         .navigationBarBackButtonHidden()
     }
-}
-
-
-#Preview {
-    FollowView(viewModel: ProfileViewModel(), selectedSegment: .constant(0))
 }

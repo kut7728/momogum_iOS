@@ -1,82 +1,3 @@
-////
-////  ProfileViewModel.swift
-////  momogum
-////
-////  Created by 류한비 on 1/20/25.
-////
-//
-//import SwiftUI
-//
-//@Observable
-//class ProfileViewModel {
-//    var profileImage: UIImage? // 확정된 프로필 이미지
-//    var currentPreviewImage: UIImage? // 편집 중에 보여지는 미리보기 이미지
-//    var uiImage: UIImage?
-//    
-//    // 기본 프로필 여부 체크
-//    var isDefaultProfileImage: Bool = true
-//    
-//    // 유저 정보 (확정)
-//    // 뷰 확인을 위해 초기값 설정함
-//    var userName: String = ""
-//    var userID: String = ""
-//    var userBio: String = ""
-//    
-//    // 유저 정보 (임시)
-//    var draftUserName: String = ""
-//    var draftUserID: String = ""
-//    var draftUserBio: String = ""
-//    
-//    // 팔로워 / 팔로잉 수 (임시)
-//    var followerCount : Int = 236
-//    var followingCount : Int = 1245
-//    
-//    init() {
-//        profileImage = UIImage(named: "defaultProfile")
-//        currentPreviewImage = profileImage
-//    }
-//    
-//    // 임시 프로필 이미지 변경
-//    func convertPreviewImage(from uiImage: UIImage) {
-//        self.currentPreviewImage = uiImage
-//        self.uiImage = uiImage
-//        self.isDefaultProfileImage = false
-//    }
-//    
-//    // 확정 (완료 버튼 클릭 시 호출)
-//    func saveUserData() {
-//        profileImage = currentPreviewImage
-//        userName = draftUserName
-//        userID = draftUserID
-//        userBio = draftUserBio
-//    }
-//    
-//    // 편집 취소 시 초기화
-//    func resetUserData() {
-//        currentPreviewImage = profileImage
-//        resetUserName()
-//        resetUserID()
-//        resetUserBio()
-//    }
-//    
-//    // 이름, 아이디, 한줄소개 각각 초기화
-//    func resetUserName() {
-//        draftUserName = userName
-//    }
-//    func resetUserID() {
-//        draftUserID = userID
-//    }
-//    func resetUserBio() {
-//        draftUserBio = userBio
-//    }
-//    
-//    // 기본 이미지로 임시 설정
-//    func setDefaultImage() {
-//        currentPreviewImage = UIImage(named: "defaultProfile")
-//        self.isDefaultProfileImage = true
-//    }
-//}
-
 //
 //  ProfileViewModel.swift
 //  momogum
@@ -107,10 +28,6 @@ class ProfileViewModel {
     var draftUserID: String
     var draftUserBio: String
     
-    // 팔로워 / 팔로잉 수 (임시)
-    var followerCount: Int
-    var followingCount: Int
-    
     init() {
         self.userName = ""
         self.userID = ""
@@ -120,9 +37,6 @@ class ProfileViewModel {
         self.draftUserName = ""
         self.draftUserID = ""
         self.draftUserBio = ""
-        
-        self.followerCount = 0
-        self.followingCount = 0
         
         self.profileImage = UIImage(named: "defaultProfile")
         self.currentPreviewImage = self.profileImage
@@ -141,9 +55,6 @@ class ProfileViewModel {
                 loadImageAsync(from: profileImageURL)
             }
         }
-        
-        self.followerCount = 236
-        self.followingCount = 124
     }
     
     // 이미지 로드

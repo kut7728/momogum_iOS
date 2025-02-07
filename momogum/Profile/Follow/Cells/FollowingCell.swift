@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FollowingCell: View {
     var userID: String
+    var onRemove: () -> Void
     
     var body: some View {
         HStack(alignment: .center, spacing: 0){
@@ -37,7 +38,7 @@ struct FollowingCell: View {
             
             // 취소버튼
             Button{
-                
+                onRemove()
             } label: {
                 Image("close_s")
                     .resizable()

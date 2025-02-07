@@ -19,6 +19,7 @@ struct MyProfileView: View {
     @State private var showDelPopup = false
     
     @State var viewModel: ProfileViewModel = ProfileViewModel()
+    @State var followViewModel: FollowViewModel = FollowViewModel()
     
     @Binding var isTabBarHidden: Bool
     
@@ -120,7 +121,7 @@ struct MyProfileView: View {
                                         .foregroundStyle(Color.black_1)
                                         .padding(.bottom, 16)
                                     
-                                    Text("\(viewModel.followerCount.formattedFollowerCount())")
+                                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
                                         .font(.mmg(.subheader4))
                                         .foregroundStyle(Color.black_1)
                                 }
@@ -141,7 +142,7 @@ struct MyProfileView: View {
                                         .foregroundStyle(Color.black_1)
                                         .padding(.bottom, 16)
                                     
-                                    Text("\(viewModel.followingCount.formattedFollowerCount())")
+                                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
                                         .font(.mmg(.subheader4))
                                         .foregroundStyle(Color.black_1)
                                 }
@@ -175,7 +176,7 @@ struct MyProfileView: View {
                                     .contentShape(Rectangle())
                             }
                             .navigationDestination(isPresented: $navigateToFollowView) {
-                                FollowView(viewModel: viewModel, selectedSegment: $showFollowList)
+                                FollowView(viewModel: viewModel, followViewModel: followViewModel, selectedSegment: $showFollowList)
                             }
                             .navigationDestination(for: String.self) { value in
                                 switch value {

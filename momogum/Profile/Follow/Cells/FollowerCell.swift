@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct FollowerCell: View {
+    @State private var isFollowing = false // 팔로우 유무
     var userID: String
+    var onRemove: () -> Void
     
     var body: some View {
         HStack(alignment: .center, spacing: 0){
@@ -36,25 +38,27 @@ struct FollowerCell: View {
             Spacer()
             
             // 맞팔로우 버튼
-            Button{
-                
-            } label: {
-                RoundedRectangle(cornerRadius: 4)
-                    .frame(width: 72, height: 28)
-                    .foregroundStyle(Color.Red_2)
-                    .overlay(
-                        Text("맞팔로우")
-                            .font(.mmg(.subheader4))
-                            .foregroundStyle(Color.black_6)
-                            .padding(6)
-                    )
+            if !isFollowing{
+                Button{
+                    isFollowing = true
+                } label: {
+                    RoundedRectangle(cornerRadius: 4)
+                        .frame(width: 72, height: 28)
+                        .foregroundStyle(Color.Red_2)
+                        .overlay(
+                            Text("맞팔로우")
+                                .font(.mmg(.subheader4))
+                                .foregroundStyle(Color.black_6)
+                                .padding(6)
+                        )
+                }
+                .padding(.trailing, 27)
             }
-            .padding(.trailing, 27)
             
             
             // 취소버튼
             Button{
-                
+                onRemove()
             } label: {
                 Image("close_s")
                     .resizable()
