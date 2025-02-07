@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SignupStartView: View {
+    @Binding var path: [String]
+
     var body: some View {
         
         VStack{
@@ -45,10 +47,18 @@ struct SignupStartView: View {
                 .padding(.horizontal, 55)
         }
         .padding(.top, 130)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                path.append("SignupStep1View") // path를 변경하여 화면 이동
+            }
+        }
+        .navigationBarBackButtonHidden()
+   
         Spacer()
+        
     }
 }
 
 #Preview {
-    SignupStartView()
+    SignupStartView(path: .constant([]))
 }

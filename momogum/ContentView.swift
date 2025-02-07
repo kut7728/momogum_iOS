@@ -9,11 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var showMainView = false
+    @State var signupDataModel = SignupDataModel()
     var body: some View {
         ZStack{
             if showMainView{
                 
 //                LoginView()
+//                    .environment(signupDataModel)
                 MainTabView()
                 
             } else{

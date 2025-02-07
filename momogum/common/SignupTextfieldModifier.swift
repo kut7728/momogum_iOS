@@ -12,8 +12,7 @@ struct SignupTextfieldModifer: ViewModifier {
         content
             .textInputAutocapitalization(.never)
             .padding(.leading, 11)
-            .font(.system(size: 16))
-            .fontWeight(.semibold)
+            .font(.mmg(.subheader4))
             .padding(.horizontal,32)
             .padding(.top,142)
 
