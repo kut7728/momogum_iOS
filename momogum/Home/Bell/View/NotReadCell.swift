@@ -43,7 +43,3 @@ struct NotReadCell: View {
         .cornerRadius(8)
     }
 }
-
-#Preview {
-    NotReadCell(title: "새 댓글", message: "당신의 게시글에 새로운 댓글이 달렸습니다.", time: "5분 전")
-}

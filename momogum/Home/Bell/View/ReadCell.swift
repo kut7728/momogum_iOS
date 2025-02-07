@@ -13,7 +13,6 @@ struct ReadCell: View {
     var message: String
     var time: String
     var type: NotificationType
-
     @Binding var isFollowing: Bool
 
     var body: some View {
@@ -40,22 +39,20 @@ struct ReadCell: View {
 
             Spacer()
 
-            // 팔로우 버튼
             if type == .follow {
                 Button(action: {
                     isFollowing.toggle()
                 }) {
                     Text(isFollowing ? "팔로잉" : "팔로우")
                         .font(.mmg(.Caption3))
-                        .foregroundColor(isFollowing ? Color.Red_2 : Color.white)
+                        .foregroundColor(isFollowing ? Color.red : Color.white)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(isFollowing ? Color.black_6 : Color.Red_2)
+                        .background(isFollowing ? Color.black_6 : Color.red)
                         .cornerRadius(6)
                 }
             }
 
-            // 댓글 남김
             if type == .comment {
                 Image("post_image")
                     .resizable()
@@ -68,20 +65,4 @@ struct ReadCell: View {
         .background(Color.white)
         .cornerRadius(8)
     }
-}
-
-// 알림 유형 Enum
-enum NotificationType {
-    case like
-    case comment
-    case follow
-}
-
-#Preview {
-    VStack(spacing: 10) {
-        ReadCell(title: "@@님이 회원님의 게시물을 좋아합니다.", message: "n일 전", time: "2일 전", type: .like, isFollowing: .constant(false))
-        ReadCell(title: "@@님이 댓글을 남겼습니다.", message: "완전 맛있어보인다...🤤", time: "n분 전", type: .comment, isFollowing: .constant(false))
-        ReadCell(title: "@@님이 회원님을 팔로우하기 시작했습니다.", message: "n일 전", time: "n일 전", type: .follow, isFollowing: .constant(false))
-    }
-    .padding()
 }

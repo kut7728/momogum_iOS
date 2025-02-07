@@ -9,16 +9,10 @@ import SwiftUI
 
 struct BellView: View {
     @Environment(\.presentationMode) var presentationMode // 뒤로가기 기능
-    @State private var unreadCount: Int = 2 // 알림 개수 (예제 데이터)
+    @State private var unreadCount: Int = 2 // 읽지 않은 알림 개수
 
-    // 목록 관리
-    @State private var notifications: [ReadNotification] = [
-        ReadNotification(id: UUID(), title: "@@님이 회원님의 게시물을 좋아합니다.", message: "n일 전", time: "2일 전", type: .like, isFollowing: false),
-        ReadNotification(id: UUID(), title: "@@님이 댓글을 남겼습니다.", message: "웨이팅 많이 걸리나요?!!!!", time: "n일 전", type: .comment, isFollowing: false),
-        ReadNotification(id: UUID(), title: "@@님이 회원님을 팔로우하기 시작했습니다.", message: "n일 전", time: "n일 전", type: .follow, isFollowing: false),
-        ReadNotification(id: UUID(), title: "@@님이 댓글을 남겼습니다.", message: "완전 맛있어보인다...🤤", time: "n분 전", type: .comment, isFollowing: false),
-        ReadNotification(id: UUID(), title: "@@님이 회원님을 팔로우하기 시작했습니다.", message: "n일 전", time: "n일 전", type: .follow, isFollowing: false)
-    ]
+    // 더미 데이터 가져오기
+    @State private var notifications: [NotificationModel] = NotificationModel.dummyNotifications
 
     var body: some View {
         VStack {
@@ -32,7 +26,7 @@ struct BellView: View {
                     if unreadCount > 0 {
                         ZStack {
                             Circle()
-                                .fill(.Red_2)
+                                .fill(Color.red)
                                 .frame(width: 6, height: 6)
                         }
                         .offset(x: 0, y: -10)
@@ -40,35 +34,42 @@ struct BellView: View {
                     
                     Spacer()
                 }
-                .padding(.bottom, 27)
+                .padding(.bottom, 12)
 
-                ForEach(0..<unreadCount, id: \.self) { _ in
-                    NotReadCell(title: "새 댓글", message: "당신의 게시글에 새로운 댓글이 달렸습니다.", time: "5분 전")
-                }
+  
+                    VStack(spacing: 16) {
+                        ForEach(0..<unreadCount, id: \.self) { _ in
+                            NotReadCell(title: "새 댓글", message: "당신의 게시글에 새로운 댓글이 달렸습니다.", time: "5분 전")
+                        }
+                    }
             }
-            .padding(.bottom, 52)
+            .padding(.top, 25)
+            .padding(.bottom, 12)
 
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Text("최근30일")
+                    Text("최근 30일")
                         .font(.mmg(.subheader4))
                         .foregroundColor(.black_2)
                         .padding(.leading, 26)
                     Spacer()
                 }
-                .padding(.bottom, 27)
+                .padding(.top, unreadCount > 0 ? 52 : 52) // 알림 여부에 따라.
 
-                // 개별 셀 분리
-                ForEach($notifications, id: \.id) { $notification in
-                    ReadCell(
-                        title: notification.title,
-                        message: notification.message,
-                        time: notification.time,
-                        type: notification.type,
-                        isFollowing: $notification.isFollowing
-                    )
+                    LazyVStack(spacing: 16) {
+                        ForEach($notifications, id: \.id) { $notification in
+                            ReadCell(
+                                title: notification.title,
+                                message: notification.message,
+                                time: notification.time,
+                                type: notification.type,
+                                isFollowing: $notification.isFollowing
+                            )
+                        }
+                    }
+                    .padding(.bottom, 24)
                 }
-            }
+
 
             Spacer()
         }
@@ -84,25 +85,15 @@ struct BellView: View {
                     }
                     
                     Spacer()
-                        .frame(width: 143)
-
+                        .frame(width: 130)
+                    
                     Text("알림")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.mmg(.subheader3))
                         .foregroundColor(.black)
                 }
             }
         }
     }
-}
-
-// 데이터 모델
-struct ReadNotification: Identifiable {
-    var id: UUID
-    var title: String
-    var message: String
-    var time: String
-    var type: NotificationType
-    var isFollowing: Bool
 }
 
 #Preview {
