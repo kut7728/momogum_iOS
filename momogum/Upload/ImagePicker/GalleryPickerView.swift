@@ -29,7 +29,7 @@ struct GalleryPickerView: View {
                             LazyVGrid(columns: gridItems, spacing: 8) {
                                 ForEach(viewModel.images, id: \UIImage.hash) { image in
                                     NavigationLink(
-                                        destination: ImageEditorView(image: image, tabIndex: $tabIndex)
+                                        destination: ImageEditorView(image: image, tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden)
                                             .navigationBarBackButtonHidden(true)
                                             .navigationBarHidden(true)
                                     ) {

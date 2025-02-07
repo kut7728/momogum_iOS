@@ -19,10 +19,10 @@ struct MainTabView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $tabIndex) {
-                HomeView(tabIndex: $tabIndex)
+                HomeView(tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden)
                     .tag(0)
 
-                GalleryPickerView(tabIndex: .constant(1), isTabBarHidden: $isTabBarHidden)
+                GalleryPickerView(tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden)
                     .tag(1)
 
                 AppointView()

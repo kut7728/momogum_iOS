@@ -1,20 +1,26 @@
 //
-//  MyCardView.swift
+//  OtherCardView.swift
 //  momogum
 //
-//  Created by 조승연 on 2/1/25.
+//  Created by 조승연 on 2/5/25.
 //
 
 import SwiftUI
 
-struct MyCardView: View {
-    @StateObject private var viewModel = MyCardViewModel()
+struct OtherCardView: View {
+    @Environment(\.dismiss) var dismiss
+    @Binding var isTabBarHidden: Bool
+    
+    @StateObject private var viewModel = OtherCardViewModel()
 
     var body: some View {
         ZStack(alignment: .top) {
             VStack(spacing: 0) {
                 HStack {
-                    Button(action: {}) {
+                    Button(action: {
+                        isTabBarHidden = false
+                        dismiss()
+                    }) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
                             .font(.title2)
@@ -24,9 +30,9 @@ struct MyCardView: View {
                     Spacer()
                     
                     Button(action: {
-                        viewModel.togglePopup()
+                        viewModel.toggleReportSheet()
                     }) {
-                        Image(systemName: "ellipsis")
+                        Image(systemName: "exclamationmark.circle")
                             .foregroundColor(.black)
                             .font(.title2)
                     }
@@ -54,7 +60,7 @@ struct MyCardView: View {
                             .frame(maxWidth: .infinity)
                             .background(Color.gray)
 
-                        if viewModel.myCard.showBookmark {
+                        if viewModel.otherCard.showBookmark {
                             Text("저장됨")
                                 .font(.system(size: 16))
                                 .foregroundColor(.red)
@@ -74,12 +80,12 @@ struct MyCardView: View {
                     
                     HStack {
                         Spacer().frame(width: 10)
-                        HeartView(likeCount: $viewModel.myCard.likeCount)
+                        HeartView(likeCount: $viewModel.otherCard.likeCount)
                             .fixedSize()
                         Spacer().frame(width: 20)
                         CommentView()
                         Spacer()
-                        BookmarkView(showBookmark: $viewModel.myCard.showBookmark)
+                        BookmarkView(showBookmark: $viewModel.otherCard.showBookmark)
                         Spacer().frame(width: 10)
                     }
                     .padding(.horizontal, 16)
@@ -87,16 +93,20 @@ struct MyCardView: View {
                     
                     Spacer().frame(height: 5)
 
-                    Text("\(viewModel.myCard.likeCount)명이 이 밥일기를 좋아합니다.")
-                        .font(.system(size: 14))
-                        .foregroundColor(.black)
-                        .padding(.leading, 28)
-                        .padding(.top, 5)
-                        .opacity(viewModel.myCard.likeCount > 0 ? 1 : 0)
-                        .frame(height: 20)
+                    Button(action: {
+                        viewModel.toggleHeartBottomSheet()
+                    }) {
+                        Text("\(viewModel.otherCard.likeCount)명이 이 밥일기를 좋아합니다.")
+                            .font(.system(size: 14))
+                            .foregroundColor(.black)
+                            .padding(.leading, 28)
+                            .padding(.top, 5)
+                            .opacity(viewModel.otherCard.likeCount > 0 ? 1 : 0)
+                            .frame(height: 20)
+                    }
                     
                     Spacer().frame(height: 5)
-
+                    
                     VStack(alignment: .leading, spacing: 5) {
                         HStack {
                             Image("map")
@@ -129,7 +139,7 @@ struct MyCardView: View {
                             .frame(width: 330, height: 79)
 
                         ScrollView {
-                            Text(viewModel.myCard.reviewText)
+                            Text(viewModel.otherCard.reviewText)
                                 .font(.system(size: 16))
                                 .foregroundColor(.black)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -144,27 +154,34 @@ struct MyCardView: View {
                 }
                 .padding(.bottom, 20)
             }
-
-            if viewModel.showPopup {
-                PopupMenuView(showPopup: $viewModel.showPopup)
-            }
-
-            if viewModel.showDeleted {
-                Text("삭제됨")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.red)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
-                    .transition(.opacity)
-            }
+        }
+        .onAppear {
+            isTabBarHidden = true
+        }
+        .onDisappear {
+            isTabBarHidden = false
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
+        
+        .sheet(isPresented: $viewModel.showHeartBottomSheet) {
+            HeartBottomSheetView()
+                .presentationDetents([.fraction(2/3)])
+        }
+        
+        .sheet(isPresented: $viewModel.showReportSheet) {
+            ReportBottomSheet(isPresented: $viewModel.showReportSheet, showCompletedModal: $viewModel.showCompletedAlert)
+                .presentationDetents([.fraction(2/3)])
+        }
+        
+        .alert("신고가 접수되었습니다.", isPresented: $viewModel.showCompletedAlert) {
+            Button("확인", role: .cancel) {}
+        } message: {
+            Text("검토는 최대 24시간 소요됩니다.")
+        }
     }
 }
 
 #Preview {
-    MyCardView()
+    OtherCardView(isTabBarHidden: .constant(false))
 }
