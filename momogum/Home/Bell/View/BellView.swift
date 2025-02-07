@@ -43,7 +43,7 @@ struct BellView: View {
                         }
                     }
             }
-            .padding(.top, 25)
+            .padding(.top, 45)
             .padding(.bottom, 12)
 
             VStack(alignment: .leading, spacing: 16) {
