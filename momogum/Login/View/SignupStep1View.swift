@@ -65,14 +65,13 @@ struct SignupStep1View: View {
                         .fontWeight(.semibold)
                         .font(.system(size:24))
                         .padding(.leading,43)
+                        .padding(.bottom,5)
                         .frame(maxWidth: .infinity,alignment: .leading)
-                    
                     Text("머머금에서 사용할 이름을 정해주세요:)")
                         .fontWeight(.regular)
                         .foregroundStyle(Color.signupDescriptionGray)
                         .font(.system(size:16))
                         .frame(maxWidth: .infinity,alignment: .leading)
-                        .padding(.top,7)
                         .padding(.leading,43)
                     
                     
@@ -81,6 +80,7 @@ struct SignupStep1View: View {
                             TextField("최대 12자 이내의 한글, 영문 사용 가능", text: $inputText /*$signupDataModel.name*/,onEditingChanged: { editing in
                                 if editing {
                                     isFocused = true
+                                    
                                 }
                                 
                             })
@@ -94,9 +94,17 @@ struct SignupStep1View: View {
                                 }
                             }
                             
-//                            Text("(최대12자)")
-//                                .padding(.top,142)
-//                                .padding(.trailing,32)
+                            if !inputText.isEmpty {
+                                Button(action: {
+                                    inputText = "" // 입력 내용 초기화
+                                }) {
+                                    Image(systemName: "xmark.circle")
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(.top,142)
+                                .padding(.trailing,32)
+                            }
+                            
                             
                             
                         }
@@ -106,23 +114,18 @@ struct SignupStep1View: View {
                             .background(isFocused ? Color.black_2 : Color.black_5)
                             .padding(.horizontal,32)
                         
-//                        Text("한글, 영어소문자,영어 대문자 사용가능")
-//                            .frame(maxWidth: .infinity, alignment: .leading)
-//                            .padding(.leading,43)
-//                            .font(.system(size:16))
-//                            .fontWeight(.regular)
-//                        
+
                         
                         if showError && isFocused && !validateInput(inputText/*signupDataModel.name*/) {
                             Text("잘못된 입력입니다.")
-                                .foregroundColor(.red)
+                                .foregroundColor(.Red_1)
                                 .font(.mmg(.Caption1))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading,43)
                         }
                         else if !showError  && validateInput(inputText/*signupDataModel.name*/)  {
                             Text("사용 가능한 이름이에요 :)")
-                                .foregroundColor(.green)
+                                .foregroundColor(.Green_1)
                                 .font(.mmg(.Caption1))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading,43)
@@ -135,6 +138,7 @@ struct SignupStep1View: View {
                     
                     NavigationLink(value: Route.SignupStep2View){
                         Text("다음")
+                            .font(.mmg(.subheader3))
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
@@ -145,17 +149,6 @@ struct SignupStep1View: View {
                     .foregroundStyle(showError  || !validateInput(inputText/*signupDataModel.name*/) ? .gray : .Red_2)
                     
                 }
-//                .navigationTitle("정보 입력")
-//                .navigationBarTitleDisplayMode(.inline)
-//                .toolbar {
-//                                ToolbarItem(placement: .navigationBarLeading) {
-//                                    Button(action: { path = [] }) {
-//                                        Image(systemName: "xmark")
-//                                            .foregroundColor(.black)
-//                                    }
-//                                }
-//                            }
-
                 .navigationBarBackButtonHidden()
             }
         }

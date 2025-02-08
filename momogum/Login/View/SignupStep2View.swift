@@ -15,7 +15,7 @@ struct SignupStep2View: View {
     @FocusState private var isFocused: Bool
     @State private var lengthCheck: Bool = false
     @State private var hasAllowedCharactersOnly: Bool = false
-    @State private var isDuplicated: Bool = true
+    @State private var isDuplicated: Bool = false
     private var isButtonEnabled: Bool {
            return lengthCheck && hasAllowedCharactersOnly
        }
@@ -75,7 +75,7 @@ struct SignupStep2View: View {
                         
                         HStack{
                             
-                            TextField("머머금", text: $inputText /*$signupDataModel.nickname*/ ,onEditingChanged: { editing in
+                            TextField("ex.momogum12._.", text: $inputText /*$signupDataModel.nickname*/ ,onEditingChanged: { editing in
                                 if editing {
                                     isFocused = true
                                 }
@@ -86,67 +86,66 @@ struct SignupStep2View: View {
                             .onChange(of: inputText /*signupDataModel.nickname*/) { _ , newValue in
                                 validateInput2(newValue)
                             }
-                            
-                            
-                            Button{
-                                //                            print(signupDataModel.creatUser())
-                                if !isDuplicated{
-                                    isDuplicated = true
-                                    
+
+                            if !inputText.isEmpty {
+                                Button(action: {
+                                    inputText = "" // 입력 내용 초기화
+                                }) {
+                                    Image(systemName: "xmark.circle")
+                                        .foregroundColor(.gray)
+                                        .padding(.top,142)
+                                        .padding(.trailing,32)
                                 }
-                                
-                            }label:{
-                                Text("중복확인")
+                              
                             }
-                            .fontWeight(.semibold)
-                            .foregroundStyle(isButtonEnabled ? Color.Red_2 : Color.signupDescriptionGray)
-                            .disabled(!isButtonEnabled)
-                            .disabled(isDuplicated)
-                            .padding(.top,142)
-                            .padding(.trailing,32)
+          
                         }
                         // Divider의 색상을 TextField 상태에 따라 변경
                         Divider()
                             .frame(height: 2)
-//                            .background(isFocused ? Color.black : Color.placeholderGray2)
                             .background{
                                 if isFocused{
-                                    Color.black
+                                    Color.black_2
                                     if isButtonEnabled{
-                                        Color.green
+                                        Color.Green_1
                                     }
-                                    else if lengthCheck && !hasAllowedCharactersOnly{
-                                        Color.Red_2
+                                    else if lengthCheck {
+                                        if !hasAllowedCharactersOnly{
+                                            Color.Green_1
+                                        }
+                                        
                                     }
-                                    
+                                 
                                 }
                                 else {
-                                    Color.placeholderGray2
+                                    Color.black_5
                                 }
                             }
                             .padding(.horizontal,32)
                         
                         
                         VStack{
-                            if isButtonEnabled{
+                            if isButtonEnabled && isDuplicated{
                                 Text("사용 가능한 아이디입니다:)")
                                     .font(.system(size:16))
                                     .fontWeight(.regular)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading,34)
-                                    .foregroundStyle(Color.green)
+                                    .foregroundStyle(Color.Green_1)
                             }
                             else {
                                 validationText("최소 5자~ 20자",isValid: lengthCheck)
                                     .font(.system(size:16))
                                     .fontWeight(.regular)
                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.top,12)
                                     .padding(.leading,34)
                                 
                                 validationText("영어소문자,숫자,'.','_'사용가능", isValid: hasAllowedCharactersOnly)
                                     .font(.system(size:16))
                                     .fontWeight(.regular)
                                     .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.top,5)
                                     .padding(.leading,34)
                             }
 
@@ -161,25 +160,49 @@ struct SignupStep2View: View {
                         } label:{
                             Text("이전단계")
                         }
+                        .font(.mmg(.subheader3))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.bottom, 93)
                         .padding(.leading, 43)
                         .foregroundStyle(Color.placeholderGray)
-                        Button{
-                            path = []
-                            print( KakaoAuthViewModel().isNewUser)
-                            print(path)
-
-                        }label: {
-                            Text("완료")
-                                .disabled(!isButtonEnabled)
-                            //+백엔드 중복확인 api값
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                                .foregroundStyle(!isButtonEnabled ? Color.gray: Color.momogumRed)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        
+                        if isButtonEnabled && isDuplicated{
+                            Button{
+                                path = []
+                                print( KakaoAuthViewModel().isNewUser)
+                                print(path)
+                                
+                            }label: {
+                                Text("완료")
+                                    .disabled(!isButtonEnabled)
+                                //+백엔드 중복확인 api값
+                                    .font(.mmg(.subheader3))
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .foregroundStyle(!isButtonEnabled ? Color.black_4: Color.momogumRed)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .padding(.trailing, 47)
+                            .padding(.bottom, 93)
                         }
-                        .padding(.trailing, 47)
-                        .padding(.bottom, 93)
+                        else{
+                            Button{
+                                //                            print(signupDataModel.creatUser())
+                                if !isDuplicated{
+                                    print(isDuplicated)
+                                    isDuplicated = true
+                                    
+                                }
+                                
+                            }label:{
+                                Text("중복확인")
+                            }
+                            .font(.mmg(.subheader3))
+                            .foregroundStyle(isButtonEnabled ? Color.Red_2 : Color.black_4)
+                            .disabled(!isButtonEnabled)
+                            .disabled(isDuplicated)
+                            .padding(.trailing, 47)
+                            .padding(.bottom, 93)
+                        }
                     }
                 }
                 .navigationBarBackButtonHidden()
@@ -206,9 +229,9 @@ struct SignupStep2View: View {
     func validationText(_ text: String, isValid: Bool) -> some View {
         HStack {
             Image(systemName:"checkmark.circle" )
-                .foregroundColor(isValid ? .green : .signupDescriptionGray)
+                .foregroundColor(isValid ? .Green_1 : .signupDescriptionGray)
             Text(text)
-                .foregroundColor(isValid ? .green : .signupDescriptionGray)
+                .foregroundColor(isValid ? .Green_1 : .signupDescriptionGray)
         }
     }
 
