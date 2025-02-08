@@ -31,7 +31,7 @@ struct AppointSentView: View {
             Button {
                 isPresented = true
             } label: {
-                Text("보낸 초대장 확인하기")
+                Text("초대장 확인하기")
                     .font(.mmg(.subheader3))
                     .frame(width: 280, height: 60)
                     .background(.black_6)
@@ -61,7 +61,7 @@ struct AppointSentView: View {
                     Image("close")
                         .resizable()
                         .frame(width: 24, height: 24)
-                        .padding(.trailing, 5)
+                        .padding(.leading, 5)
                         .foregroundStyle(.black)
                 }
             }
@@ -70,5 +70,5 @@ struct AppointSentView: View {
 }
 
 #Preview {
-    AppointSentView(path: AppointView().$path)
+    AppointSentView(path: AppointView(isTabBarHidden: .constant(true)).$path)
 }
