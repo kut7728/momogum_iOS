@@ -9,14 +9,17 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var showMainView = false
+    @State private var isLoggedIn = false  // 로그인 상태 관리
     @State var signupDataModel = SignupDataModel()
     var body: some View {
         ZStack{
             if showMainView{
-                
-//                LoginView()
-//                    .environment(signupDataModel)
-                MainTabView()
+                if isLoggedIn{
+                    MainTabView()
+                } else{
+                    LoginView(isLoggedIn: $isLoggedIn)
+                        .environment(signupDataModel)
+                }
                 
             } else{
                 SplashView()
