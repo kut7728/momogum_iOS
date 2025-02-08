@@ -59,7 +59,8 @@ struct ImageEditorView: View {
                     VStack {
                         HStack {
                             Button(action: {
-                                dismiss()  
+                                isTabBarHidden = true
+                                dismiss()
                             }) {
                                 Image(systemName: "chevron.left")
                                     .foregroundColor(.black)
@@ -71,8 +72,10 @@ struct ImageEditorView: View {
 
                             Button(action: {
                                 dismiss()
-                                tabIndex = 0
-                                isTabBarHidden = false
+                                DispatchQueue.main.async {
+                                    tabIndex = 0
+                                    isTabBarHidden = false
+                                }
                                 viewModel.resetToOriginalImage()
                             }) {
                                 Image(systemName: "xmark")
@@ -118,12 +121,6 @@ struct ImageEditorView: View {
             .navigationBarBackButtonHidden(true)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarHidden(true)
-        }
-        .onAppear {
-            UITabBar.appearance().isHidden = true
-        }
-        .onDisappear {
-            UITabBar.appearance().isHidden = false
         }
     }
 }
