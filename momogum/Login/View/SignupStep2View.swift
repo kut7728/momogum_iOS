@@ -16,12 +16,10 @@ struct SignupStep2View: View {
     @State private var lengthCheck: Bool = false
     @State private var hasAllowedCharactersOnly: Bool = false
     @State private var isDuplicated: Bool = true
-
     private var isButtonEnabled: Bool {
            return lengthCheck && hasAllowedCharactersOnly
        }
-    @Binding var path: [String]
-
+    @Binding var path: [Route]
     //MARK: - View
     var body: some View {
         
@@ -167,14 +165,17 @@ struct SignupStep2View: View {
                         .padding(.bottom, 93)
                         .padding(.leading, 43)
                         .foregroundStyle(Color.placeholderGray)
-                        NavigationLink{
-                            MainTabView()
+                        Button{
+                            path = []
+                            print( KakaoAuthViewModel().isNewUser)
+                            print(path)
+
                         }label: {
                             Text("완료")
                                 .disabled(!isButtonEnabled)
                             //+백엔드 중복확인 api값
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .foregroundStyle(.gray)
+                                .foregroundStyle(!isButtonEnabled ? Color.gray: Color.momogumRed)
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
                         .padding(.trailing, 47)
@@ -214,5 +215,5 @@ struct SignupStep2View: View {
 
 
 #Preview {
-    SignupStep2View(path: .constant([]))
+    SignupStep2View( path: .constant([]))
 }

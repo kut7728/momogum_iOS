@@ -17,7 +17,7 @@ struct SignupStep1View: View {
     @FocusState private var isFocused: Bool // TextField의 포커스 상태
     
     @State private var showError: Bool = false // 에러 메시지 표시 여부
-    @Binding var path: [String]
+    @Binding var path: [Route]
     
     
     //MARK: - View
@@ -133,17 +133,12 @@ struct SignupStep1View: View {
                     }
                     Spacer()
                     
-                    NavigationLink(value: "SignupStep2View"){
+                    NavigationLink(value: Route.SignupStep2View){
                         Text("다음")
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
-                    .navigationDestination(for: String.self) { value in
-                        if value == "SignupStep2View" {
-                            SignupStep2View(path: $path)
-                        }
-                    }
-                    .padding(.trailing, 49)
+                                        .padding(.trailing, 49)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.bottom ,93)
                     .disabled(showError || !validateInput(inputText/*signupDataModel.name*/))
