@@ -71,10 +71,20 @@ struct ImageEditorView: View {
                             Spacer()
 
                             Button(action: {
-                                dismiss()
-                                DispatchQueue.main.async {
-                                    tabIndex = 0
-                                    isTabBarHidden = false
+                                isTabBarHidden = false
+
+                                if let window = UIApplication.shared.connectedScenes
+                                    .compactMap({ $0 as? UIWindowScene })
+                                    .flatMap({ $0.windows })
+                                    .first(where: { $0.isKeyWindow }) {
+                                    
+                                    let newRootVC = UIHostingController(rootView: MainTabView())
+                                    newRootVC.modalPresentationStyle = .fullScreen
+
+                                    UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                                        window.rootViewController = newRootVC
+                                    })
+                                    window.makeKeyAndVisible()
                                 }
                                 viewModel.resetToOriginalImage()
                             }) {
