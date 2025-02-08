@@ -19,7 +19,7 @@ struct MyFollower: View {
                 searchBar
                 // 팔로워 목록
                 ForEach(followViewModel.filteredFollowers, id: \.self) { userID in
-                    FollowerCell(userID: userID) {
+                    FollowerCell(followViewModel: followViewModel, userID: userID) {
                         followViewModel.removeFollower(userID)
                     }
                     .onAppear {

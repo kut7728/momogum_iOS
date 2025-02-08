@@ -18,9 +18,9 @@ struct MyFollowing: View {
             List {
                 searchBar
                 // 팔로워 목록
-                ForEach(followViewModel.filteredFollowers, id: \.self) { userID in
-                    FollowingCell(userID: userID) {
-                        followViewModel.removeFollower(userID)
+                ForEach(followViewModel.filteredFollowing, id: \.self) { userID in
+                    FollowingCell(followViewModel: followViewModel, userID: userID) {
+                        followViewModel.unfollow(userID) // 언팔로우 기능
                     }
                     .onAppear {
                         if userID == followViewModel.filteredFollowers.last {

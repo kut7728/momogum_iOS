@@ -145,6 +145,7 @@ struct EditNameView: View {
         .navigationBarBackButtonHidden()
         .onAppear {
             addKeyboardObservers()
+            KeyboardHider.hideKeyboard()
         }
         .onDisappear {
             removeKeyboardObservers()

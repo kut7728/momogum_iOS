@@ -97,6 +97,7 @@ struct EditBioView: View {
         .navigationBarBackButtonHidden()
         .onAppear {
             addKeyboardObservers()
+            KeyboardHider.hideKeyboard()
         }
         .onDisappear {
             removeKeyboardObservers()
