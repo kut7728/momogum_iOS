@@ -27,120 +27,64 @@ struct AppointCheckingView: View {
     var body: some View {
         NavigationView {
             VStack {
-                VStack {
+                /// 초대장
+                VStack (alignment: .leading) {
+                    /// 초대장 이미지
                     Rectangle()
-                        .frame(width: 250, height: 150)
-                        .foregroundStyle(.gray.opacity(0.8))
-                        .padding(20)
+                        .frame(width: 300, height: 150)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .foregroundStyle(.black_6)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding(.vertical, 20)
                     
-                    HStack {
-                        ZStack {
-                            Image(systemName: "person.circle.fill")
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                                .foregroundStyle(.gray)
-                                .overlay {
-                                    Circle()
-                                        .stroke(style: StrokeStyle(lineWidth: 2))
-                                        .foregroundStyle(.black)
-                                }
-                                .offset(x: 0, y: 0)
+                    /// 선택된 친구들
+                    ApmInvitedFriends(pickedFriends: appoint.pickedFriends, isEditing: false)
+                    
+                    /// 각 속성들의 묶음
+                    VStack (alignment: .leading, spacing: 30) {
+                        
+                        ///타이틀과 항목 묶음
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("식사 메뉴")
+                                .font(.mmg(.Body3))
                             
-                            Image(systemName: "person.circle.fill")
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                                .foregroundStyle(.gray)
-                                .overlay {
-                                    Circle()
-                                        .stroke(style: StrokeStyle(lineWidth: 2))
-                                        .foregroundStyle(.black)
-                                }
-                                .offset(x: 30, y: 0)
                             
-                            Image(systemName: "person.circle.fill")
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                                .foregroundStyle(.gray)
-                                .overlay {
-                                    Circle()
-                                        .stroke(style: StrokeStyle(lineWidth: 2))
-                                        .foregroundStyle(.black)
-                                }
-                                .offset(x: 60, y: 0)
-                            
-                            Image(systemName: "person.circle.fill")
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                                .foregroundStyle(.gray)
-                                .overlay {
-                                    Circle()
-                                        .stroke(style: StrokeStyle(lineWidth: 2))
-                                        .foregroundStyle(.black)
-                                }
-                                .offset(x: 90, y: 0)
-                            
-                            Image(systemName: "plus.circle")
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                                .background(.gray)
-                                .foregroundStyle(.white)
-                                .clipShape(Circle())
-                                .overlay {
-                                    Circle()
-                                        .stroke(style: StrokeStyle(lineWidth: 2))
-                                        .foregroundStyle(.black)
-                                }
-                                .offset(x: 120, y: 0)
+                            Text(appoint.menuName)
+                                .font(.mmg(.subheader4))
                         }
-                        Spacer()
-                    }
-                    .padding(.bottom)
-                    
-                    VStack (spacing: 10) {
-                        Text("식사 메뉴")
-                            .font(.mmg(.Body3))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         
                         
-                        Text(appoint.menuName)
-                            .font(.mmg(.subheader4))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        
-                        Text("식사 일정")
-                            .font(.mmg(.Body3))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, 20)
-                        
-                        
-                        Text("\(appoint.pickedDate, formatter: dateFormatter())")
-                            .font(.mmg(.subheader4))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("식사 일정")
+                                .font(.mmg(.Body3))
+                            
+                            
+                            Text("\(appoint.pickedDate, formatter: dateFormatter())")
+                                .font(.mmg(.subheader4))
+                        }
                         
                         
                         
-                        Text("만나는 장소")
-                            .font(.mmg(.Body3))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, 20)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("만나는 장소")
+                                .font(.mmg(.Body3))
+                            
+                            
+                            Text(appoint.placeName)
+                                .font(.mmg(.subheader4))
+                        }
                         
                         
-                        Text(appoint.placeName)
-                            .font(.mmg(.subheader4))
-                            .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        
-                        
-                        Text("추가 메모")
-                            .font(.mmg(.Body3))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, 20)
-                        
-                        
-                        Text(appoint.note)
-                            .font(.mmg(.subheader4))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("추가 메모")
+                                .font(.mmg(.Body3))
+                            
+                            
+                            Text(appoint.note)
+                                .font(.mmg(.subheader4))
+                        }
                         
                         
                         
@@ -152,6 +96,8 @@ struct AppointCheckingView: View {
                 .background(.black_5)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 
+                
+                /// 버튼들
                 HStack {
                     Button {
                         showCancleAlert = true

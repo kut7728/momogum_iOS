@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-
+/// 약속생성 4단계(전체 편집 뷰)에서 사용되는 편집모드 전환 가능한 텍스트 필드 뷰
 struct ApmEditingTextFieldView: View {
     @State var isEditing = false
     @Binding var target: String
@@ -25,6 +25,7 @@ struct ApmEditingTextFieldView: View {
         } else {
             ZStack {
                 Text(target == "" ? addingNote : target)
+                    .foregroundStyle(target == "" ? .black_4 : .black_1)
                     .modifier(ApmTextFieldModifier(target: target, isNecessary: $isNecessary))
 
                 

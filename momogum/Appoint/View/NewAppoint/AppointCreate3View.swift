@@ -160,21 +160,7 @@ struct AppointCreate3View: View {
             
             /// 다음 호버 버튼
             if (isButtonShowing) {
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        NavigationLink(value: "create4") {
-                            Text("다음")
-                                .font(.mmg(.subheader3))
-                                .frame(width: 100, height: 50)
-                                .background(.Red_2)
-                                .foregroundStyle(.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                                .padding(30)
-                        }
-                    }
-                }
+                ApmHoveringNavButton(navLinkValue: "create4")
             }
         }
     }

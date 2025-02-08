@@ -32,69 +32,31 @@ struct AppointCreate4View: View {
         
         ScrollView {
             VStack {
-                ZStack {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.gray)
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: -60, y: 0)
-                    
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.gray)
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: -30, y: 0)
-                    
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.gray)
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: 0, y: 0)
-                    
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.gray)
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: 30, y: 0)
-                    
-                    Image(systemName: "plus.circle")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .background(.gray)
-                        .foregroundStyle(.white)
-                        .clipShape(Circle())
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: 60, y: 0)
+                Button {
+                    path.append("create1")
+                } label: {
+                    ApmInvitedFriends(pickedFriends: viewModel.pickedFriends, isEditing: true)
                 }
+
                 
                 Rectangle()
-                    .frame(width: 170, height: 120)
-                    .foregroundStyle(.gray.opacity(0.2))
+                    .frame(width: 200, height: 150)
+                    .foregroundStyle(.black_5)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                     .padding(.vertical, 30)
+                    .overlay {
+                        Button {
+                            path.append("create2")
+                        } label: {
+                            Image("pencil")
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                                .contentShape(Rectangle())
+
+                        }
+                        .offset(x: 80, y: -55)
+
+                    }
                 
                 
                 
