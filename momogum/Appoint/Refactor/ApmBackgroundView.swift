@@ -22,7 +22,7 @@ struct ApmBackgroundView<Content: View>: View {
     var body: some View {
         @Bindable var viewModel = appointViewModel
         
-        ZStack {
+        ZStack (alignment: .bottomTrailing) {
             content
         }
         .navigationBarTitleDisplayMode(.inline)
