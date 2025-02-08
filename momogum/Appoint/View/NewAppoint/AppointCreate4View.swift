@@ -12,6 +12,12 @@ struct AppointCreate4View: View {
     @Environment(\.dismiss) var dismiss
     @Environment(NewAppointViewModel.self) var appointViewModel
     
+    @State var menuNecessary: Bool = false
+    @State var titleNecessary: Bool = false
+    @State var placeNecessary: Bool = false
+    
+    var isButtonShowing: Bool {!self.menuNecessary && !self.titleNecessary && !self.placeNecessary}
+    
     @Binding var path: [String]
     
     let dateFormatter = {
@@ -26,87 +32,66 @@ struct AppointCreate4View: View {
         
         ScrollView {
             VStack {
-                ZStack {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.gray)
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: -60, y: 0)
-                    
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.gray)
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: -30, y: 0)
-                    
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.gray)
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: 0, y: 0)
-                    
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.gray)
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: 30, y: 0)
-                    
-                    Image(systemName: "plus.circle")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .background(.gray)
-                        .foregroundStyle(.white)
-                        .clipShape(Circle())
-                        .overlay {
-                            Circle()
-                                .stroke(style: StrokeStyle(lineWidth: 2))
-                                .foregroundStyle(.black)
-                        }
-                        .offset(x: 60, y: 0)
+                Button {
+                    path.append("create1")
+                } label: {
+                    ApmInvitedFriends(pickedFriends: viewModel.pickedFriends, isEditing: true)
                 }
+
                 
                 Rectangle()
-                    .frame(width: 170, height: 120)
-                    .foregroundStyle(.gray.opacity(0.2))
+                    .frame(width: 200, height: 150)
+                    .foregroundStyle(.black_5)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                     .padding(.vertical, 30)
-                
-                
-                
-                VStack (spacing: 0) {
-                    Text("식사 모임명")
-                        .font(.mmg(.Body3))
-                        .foregroundStyle(.black_2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    ApmEditingTextFieldView(target: $viewModel.appointName)
-                    
-                    Text("식사 메뉴")
-                        .font(.mmg(.Body3))
-                        .foregroundStyle(.black_2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    .overlay {
+                        Button {
+                            path.append("create2")
+                        } label: {
+                            Image("pencil")
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                                .contentShape(Rectangle())
 
+                        }
+                        .offset(x: 80, y: -55)
+
+                    }
+                
+                
+                
+                VStack (spacing: 20) {
+                    HStack {
+                        Text("식사 모임명")
+                            .font(.mmg(.Body3))
+                            .foregroundStyle(.black_2)
+                        
+                        Spacer()
+                        
+                        if titleNecessary {
+                            Text("*필수입력")
+                                .font(.mmg(.Caption2))
+                                .foregroundStyle(.Red_1)
+                        }
+                    }
                     
-                    ApmEditingTextFieldView(target: $viewModel.menuName)
+                    ApmEditingTextFieldView(target: $viewModel.appointName, isNecessary: $titleNecessary)
+                    
+                    HStack {
+                        Text("식사 메뉴")
+                            .font(.mmg(.Body3))
+                            .foregroundStyle(.black_2)
+                        
+                        Spacer()
+                        
+                        if menuNecessary {
+                            Text("*필수입력")
+                                .font(.mmg(.Caption2))
+                                .foregroundStyle(.Red_1)
+                        }
+                    }
+                    
+                    ApmEditingTextFieldView(target: $viewModel.menuName, isNecessary: $menuNecessary)
                     
                     Text("식사 일정")
                         .font(.mmg(.Body3))
@@ -115,7 +100,7 @@ struct AppointCreate4View: View {
                     
                     ZStack {
                         Text("\(viewModel.pickedDate, formatter: dateFormatter())")
-                            .modifier(ApmTextFieldModifier())
+                            .modifier(ApmTextFieldViewModifier())
                         HStack {
                             Spacer()
                             Button {
@@ -132,19 +117,28 @@ struct AppointCreate4View: View {
                     }
                     
                     
-                    Text("만나는 장소")
-                        .font(.mmg(.Body3))
-                        .foregroundStyle(.black_2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack {
+                        Text("만나는 장소")
+                            .font(.mmg(.Body3))
+                            .foregroundStyle(.black_2)
+                        
+                        Spacer()
+                        
+                        if placeNecessary {
+                            Text("*필수입력")
+                                .font(.mmg(.Caption2))
+                                .foregroundStyle(.Red_1)
+                        }
+                    }
                     
-                    ApmEditingTextFieldView(target: $viewModel.placeName)
+                    ApmEditingTextFieldView(target: $viewModel.placeName, isNecessary: $placeNecessary)
                     
                     Text("추가 메모")
                         .font(.mmg(.Body3))
                         .foregroundStyle(.black_2)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    ApmEditingTextFieldView(target: $viewModel.note)
+                    ApmEditingTextFieldView(target: $viewModel.note, isNecessary: .constant(false))
                     
                     Button {
                         viewModel.createAppoint()
@@ -154,7 +148,7 @@ struct AppointCreate4View: View {
                             .font(.mmg(.subheader3))
                             .frame(maxWidth: .infinity)
                             .frame(height: 60)
-                            .background(.Red_2)
+                            .background(isButtonShowing ? .Red_2 : .black_4)
                             .foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 24))
                     }
@@ -198,7 +192,7 @@ struct AppointCreate4View: View {
 }
 
 #Preview {
-    AppointCreate4View(path: AppointView().$path)
+    AppointCreate4View(path: AppointView(isTabBarHidden: .constant(true)).$path)
         .environment(NewAppointViewModel())
 
 }
