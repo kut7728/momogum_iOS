@@ -1,22 +1,19 @@
 //
-//  MyProfileView.swift
+//  OtherProfileView.swift
 //  momogum
 //
-//  Created by 류한비 on 1/18/25.
+//  Created by 류한비 on 2/8/25.
 //
 
 import SwiftUI
 
-struct MyProfileView: View {
-    @State private var navigationPath = NavigationPath()
+struct OtherProfileView: View {
+    @Environment(\.dismiss) var dismiss
     @State private var selectedSegment = 0
     @State private var showFollowList = 0
-    @State private var navigateToFollowView = false // 화면 전환 제어
+    @State private var navigateToFollowView = false
     @State private var navigateToMyCardView = false
-    // 팝업창 제어
-    @State private var showPopup = false
-    @State private var showLogoutPopup = false
-    @State private var showDelPopup = false
+    @State private var showReportPopup = false
     
     @State var viewModel: ProfileViewModel = ProfileViewModel()
     @State var followViewModel: FollowViewModel = FollowViewModel()
@@ -27,15 +24,22 @@ struct MyProfileView: View {
     
     var body: some View {
         ZStack{
-            NavigationStack(path: $navigationPath){
+            NavigationStack{
                 VStack{
                     VStack{
                         HStack(alignment: .center){
                             
-                            Spacer()
-                            Spacer().frame(width: 24, height: 24)
+                            Button{
+                                dismiss()
+                            }label:{
+                                Image("back")
+                                    .resizable()
+                                    .frame(width: 24,height: 24)
+                            }
                             
-                            // 내 유저 아이디
+                            Spacer()
+                            
+                            // 유저 아이디
                             Text(viewModel.userID)
                                 .frame(height: 20)
                                 .fontWeight(.semibold)
@@ -44,9 +48,9 @@ struct MyProfileView: View {
                             
                             // 설정 버튼
                             Button{
-                                showPopup = true
+                                showReportPopup = true
                             } label: {
-                                Image("settings")
+                                Image("exclamation")
                                     .resizable()
                                     .frame(width: 24, height: 24)
                             }
@@ -134,7 +138,7 @@ struct MyProfileView: View {
                                     showFollowList = 1
                                     navigateToFollowView = true
                                 }
-                                    isTabBarHidden = true
+                                isTabBarHidden = true
                             }) {
                                 VStack(alignment: .center, spacing: 0){
                                     Text("팔로잉")
@@ -151,10 +155,6 @@ struct MyProfileView: View {
                             
                             // 프로필 편집 버튼
                             Button {
-                                DispatchQueue.main.async {
-                                    navigationPath.append("EditProfileView")
-                                    isTabBarHidden = true
-                                }
                             }label: {
                                 RoundedRectangle(cornerRadius: 8)
                                     .frame(width: 86, height: 52)
@@ -177,24 +177,6 @@ struct MyProfileView: View {
                             }
                             .navigationDestination(isPresented: $navigateToFollowView) {
                                 FollowView(viewModel: viewModel, followViewModel: followViewModel, selectedSegment: $showFollowList)
-                            }
-                            .navigationDestination(for: String.self) { value in
-                                switch value {
-                                case "EditProfileView":
-                                    EditProfileView(navigationPath: $navigationPath, viewModel: viewModel)
-                                case "GalleryProfileView":
-                                    GalleryProfileView(navigationPath: $navigationPath, viewModel: viewModel)
-                                case "EditImageView":
-                                    EditImageView(navigationPath: $navigationPath, viewModel: viewModel)
-                                case "EditNameView":
-                                    EditNameView(navigationPath: $navigationPath, viewModel: viewModel)
-                                case "EditIDView":
-                                    EditIDView(navigationPath: $navigationPath, viewModel: viewModel)
-                                case "EditBioView":
-                                    EditBioView(navigationPath: $navigationPath, viewModel: viewModel)
-                                default:
-                                    EmptyView()
-                                }
                             }
                         }
                         .padding(.bottom, 23)
@@ -244,7 +226,7 @@ struct MyProfileView: View {
                             .onAppear { isTabBarHidden = true }
                             .onDisappear { isTabBarHidden = false }
                     }
-                                        
+                    
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 20) {
                             ForEach(0..<30, id: \.self) { index in
@@ -261,43 +243,18 @@ struct MyProfileView: View {
                     
                 }
                 .toolbar(.hidden, for: .navigationBar)
-                .onAppear {
-                    if isTabBarHidden {
-                        isTabBarHidden = false
-                    }
-                }
             }
-            .disabled(showPopup) // 팝업이 보일 때 메인 화면 비활성화
-            
-            // 팝업 띄우기
-            if showPopup {
-                Color.black.opacity(0.001)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        showPopup = false // 바깥 영역 터치 시 팝업 비활성화
-                    }
-                
-                SettingsPopupView(showPopup: $showPopup, showLogoutPopup: $showLogoutPopup, showDelPopup: $showDelPopup)
-                    .padding(.bottom, UIScreen.main.bounds.height <= 812 ? 450 : 505)
-                    .padding(.leading, UIScreen.main.bounds.height <= 812 ? 180 : 195)
-                    .padding(.trailing, 37)
-            } else if showLogoutPopup {
-                Color.black.opacity(0.001)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        showLogoutPopup = false
-                    }
-                LogoutPopupView(showLogoutPopup: $showLogoutPopup)
-            } else if showDelPopup {
-                Color.black.opacity(0.001)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        showDelPopup = false
-                    }
-                DelAccPopupView(showDelPopup: $showDelPopup)
+            .sheet(isPresented: $showReportPopup) {
+                ReportPopupView()
+                    .presentationDetents([.fraction(3/4)])
+                    .presentationDragIndicator(.hidden)
+                    .presentationBackground(.clear)
             }
             
         }
     }
 }
 
+#Preview {
+    OtherProfileView(isTabBarHidden: .constant(true))
+}

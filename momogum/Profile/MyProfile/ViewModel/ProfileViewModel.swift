@@ -42,16 +42,16 @@ class ProfileViewModel {
         self.currentPreviewImage = self.profileImage
         
         // 더미 데이터 적용
-        if let dummyUser = UserProfileResponse.dummyUser.result {
+        if let dummyUser = User.dummyUser.result {
             self.userName = dummyUser.name
             self.userID = dummyUser.nickname
-            self.userBio = dummyUser.about
+            self.userBio = dummyUser.about ?? ""
             self.draftUserName = self.userName
             self.draftUserID = self.userID
             self.draftUserBio = self.userBio
             
             // 프로필 이미지 로드
-            if let profileImageURL = URL(string: dummyUser.profileImage) {
+            if let profileImageURL = URL(string: dummyUser.profileImage!) {
                 loadImageAsync(from: profileImageURL)
             }
         }
