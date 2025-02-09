@@ -12,27 +12,39 @@ struct MyFollowing: View {
     
     @State private var showCloseButton = false
     @State private var isEditing = false // 텍스트필드 활성화 여부
+    @State private var selectedUserID: String? = nil
     
     var body: some View {
-        VStack {
-            List {
-                searchBar
-                // 팔로워 목록
-                ForEach(followViewModel.filteredFollowing, id: \.self) { userID in
-                    FollowingCell(followViewModel: followViewModel, userID: userID) {
-                        followViewModel.unfollow(userID) // 언팔로우 기능
-                    }
-                    .onAppear {
-                        if userID == followViewModel.filteredFollowers.last {
-                            followViewModel.loadMoreFollowers()
+        NavigationStack{
+            VStack {
+                List {
+                    searchBar
+                    // 팔로워 목록
+                    ForEach(followViewModel.filteredFollowing, id: \.self) { userID in
+                        FollowingCell(followViewModel: followViewModel, userID: userID) {
+                            followViewModel.unfollow(userID)
                         }
+                        .onTapGesture {
+                            selectedUserID = userID
+                        }
+                        .onAppear {
+                            if userID == followViewModel.filteredFollowers.last {
+                                followViewModel.loadMoreFollowers()
+                            }
+                        }
+                        .listRowSeparator(.hidden)
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.horizontal, 5)
                     }
-                    .listRowSeparator(.hidden)
-                    .buttonStyle(PlainButtonStyle())
-                    .padding(.horizontal, 5)
                 }
+                .listStyle(PlainListStyle())
             }
-            .listStyle(PlainListStyle())
+            .navigationDestination(item: $selectedUserID) { userID in
+                OtherProfileView(userID: userID,
+                       isFollowing: followViewModel.isFollowing(userID),
+                       followViewModel: followViewModel
+                   )
+            }
         }
     }
     

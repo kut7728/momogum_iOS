@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ReportPopupView: View {
     @Environment(\.dismiss) var dismiss
+    @Binding var showReportDetailPopup: Bool
     
     var body: some View {
         VStack(spacing: 0) {
@@ -64,6 +65,7 @@ struct ReportPopupView: View {
         Button {
             print("\(text) 신고 선택됨")
             dismiss()
+            showReportDetailPopup = true
         } label: {
             VStack(alignment: .leading, spacing: 0){
                 HStack(alignment: .center, spacing: 0){
@@ -75,6 +77,7 @@ struct ReportPopupView: View {
                     
                     Spacer()
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.horizontal, 43)
                 
                 Rectangle()
@@ -85,8 +88,4 @@ struct ReportPopupView: View {
         }
         .buttonStyle(.plain)
     }
-}
-
-#Preview {
-    ReportPopupView()
 }

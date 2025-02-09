@@ -13,7 +13,6 @@ struct MyFollower: View {
     @State private var showCloseButton = false
     @State private var isEditing = false // 텍스트필드 활성화 여부
     @State private var selectedUserID: String? = nil // 선택된 유저 ID
-    @State private var isTabBarHidden = false
     
     var body: some View {
         NavigationStack {
@@ -41,7 +40,11 @@ struct MyFollower: View {
                 .listStyle(PlainListStyle())
             }
             .navigationDestination(item: $selectedUserID) { userID in
-                OtherProfileView(isTabBarHidden: $isTabBarHidden)
+                OtherProfileView(
+                    userID: userID,
+                    isFollowing: followViewModel.isFollowing(userID),
+                    followViewModel: followViewModel
+                )
             }
         }
     }

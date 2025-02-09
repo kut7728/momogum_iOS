@@ -9,16 +9,16 @@ import SwiftUI
 
 struct OtherProfileView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var selectedSegment = 0
-    @State private var showFollowList = 0
-    @State private var navigateToFollowView = false
-    @State private var navigateToMyCardView = false
+    var userID: String
+    var isFollowing: Bool
     @State private var showReportPopup = false
+    @State private var showReportDetailPopup = false
+    
+    @State private var selectedSegment = 0
+    @State private var navigateToMyCardView = false
     
     @State var viewModel: ProfileViewModel = ProfileViewModel()
     @State var followViewModel: FollowViewModel = FollowViewModel()
-    
-    @Binding var isTabBarHidden: Bool
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -26,7 +26,7 @@ struct OtherProfileView: View {
         ZStack{
             NavigationStack{
                 VStack{
-                    VStack{
+                    VStack(alignment: .leading){
                         HStack(alignment: .center){
                             
                             Button{
@@ -40,13 +40,13 @@ struct OtherProfileView: View {
                             Spacer()
                             
                             // 유저 아이디
-                            Text(viewModel.userID)
+                            Text(userID)
                                 .frame(height: 20)
                                 .fontWeight(.semibold)
                             
                             Spacer()
                             
-                            // 설정 버튼
+                            // 신고 버튼
                             Button{
                                 showReportPopup = true
                             } label: {
@@ -93,11 +93,11 @@ struct OtherProfileView: View {
                             VStack(alignment: .leading){
                                 VStack(alignment: .leading){
                                     // 이름
-                                    Text(viewModel.userName)
+                                    Text("이름")
                                         .font(.mmg(.subheader4))
                                         .padding(.bottom, 13)
                                     
-                                    Text(viewModel.userBio)
+                                    Text("한 줄 소개")
                                         .font(.mmg(.Caption2))
                                         .foregroundStyle(Color.black_2)
                                 }
@@ -110,14 +110,14 @@ struct OtherProfileView: View {
                         .padding(.horizontal, 32)
                         .padding(.bottom, 24)
                         
+                        Text("@@@님, ###님 외 n명이 팔로우 합니다.")
+                            .font(.mmg(.Caption2))
+                            .padding(.bottom, 24)
+                            .padding(.leading, 33)
+                        
                         HStack(alignment: .center, spacing: 0){
                             // 팔로워
                             Button(action: {
-                                DispatchQueue.main.async {
-                                    showFollowList = 0
-                                    navigateToFollowView = true
-                                }
-                                isTabBarHidden = true
                             }) {
                                 VStack(alignment: .center, spacing: 0){
                                     Text("팔로워")
@@ -134,11 +134,6 @@ struct OtherProfileView: View {
                             
                             // 팔로잉
                             Button(action: {
-                                DispatchQueue.main.async {
-                                    showFollowList = 1
-                                    navigateToFollowView = true
-                                }
-                                isTabBarHidden = true
                             }) {
                                 VStack(alignment: .center, spacing: 0){
                                     Text("팔로잉")
@@ -153,33 +148,43 @@ struct OtherProfileView: View {
                             }
                             .padding(.trailing, 67)
                             
-                            // 프로필 편집 버튼
-                            Button {
-                            }label: {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .frame(width: 86, height: 52)
-                                    .foregroundStyle(Color.black_5)
-                                    .overlay(
-                                        VStack{
-                                            Image("user_circle")
-                                                .resizable()
-                                                .frame(width: 27, height: 27)
-                                                .padding(.bottom, 3)
-                                            
-                                            
-                                            Text("프로필 편집")
-                                                .font(.system(size: 10))
-                                                .fontWeight(.semibold)
-                                                .foregroundStyle(Color.black_2)
-                                        }
-                                    )
-                                    .contentShape(Rectangle())
-                            }
-                            .navigationDestination(isPresented: $navigateToFollowView) {
-                                FollowView(viewModel: viewModel, followViewModel: followViewModel, selectedSegment: $showFollowList)
+                            // 팔로우 / 팔로잉 버튼
+                            if followViewModel.isFollowing(userID) {
+                                Button {
+                                    followViewModel.unfollow(userID)
+                                } label: {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .frame(width: 72, height: 28)
+                                        .foregroundStyle(Color.black_6)
+                                        .overlay(
+                                            Text("팔로잉")
+                                                .font(.mmg(.subheader4))
+                                                .foregroundStyle(Color.Red_2)
+                                                .padding(6)
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 4)
+                                                .stroke(Color.black_4, lineWidth: 1)
+                                        )
+                                }
+                            } else {
+                                Button {
+                                    followViewModel.follow(userID)
+                                } label: {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .frame(width: 72, height: 28)
+                                        .foregroundStyle(Color.Red_2)
+                                        .overlay(
+                                            Text("팔로우")
+                                                .font(.mmg(.subheader4))
+                                                .foregroundStyle(Color.black_6)
+                                                .padding(6)
+                                        )
+                                }
                             }
                         }
                         .padding(.bottom, 23)
+                        .padding(.leading, 51)
                     }
                     
                     
@@ -222,39 +227,44 @@ struct OtherProfileView: View {
                     .padding(.bottom, 41)
                     .padding(.horizontal, 10)
                     .navigationDestination(isPresented: $navigateToMyCardView) {
-                        MyCardView(isTabBarHidden: $isTabBarHidden)
-                            .onAppear { isTabBarHidden = true }
-                            .onDisappear { isTabBarHidden = false }
+                        //                        MyCardView(isTabBarHidden: $isTabBarHidden)
+                        //                            .onAppear { isTabBarHidden = true }
+                        //                            .onDisappear { isTabBarHidden = false }
                     }
                     
                     ScrollView {
                         LazyVGrid(columns: columns, spacing: 20) {
                             ForEach(0..<30, id: \.self) { index in
-                                NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
-                                    .onAppear { isTabBarHidden = true }
-                                    .onDisappear { isTabBarHidden = false }
-                                ) {
-                                    CardPostCell(selectedSegment: $selectedSegment)
-                                }
+                                //                                NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
+                                //                                    .onAppear { isTabBarHidden = true }
+                                //                                    .onDisappear { isTabBarHidden = false }
+                                //                                ) {
+                                CardPostCell(selectedSegment: $selectedSegment)
                             }
                         }
-                        .padding(.horizontal, 20)
                     }
-                    
+                    .padding(.horizontal, 20)
                 }
-                .toolbar(.hidden, for: .navigationBar)
+                
             }
-            .sheet(isPresented: $showReportPopup) {
-                ReportPopupView()
-                    .presentationDetents([.fraction(3/4)])
-                    .presentationDragIndicator(.hidden)
-                    .presentationBackground(.clear)
-            }
+            .toolbar(.hidden, for: .navigationBar)
+            .disabled(showReportDetailPopup)
             
+            if showReportDetailPopup {
+                Color.black.opacity(0.001)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        showReportDetailPopup = false // 바깥 영역 터치 시 팝업 비활성화
+                    }
+                
+                ReportDetailView(showReportDetailPopup: $showReportDetailPopup)
+            }
+        }
+        .sheet(isPresented: $showReportPopup) {
+            ReportPopupView(showReportDetailPopup: $showReportDetailPopup)
+                .presentationDetents([.fraction(3/4)])
+                .presentationDragIndicator(.hidden)
+                .presentationBackground(.clear)
         }
     }
-}
-
-#Preview {
-    OtherProfileView(isTabBarHidden: .constant(true))
 }

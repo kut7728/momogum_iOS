@@ -35,7 +35,7 @@ class FollowViewModel {
         }
     }
     
-    init(followerCount: Int = 6325, followingCount: Int = 0) {
+    init(followerCount: Int = 1325, followingCount: Int = 0) {
         self.followerCount = followerCount
         self.followingCount = followingCount
         generateFollowers() // 팔로워 목록 초기화
