@@ -135,7 +135,13 @@ struct Story2View: View {
         }
         .sheet(isPresented: $showReportSheet) {
             ReportView(showReportSheet: $showReportSheet, showPopup: $showPopup)
+                .presentationDetents([.fraction(3/4)])
+                .presentationDragIndicator(.hidden)
         }
         .navigationBarBackButtonHidden(true)
     }
+}
+
+#Preview {
+    Story2View(userID: "유저아이디")
 }
