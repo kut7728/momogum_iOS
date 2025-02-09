@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct LoginView: View {
-    @StateObject var kakaoAuthViewModel : KakaoAuthViewModel = KakaoAuthViewModel()
+    @StateObject var kakaoAuthViewModel = KakaoAuthViewModel()
     @FocusState private var isFocused: Bool // TextField의 포커스 상태
-    let isNewUser : Bool = false
     @FocusState private var isFocusedPWD: Bool
-    @State private var path: [String] = [] //path 설정
-    
+    @State private var path: [Route] = [] //path 설정
+    @Binding var isLoggedIn: Bool
     var body: some View {
         
         NavigationStack(path: $path){
@@ -32,15 +31,35 @@ struct LoginView: View {
                 .padding(.horizontal,116)
                 .padding(.top, 72)
                 .padding(.bottom, 61)
-         
-
+            
+            
             Button{
-                KakaoAuthViewModel().handleKakaoLogin()
+                Login()
+//                kakaoAuthViewModel.handleKakaoLogin()
+                print("Current path: \(path)")
+//                path.append(.SignupStartView)
             }
             label: {
                 Image("KakaoLogin")
             }
 
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case.SignupStartView:
+                    SignupStartView(path: $path)
+                    
+                case.SignupStep1View:
+                    SignupStep1View(path: $path)
+                    
+                case.SignupStep2View:
+                    SignupStep2View(path: $path)
+                    
+                case.MainTabView:
+                    MainTabView()
+                }
+                
+            }
+            
             
             Button{
                 KakaoAuthViewModel().handleKakaoLogout()
@@ -51,37 +70,34 @@ struct LoginView: View {
                     .resizable()
                     .frame(width: 300 ,height: 45)
             }
-           
 
-            //회원가입뷰
-            NavigationLink(value: "SignupStartView"){
-                
-                
-                Text("회원가입하기")
-                    .foregroundColor(Color.momogumRed) // 강조된 색상
-                    .fontWeight(.bold) // 굵게 설정
-                
-                    .navigationDestination(for: String.self) { value in
-                        if value == "SignupStep1View" {
-                            SignupStep1View(path: $path)
-                        }
-                        else if value == "SignupStep2View" {
-                            SignupStep2View(path: $path)
-                        }
-                        else if value == "SignupStartView"{
-                            SignupStartView(path: $path)
-                        }
-                    }
-                
+                Spacer()
             }
-            .padding()
-            Spacer()
-        }
     }
     
-    
+    func Login() {
+        
+            if kakaoAuthViewModel.isNewUser {
+                kakaoAuthViewModel.handleKakaoLogin { success in
+                    if success, let token = kakaoAuthViewModel.oauthToken?.accessToken {
+                        print("✅ 로그인 성공: \(token)")
+                        path.append(.SignupStartView) // 신규 유저는 회원가입 화면으로 이동
+                        print(kakaoAuthViewModel.isNewUser)
+                    } else {
+                        print("❌ 로그인 실패")
+                    }
+                }
+            } else {
+                if kakaoAuthViewModel.isNewUser == false{
+                    isLoggedIn = true
+
+                }
+            }
+        }
+
 }
 
+
 #Preview {
-    LoginView()
+    LoginView(isLoggedIn: .constant(false))
 }

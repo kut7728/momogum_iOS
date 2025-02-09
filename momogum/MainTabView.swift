@@ -58,6 +58,7 @@ struct MainTabView: View {
                 }
             }
         }
+        .navigationBarBackButtonHidden()
         .edgesIgnoringSafeArea(.bottom) // 하단 여백 제거
     }
 }

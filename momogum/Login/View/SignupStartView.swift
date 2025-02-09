@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SignupStartView: View {
-    @Binding var path: [String]
+    @Binding var path: [Route]
 
     var body: some View {
         
@@ -49,7 +49,8 @@ struct SignupStartView: View {
         .padding(.top, 130)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                path.append("SignupStep1View") // path를 변경하여 화면 이동
+                print("Current path: \(path)")
+                path.append(.SignupStep1View) // path를 변경하여 화면 이동
             }
         }
         .navigationBarBackButtonHidden()
