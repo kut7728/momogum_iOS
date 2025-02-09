@@ -59,7 +59,8 @@ struct ImageEditorView: View {
                     VStack {
                         HStack {
                             Button(action: {
-                                dismiss()  
+                                isTabBarHidden = true
+                                dismiss()
                             }) {
                                 Image(systemName: "chevron.left")
                                     .foregroundColor(.black)
@@ -70,9 +71,21 @@ struct ImageEditorView: View {
                             Spacer()
 
                             Button(action: {
-                                dismiss()
-                                tabIndex = 0
                                 isTabBarHidden = false
+
+                                if let window = UIApplication.shared.connectedScenes
+                                    .compactMap({ $0 as? UIWindowScene })
+                                    .flatMap({ $0.windows })
+                                    .first(where: { $0.isKeyWindow }) {
+                                    
+                                    let newRootVC = UIHostingController(rootView: MainTabView())
+                                    newRootVC.modalPresentationStyle = .fullScreen
+
+                                    UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                                        window.rootViewController = newRootVC
+                                    })
+                                    window.makeKeyAndVisible()
+                                }
                                 viewModel.resetToOriginalImage()
                             }) {
                                 Image(systemName: "xmark")
@@ -118,12 +131,6 @@ struct ImageEditorView: View {
             .navigationBarBackButtonHidden(true)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarHidden(true)
-        }
-        .onAppear {
-            UITabBar.appearance().isHidden = true
-        }
-        .onDisappear {
-            UITabBar.appearance().isHidden = false
         }
     }
 }

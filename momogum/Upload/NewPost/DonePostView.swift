@@ -9,13 +9,24 @@ import SwiftUI
 
 struct DonePostView: View {
     @Environment(\.dismiss) var dismiss
-    let uploadedImage: UIImage
 
     var body: some View {
         VStack {
             HStack {
                 Button(action: {
-                    dismiss()
+                    if let window = UIApplication.shared.connectedScenes
+                        .compactMap({ $0 as? UIWindowScene })
+                        .flatMap({ $0.windows })
+                        .first(where: { $0.isKeyWindow }) {
+                        
+                        let newRootVC = UIHostingController(rootView: MainTabView())
+                        newRootVC.modalPresentationStyle = .fullScreen
+
+                        UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                            window.rootViewController = newRootVC
+                        })
+                        window.makeKeyAndVisible()
+                    }
                 }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
@@ -35,24 +46,24 @@ struct DonePostView: View {
 
             Spacer().frame(height: 80)
 
-            Image(uiImage: uploadedImage)
+            Image("donePost")
                 .resizable()
                 .scaledToFill()
-                .frame(width: 211, height: 211)
+                .frame(width: 212, height: 212)
                 .clipped()
 
             Spacer().frame(height: 90)
 
-
-                Text("바로 확인하기")
+            NavigationLink(destination: MyCardView(isTabBarHidden: .constant(true))) {
+                    Text("바로 확인하기")
                     .font(.system(size: 20, weight: .bold))
                     .frame(width: 340, height: 58)
                     .foregroundColor(Color(hex: 0xE05A55))
                     .overlay(
                         RoundedRectangle(cornerRadius: 24)
-                            .stroke(Color(hex: 0xE05A55), lineWidth: 2)
+                        .stroke(Color(hex: 0xE05A55), lineWidth: 2)
                     )
-
+            }
             .padding(.bottom, 40)
 
             Spacer()
@@ -63,5 +74,5 @@ struct DonePostView: View {
 }
 
 #Preview {
-    DonePostView(uploadedImage: UIImage(systemName: "photo") ?? UIImage())
+    DonePostView()
 }
