@@ -22,8 +22,11 @@ class ImageEditorViewModel: ObservableObject {
     }
 
     func updateScale(_ scale: CGFloat, frameSize: CGFloat) {
-        self.scale = max(1.0, min(3.0, scale))
-        adjustOffset(frameSize: frameSize)
+        let newScale = max(1.0, min(3.0, scale))
+        if newScale != self.scale {
+            self.scale = newScale
+            adjustOffset(frameSize: frameSize)
+        }
     }
 
     func updateOffset(_ translation: CGSize, frameSize: CGFloat) {
@@ -36,10 +39,14 @@ class ImageEditorViewModel: ObservableObject {
             height: max(0, (scaledImageSize.height - frameSize) / 2)
         )
 
-        offset = CGSize(
+        let newOffset = CGSize(
             width: min(max(-maxOffset.width, offset.width + translation.width), maxOffset.width),
             height: min(max(-maxOffset.height, offset.height + translation.height), maxOffset.height)
         )
+
+        if newOffset != offset {
+            offset = newOffset
+        }
     }
 
     private func adjustOffset(frameSize: CGFloat) {
@@ -60,7 +67,7 @@ class ImageEditorViewModel: ObservableObject {
 
     func finalizeImage(frameSize: CGFloat) -> UIImage? {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: frameSize, height: frameSize), format: UIGraphicsImageRendererFormat())
-        
+
         return renderer.image { context in
             let scaledImageSize = CGSize(
                 width: frameSize * scale,
@@ -75,7 +82,7 @@ class ImageEditorViewModel: ObservableObject {
             )
 
             if let cgImage = image.cgImage {
-                let uiImage = UIImage(cgImage: cgImage, scale: 0.5, orientation: .up) // 크기 줄이기
+                let uiImage = UIImage(cgImage: cgImage, scale: UIScreen.main.scale, orientation: .up)
                 uiImage.draw(in: drawingRect)
             } else {
                 image.draw(in: drawingRect)
