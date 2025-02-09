@@ -30,7 +30,7 @@ struct Story2View: View {
                         .frame(width:64, height:64)
                         .padding(.leading, 24)
                         .padding(.top, 22)
-                        .foregroundColor(Color(red: 207 / 255, green: 207 / 255, blue: 207 / 255))
+                        .foregroundColor(Color(.black_3))
                     VStack {
                         HStack {
                             Text("유저아이디")
