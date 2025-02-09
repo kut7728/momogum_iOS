@@ -44,12 +44,19 @@ struct NewPostView: View {
 
                             Button(action: {
                                 isTabBarHidden = false
-                                dismiss()  // 현재 NewPostView 닫기
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                    dismiss()  // ImageEditorView 닫기
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                    tabIndex = 0  // 홈뷰로 이동
+                                
+                                if let window = UIApplication.shared.connectedScenes
+                                    .compactMap({ $0 as? UIWindowScene })
+                                    .flatMap({ $0.windows })
+                                    .first(where: { $0.isKeyWindow }) {
+                                    
+                                    let newRootVC = UIHostingController(rootView: MainTabView())
+                                    newRootVC.modalPresentationStyle = .fullScreen
+
+                                    UIView.transition(with: window, duration: 0.3, options: .transitionCrossDissolve, animations: {
+                                        window.rootViewController = newRootVC
+                                    })
+                                    window.makeKeyAndVisible()
                                 }
                             }) {
                                 Image(systemName: "xmark")
@@ -146,7 +153,7 @@ struct NewPostView: View {
                         Color.clear.frame(height: 1).id("finalID")
 
                         if viewModel.newPost.selectedIcon != nil {
-                            NavigationLink(destination: DonePostView(uploadedImage: editedImage)) {
+                            NavigationLink(destination: DonePostView()) {
                                 Text("밥일기 업로드 하기")
                                     .font(.system(size: 17, weight: .bold))
                                     .frame(width: 340, height: 58)
