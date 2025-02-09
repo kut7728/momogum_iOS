@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct FollowerCell: View {
+    @Bindable var followViewModel: FollowViewModel
     var userID: String
+    var onRemove: () -> Void
     
     var body: some View {
         HStack(alignment: .center, spacing: 0){
@@ -35,32 +37,42 @@ struct FollowerCell: View {
             
             Spacer()
             
-            // 맞팔로우 버튼
-            Button{
-                
-            } label: {
-                RoundedRectangle(cornerRadius: 4)
-                    .frame(width: 72, height: 28)
-                    .foregroundStyle(Color.Red_2)
-                    .overlay(
-                        Text("맞팔로우")
-                            .font(.mmg(.subheader4))
-                            .foregroundStyle(Color.black_6)
-                            .padding(6)
-                    )
+            // 팔로우 / 팔로잉 버튼
+            if followViewModel.isFollowing(userID) {
+                Button {
+                    followViewModel.unfollow(userID)
+                } label: {
+                    RoundedRectangle(cornerRadius: 4)
+                        .frame(width: 72, height: 28)
+                        .foregroundStyle(Color.black_6)
+                        .overlay(
+                            Text("팔로잉")
+                                .font(.mmg(.subheader4))
+                                .foregroundStyle(Color.Red_2)
+                                .padding(6)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 4)
+                                .stroke(Color.black_4, lineWidth: 1)
+                        )
+                }
+                .padding(.trailing, 30)
+            } else {
+                Button {
+                    followViewModel.follow(userID)
+                } label: {
+                    RoundedRectangle(cornerRadius: 4)
+                        .frame(width: 72, height: 28)
+                        .foregroundStyle(Color.Red_2)
+                        .overlay(
+                            Text("팔로우")
+                                .font(.mmg(.subheader4))
+                                .foregroundStyle(Color.black_6)
+                                .padding(6)
+                        )
+                }
+                .padding(.trailing, 30)
             }
-            .padding(.trailing, 27)
-            
-            
-            // 취소버튼
-            Button{
-                
-            } label: {
-                Image("close_s")
-                    .resizable()
-                    .frame(width: 24, height: 24)
-            }
-            .padding(.trailing, 12)
         }
         .frame(maxWidth: .infinity)
     }
