@@ -35,7 +35,7 @@ class NewAppointViewModel {
     
     /// 약속잡기 초대장 이미지 로드
     func loadAppointmentCard() {
-        let urls = ["http://15.164.59.139:8080/Appointment/card/fun", "http://15.164.59.139:8080/Appointment/card/basic"]
+        let urls = ["\(BaseAPI)/appointment/card/fun", "\(BaseAPI)/appointment/card/basic"]
         
         for url in urls {
             AF.request(url, method: .get).responseString() { response in
@@ -66,7 +66,7 @@ class NewAppointViewModel {
         printingForDebug()
         resetAppoint()
         
-        let url = "http://15.164.59.139:8080/Appointment/name"
+        let url = "\(BaseAPI)/Appointment/name"
         
         AF.request(url,
                    method: .post,
