@@ -19,7 +19,7 @@ struct MealIconView: View {
                 .font(.headline)
                 .padding(.bottom, 28)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 8)  // 텍스트를 오른쪽으로 조금 이동시킴
+                .padding(.leading, 10)  // 텍스트를 오른쪽으로 조금 이동시킴
 
             HStack(spacing: 10) {
                 Button(action: {

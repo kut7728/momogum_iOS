@@ -68,7 +68,7 @@ struct MealInputView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 22)
         .animation(.easeInOut, value: tags)
     }
 
