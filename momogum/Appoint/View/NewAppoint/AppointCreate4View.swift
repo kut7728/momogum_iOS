@@ -12,10 +12,10 @@ struct AppointCreate4View: View {
     @Environment(\.dismiss) var dismiss
     @Environment(NewAppointViewModel.self) var appointViewModel
     
+    /// 조건 미충족시 경고 및 버튼 비활성화
     @State var menuNecessary: Bool = false
     @State var titleNecessary: Bool = false
     @State var placeNecessary: Bool = false
-    
     var isButtonShowing: Bool {!self.menuNecessary && !self.titleNecessary && !self.placeNecessary}
     
     @Binding var path: [String]
@@ -27,6 +27,7 @@ struct AppointCreate4View: View {
         return formatter
     }
     
+    // MARK: - 
     var body: some View {
         @Bindable var viewModel = appointViewModel
         
