@@ -10,7 +10,8 @@ import SwiftUI
 struct StoryView: View {
     var userID: String
     @Binding var tabIndex: Int
-    @Environment(\.dismiss) private var dismiss // iOS 15+에서 권장하는 뒤로가기 기능
+    @StateObject private var viewModel = StoryViewModel()  // ✅ 뷰 모델 연결
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
@@ -25,24 +26,12 @@ struct StoryView: View {
                     .padding(.top, 1)
                     .padding(.bottom, 92)
                 
-                HStack {
-                    Image("no")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 95, height: 95)
-                    
-                    Image("notbad")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 95, height: 95)
-                    
-                    Image("yes")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 95, height: 95)
-                }
+                reactionIcons() // ✅ 이모지 아이콘
                 
-                NavigationLink(destination: GalleryPickerView(tabIndex: $tabIndex, isTabBarHidden: .constant(false))) {
+                // ✅ NavigationStack 사용하여 pop 방지
+                Button(action: {
+                    viewModel.startWritingStory()
+                }) {
                     Text("바로 밥일기 작성하기")
                         .font(.mmg(.subheader3))
                         .foregroundColor(Color(red: 224/255, green: 90/255, blue: 85/255))
@@ -55,29 +44,55 @@ struct StoryView: View {
                         )
                 }
                 .padding(.top, 100)
-                
+
                 Spacer()
             }
             .frame(maxWidth: .infinity)
-            .navigationBarBackButtonHidden(true) // 기본 백 버튼 숨김
+            .navigationBarBackButtonHidden(true) // ✅ 기본 백 버튼 숨김
             .toolbar {
-                // 기본 백 버튼을 없애고, 커스텀 쉐브론 버튼을 추가
+                // 쉐브론 버튼 (기본 백 버튼 제거)
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         dismiss() // 뒤로가기 동작
                     }) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
-                            .imageScale(.large) // 아이콘 크기 조정
+                            .imageScale(.large)
                     }
                 }
-                
+
                 // 자동 생성되는 네비게이션 타이틀 제거
                 ToolbarItem(placement: .principal) {
                     Text("")
-                        .frame(height: 0) // 높이 0으로 설정하여 완전히 숨김
+                        .frame(height: 0)
                 }
             }
+            .navigationDestination(isPresented: $viewModel.navigateToGallery) {
+                GalleryPickerView(tabIndex: $tabIndex, isTabBarHidden: .constant(false))
+            }
+        }
+    }
+}
+
+// MARK: - UI 컴포넌트 분리
+extension StoryView {
+    // 이모지 아이콘
+    private func reactionIcons() -> some View {
+        HStack {
+            Image("no")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 95, height: 95)
+            
+            Image("notbad")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 95, height: 95)
+            
+            Image("yes")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 95, height: 95)
         }
     }
 }
