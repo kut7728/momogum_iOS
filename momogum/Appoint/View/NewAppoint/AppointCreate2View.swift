@@ -11,8 +11,10 @@ import SwiftUI
 struct AppointCreate2View: View {
     @Environment(NewAppointViewModel.self) var appointViewModel
     @State var isPicked: Bool = false
-    
     @Binding var path: [String]
+    
+    private var isEditingBeforeEnd: Bool { path.dropLast().last == "create4"}
+
     
     private func selectCard(_ value: String) {
         if appointViewModel.pickedImage != value {
@@ -132,7 +134,7 @@ struct AppointCreate2View: View {
 
             }
             if isPicked {
-                ApmHoveringNavButton(navLinkValue: "create3")
+                ApmHoveringNavButton(navLinkValue: isEditingBeforeEnd ? "" : "create3")
             }
         }
     }

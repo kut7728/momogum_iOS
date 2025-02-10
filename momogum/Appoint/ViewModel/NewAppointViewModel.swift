@@ -53,7 +53,6 @@ class NewAppointViewModel {
     
     /// 초대장을 발송 및 저장소 초기화
     func createAppoint() {
-        //        let sendingData = SendingData(name: self.appointName, menu: self.menuName, date: self.pickedDate, place: self.placeName, note: self.note)
         
         let parm: Parameters = [
             "name": self.appointName,
@@ -63,10 +62,8 @@ class NewAppointViewModel {
             "notes": self.note
         ]
         
-        printingForDebug()
-        resetAppoint()
         
-        let url = "\(BaseAPI)/Appointment/name"
+        let url = "\(BaseAPI)/appointment/name"
         
         AF.request(url,
                    method: .post,
@@ -82,7 +79,13 @@ class NewAppointViewModel {
                 return
             }
         }
+        
+        
+        printingForDebug()
+        resetAppoint()
     }
+    
+    
     
     /// 새 약속잡기를 취소한 경우 저장소 초기화
     func resetAppoint() {

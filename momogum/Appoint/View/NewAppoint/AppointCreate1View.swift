@@ -15,6 +15,8 @@ struct AppointCreate1View: View {
     @State var searchText = ""
     @State var isEditing: Bool = false
     @State var buttonShowing: Bool = false
+    
+    private var isEditingBeforeEnd: Bool { path.dropLast().last == "create4"}
 
     
     var filteredFriends: [String] {
@@ -132,7 +134,7 @@ struct AppointCreate1View: View {
             
             /// '다음 버튼'
             if buttonShowing {
-                ApmHoveringNavButton(navLinkValue: "create2")
+                ApmHoveringNavButton(navLinkValue: isEditingBeforeEnd ? "" : "create2")
             }
         }
     }
@@ -145,6 +147,10 @@ struct AppointCreate1View: View {
             if (appointViewModel.pickedFriends.isEmpty) {
                 withAnimation {
                     buttonShowing = false
+                }
+            } else {
+                withAnimation {
+                    buttonShowing = true
                 }
             }
         } else {
