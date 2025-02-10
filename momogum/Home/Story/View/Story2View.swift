@@ -128,33 +128,36 @@ extension Story2View {
     // 신고 접수 팝업
     private func popupView() -> some View {
         VStack {
-            Text("신고가 접수되었습니다.\n검토는 최대 24시간 소요됩니다.")
-                .font(.mmg(.Body3))
-                .multilineTextAlignment(.center)
-                .padding(.top, 20)
+            Text("신고가 접수되었습니다.")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Color.black_2)
+                .padding(.top, 31)
 
-            Rectangle()
+            Text("검토는 최대 24시간 소요됩니다.")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Color.black_2)
+
+            Divider()
                 .frame(width: 300, height: 1)
-                .foregroundColor(.gray)
-                .padding(.top, 20)
+                .foregroundStyle(Color.black_4)
+                .padding(.top, 28)
 
             Button(action: {
                 viewModel.closePopup()  
             }) {
                 Text("확인")
                     .font(.mmg(.subheader4))
-                    .foregroundColor(.blue)
+                    .foregroundColor(.Blue_1)
                     .frame(maxWidth: .infinity, maxHeight: 44)
                     .background(Color.white)
             }
         }
         .frame(width: 319, height: 185)
-        .background(Color.white)
-        .cornerRadius(10)
-        .shadow(radius: 5)
+        .background(Color.black_6)
+        .cornerRadius(12)
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.gray, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.black_5, lineWidth: 1)
         )
     }
 }
