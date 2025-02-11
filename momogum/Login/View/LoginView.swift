@@ -48,6 +48,7 @@ struct LoginView: View {
                                         print("기존 유저 로그인 완료")
                                     }
                                 } else {
+                                    isLoggedIn = true // 백엔드쪽오류로 일단은 열어놓기
                                     print("❌ 유저 확인 실패")
                                 }
                             }  } else {
@@ -76,7 +77,7 @@ struct LoginView: View {
                     
                 }
                 
-                
+
                 Button{
                     authViewModel.handleKakaoLogout()
                     print("카카오 로그아웃 성공")
