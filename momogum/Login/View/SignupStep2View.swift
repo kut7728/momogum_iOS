@@ -169,7 +169,7 @@ struct SignupStep2View: View {
                         if isButtonEnabled && isDuplicated{
                             Button{
                                 path = []
-                                print( KakaoAuthViewModel().isNewUser)
+                              
                                 print(path)
                                 
                             }label: {
