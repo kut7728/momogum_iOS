@@ -12,7 +12,6 @@ struct LoginView: View {
     @FocusState private var isFocused: Bool // TextField의 포커스 상태
     @FocusState private var isFocusedPWD: Bool
     @State private var path: [Route] = [] //path 설정
-    @Binding var isLoggedIn: Bool
     var body: some View {
         
         NavigationStack(path: $path){
@@ -44,13 +43,11 @@ struct LoginView: View {
                                         path.append(.SignupStartView)
                                         print("신규 유저입니다. 회원가입이 필요합니다.")
                                     } else {
-                                        isLoggedIn = true
+                                        AuthManager.shared.isLoggedIn = true
                                         print("기존 유저 로그인 완료")
                                     }
                                 } else {
-                                    path.append(.SignupStartView)
-
-//                                    isLoggedIn = true // 백엔드쪽오류로 일단은 열어놓기
+                                    AuthManager.shared.isLoggedIn = true
                                     print("❌ 유저 확인 실패")
                                 }
                             }  } else {
@@ -99,5 +96,5 @@ struct LoginView: View {
 
 
 #Preview {
-    LoginView(isLoggedIn: .constant(false))
+    LoginView()
 }

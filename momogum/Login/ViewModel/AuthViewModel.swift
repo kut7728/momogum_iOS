@@ -46,7 +46,7 @@ final class AuthViewModel: ObservableObject {
     func signup() {
         
         let signupModel = signupData.createSignupModel()
-        let accessToken = kakaoAccessToken
+//        let accessToken = kakaoAccessToken
             AuthService.shared.signup(signupModel: signupModel) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {

@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class AuthManager {
+final class AuthManager : ObservableObject {
     static let shared = AuthManager()
-    
+    @Published var isLoggedIn: Bool = false
     private init() {}
     
     private let defaults = UserDefaults.standard
@@ -29,10 +29,18 @@ final class AuthManager {
         }
     }
     
-    
+    func updateLoginState(isLoggedIn: Bool) {
+            DispatchQueue.main.async {
+                self.isLoggedIn = isLoggedIn
+            }
+        }
     
     
     func clearUserData() {
           defaults.removeObject(forKey: "UUID")
       }
+    
+    func handleLoginSuccess() {
+        UserDefaults.standard.setValue(true, forKey: "isLoggedIn")
+    }
 }
