@@ -38,8 +38,8 @@ final class AuthService {
                     switch response.result {
                     case .success(let data):
                         print(" 회원가입 성공")
-                        print("🔹 isSuccess: \(data.isSuccess)")
-                        print("🔹 message: \(data.message)")
+                        print(" isSuccess: \(data.isSuccess)")
+                        print(" message: \(data.message)")
                         completion(.success(data))
                         
                     case .failure(let error):
@@ -53,6 +53,28 @@ final class AuthService {
                     }
                 }
         }
+    
+    
+    func checkDuplicateUsername(username: String, completion: @escaping (Result<Bool, APIError>) -> Void) {
+           let url = "\(BaseAPI)/auth/check-nickname?nickname=\(username)"
+           let headers: HTTPHeaders = ["Content-Type": "application/json"]
+
+           AF.request(url, method: .get, headers: headers)
+               .validate()
+               .responseDecodable(of: IsDuplicatedResponseModel.self) { response in
+                   switch response.result {
+                   case .success(let data):
+                       print(" 아이디 중복 확인 성공")
+                       print("isSuccess: \(data.isSuccess), 중복 여부: \(data.result)")
+                       completion(.success(data.result)) // `true`이면 중복, `false`이면 사용 가능
+
+                   case .failure(let error):
+                       print(" 아이디 중복 확인 실패")
+                       print("error: \(error.localizedDescription)")
+                       completion(.failure(self.handleError(error: error, response: response)))
+                   }
+               }
+       }
     
     
     

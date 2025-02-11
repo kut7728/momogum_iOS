@@ -15,6 +15,7 @@ class SignupDataModel{
     var nickname = ""
     
     func creatUser(){
+        print("accessToken",accessToken)
         print("name",name)
         print("nickname",nickname)
     }

@@ -7,9 +7,9 @@ final class AuthViewModel: ObservableObject {
     @Published var isNewUser: Bool?
     @Published var errorMessage: String?
     @Published var isSignedUp = false
+    @Published var isUsernameDuplicated: Bool? = nil // ✅ 중복 여부 저장
     @Published var kakaoAccessToken: String = ""
-
-    var signupData = SignupDataModel()
+    @Published var signupData = SignupDataModel()
 
     ///
     ///
@@ -46,7 +46,7 @@ final class AuthViewModel: ObservableObject {
     func signup() {
         
         let signupModel = signupData.createSignupModel()
-
+        let accessToken = kakaoAccessToken
             AuthService.shared.signup(signupModel: signupModel) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {
@@ -91,7 +91,28 @@ final class AuthViewModel: ObservableObject {
         }
     }
     
-    
+    func checkUsernameisDuplicated() {
+        AuthService.shared.checkDuplicateUsername(username: signupData.name) { [weak self] result in
+               DispatchQueue.main.async {
+                   switch result {
+                   case .success(let isDuplicated):
+                       if isDuplicated {
+                           print("중복확인: 사용자가 있습니다.")
+                           self?.isUsernameDuplicated = isDuplicated
+                           
+                       }
+                       else if !isDuplicated{
+                           print("중복확인: 사용 가능한 아이디입니다!")
+                           self?.isUsernameDuplicated = isDuplicated
+                       }
+                       
+                   case .failure:
+                       print("api 통신에러")
+                       self?.isUsernameDuplicated = nil
+                   }
+               }
+           }
+       }
     
     
     func handleKakaoLogout(){
