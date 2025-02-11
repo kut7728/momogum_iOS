@@ -47,6 +47,7 @@ struct LoginView: View {
                                         print("기존 유저 로그인 완료")
                                     }
                                 } else {
+//                                    path.append(.SignupStartView)
                                     AuthManager.shared.isLoggedIn = true
                                     print("❌ 유저 확인 실패")
                                 }
@@ -69,9 +70,8 @@ struct LoginView: View {
                         
                     case.SignupStep2View:
                         SignupStep2View(path: $path)
-                        
-                    case.MainTabView:
-                        MainTabView()
+                    case.SignupEndView:
+                        SignupEndView(path: $path)
                     }
                     
                 }

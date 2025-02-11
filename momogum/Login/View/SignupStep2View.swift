@@ -169,7 +169,7 @@ struct SignupStep2View: View {
                         
                         if isButtonEnabled && authViewModel.isUsernameDuplicated==false{
                             Button{
-                                path = []
+                                path.append(.SignupEndView)
                                 print(signupDataModel.creatUser())
                                 
                             }label: {
