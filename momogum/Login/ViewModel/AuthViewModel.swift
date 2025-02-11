@@ -10,13 +10,15 @@ final class AuthViewModel: ObservableObject {
     @Published var kakaoAccessToken: String = ""
 
     var signupData = SignupDataModel()
-    ///  신규 유저 확인 (AuthService 호출)
+
     ///
     ///
     ///
+    ///
+    ///신규회원 구분 함수 첫번째값은 통신성공여부, 둘째값은 실제 신규회원인지의 여부 newUser값
     func checkIsNewUser(completion: @escaping (Bool,Bool) -> Void) {
             guard !kakaoAccessToken.isEmpty else {
-                print("❌ 카카오 액세스 토큰이 없습니다.")
+                print(" 카카오 액세스 토큰이 없습니다.")
                 completion(false,false)
                 return
             }
@@ -27,6 +29,7 @@ final class AuthViewModel: ObservableObject {
                 switch result {
                 case .success(let response):
                     print(" 유저 정보 확인 성공: \(response)")
+                    AuthManager.shared.UUID = response.result.id //식별값 저장
                     self.isNewUser = response.result.newUser
                     completion(true,response.result.newUser)
                 case .failure(let error):
@@ -38,9 +41,7 @@ final class AuthViewModel: ObservableObject {
     
     
     
-    func loginWithKakao(accessToken: String) {
-         signupData.accessToken = accessToken
-     }
+
     
     func signup() {
         
