@@ -9,11 +9,10 @@ import Foundation
 import SwiftUI
 
 struct KeywordCell: View {
-    let keyword: KeywordSearchResult // 🔹 기존 뷰 유지, API 데이터 적용
+    let keyword: KeywordSearchResult
 
     var body: some View {
         VStack(spacing: 0) {
-            // 🔹 기존 뷰 유지, API 데이터 적용
             AsyncImage(url: URL(string: keyword.foodImageURL)) { image in
                 image.resizable()
                     .scaledToFit()
@@ -40,7 +39,7 @@ struct KeywordCell: View {
                             .frame(width: 36, height: 36)
                     }
 
-                    Text(keyword.foodName) // 🔹 기존 뷰 유지, API 데이터 적용
+                    Text(keyword.foodName)
                         .font(.mmg(.Caption1))
                         .foregroundColor(.black)
 

@@ -9,11 +9,11 @@ import Foundation
 import SwiftUI
 
 struct AccountCell: View {
-    var account: AccountSearchResult // 🔹 기존 뷰 유지, API 데이터 적용
+    var account: AccountSearchResult
 
     var body: some View {
         HStack {
-            // 🔹 프로필 이미지 (API에서 가져온 데이터 사용)
+            // 프로필 이미지 (API에서 가져온 데이터 사용)
             AsyncImage(url: URL(string: account.userImageURL)) { image in
                 image.resizable()
                     .scaledToFit()
@@ -21,18 +21,18 @@ struct AccountCell: View {
                     .clipShape(Circle())
             } placeholder: {
                 Circle()
-                    .fill(Color.gray)
+                    .fill(Color.black_4)
                     .frame(width: 64, height: 64)
             }
 
             VStack(alignment: .leading) {
-                Text(account.userName) // 🔹 기존 뷰 유지, API 데이터 적용
+                Text(account.userName)
                     .font(.mmg(.subheader4))
-                    .foregroundColor(.black)
+                    .foregroundColor(.black_1)
 
-                Text(account.userNickName) // 🔹 기존 뷰 유지, API 데이터 적용
+                Text(account.userNickName)
                     .font(.mmg(.Caption3))
-                    .foregroundColor(.gray)
+                    .foregroundColor(.black_2)
             }
             .padding(.leading, 2)
 
@@ -42,4 +42,13 @@ struct AccountCell: View {
         .background(Color.white)
         .cornerRadius(8)
     }
+}
+
+#Preview {
+    AccountCell(account: AccountSearchResult(
+        id: 0,
+        userName: "김윤진",
+        userNickName: "yunjin_kim",
+        userImageURL: "https://via.placeholder.com/64" // 더미 이미지
+    ))
 }
