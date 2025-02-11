@@ -11,8 +11,8 @@ struct SignupStep1View: View {
    //MARK: - Properties
     
     @Environment(\.dismiss) var dismiss
-//    @Environment(SignupDataModel.self) var signupDataModel
-    @State private var inputText: String = ""
+    @Environment(SignupDataModel.self) var signupDataModel
+//    @State private var inputText: String = ""
 
     @FocusState private var isFocused: Bool // TextField의 포커스 상태
     
@@ -22,7 +22,7 @@ struct SignupStep1View: View {
     
     //MARK: - View
     var body: some View {
-//        @Bindable var signupDataModel = signupDataModel
+        @Bindable var signupDataModel = signupDataModel
         ZStack (alignment: .bottomTrailing) {
             VStack{
                 HStack{
@@ -77,7 +77,7 @@ struct SignupStep1View: View {
                     
                     VStack{
                         HStack{
-                            TextField("최대 12자 이내의 한글, 영문 사용 가능", text: $inputText /*$signupDataModel.name*/,onEditingChanged: { editing in
+                            TextField("최대 12자 이내의 한글, 영문 사용 가능", text: /*$inputText*/ $signupDataModel.name,onEditingChanged: { editing in
                                 if editing {
                                     isFocused = true
                                     
@@ -87,16 +87,18 @@ struct SignupStep1View: View {
                             .modifier(SignupTextfieldModifer())
                             .focused($isFocused)
                             .foregroundStyle(isFocused ? Color.black : Color.black_3)
-                            .onChange(of: inputText /*signupDataModel.name*/) { _, newValue in
+                            .onChange(of: /*inputText*/ signupDataModel.name) { _, newValue in
                                 // 입력 값 길이 제한
                                 if isFocused && newValue.count > 1 {
-                                    showError = !validateInput(/*signupDataModel.name*/inputText) || newValue.count > 12
+                                    showError = !validateInput(signupDataModel.name/*inputText*/) || newValue.count > 12
                                 }
                             }
                             
-                            if !inputText.isEmpty {
+                            if /*!inputText*/!signupDataModel.name.isEmpty {
                                 Button(action: {
-                                    inputText = "" // 입력 내용 초기화
+//                                    inputText = ""
+                                    signupDataModel.name = ""
+                                    // 입력 내용 초기화
                                 }) {
                                     Image(systemName: "xmark.circle")
                                         .foregroundColor(.gray)
@@ -116,14 +118,14 @@ struct SignupStep1View: View {
                         
 
                         
-                        if showError && isFocused && !validateInput(inputText/*signupDataModel.name*/) {
+                        if showError && isFocused && !validateInput(/*inputText*/signupDataModel.name) {
                             Text("잘못된 입력입니다.")
                                 .foregroundColor(.Red_1)
                                 .font(.mmg(.Caption1))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading,43)
                         }
-                        else if !showError  && validateInput(inputText/*signupDataModel.name*/)  {
+                        else if !showError  && validateInput(/*inputText*/signupDataModel.name)  {
                             Text("사용 가능한 이름이에요 :)")
                                 .foregroundColor(.Green_1)
                                 .font(.mmg(.Caption1))
@@ -145,8 +147,8 @@ struct SignupStep1View: View {
                                         .padding(.trailing, 49)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.bottom ,93)
-                    .disabled(showError || !validateInput(inputText/*signupDataModel.name*/))
-                    .foregroundStyle(showError  || !validateInput(inputText/*signupDataModel.name*/) ? .gray : .Red_2)
+                    .disabled(showError || !validateInput(/*inputText*/signupDataModel.name))
+                    .foregroundStyle(showError  || !validateInput(/*inputText*/signupDataModel.name) ? .gray : .Red_2)
                     
                 }
                 .navigationBarBackButtonHidden()

@@ -10,12 +10,12 @@ import SwiftUI
 struct SignupStep2View: View {
     //MARK: - Properties
     @Environment(\.dismiss) var dismiss
-//    @Environment(SignupDataModel.self) var signupDataModel
-    @State private var inputText: String = ""
+    @ObservedObject var authViewModel = AuthViewModel()
+    @Environment(SignupDataModel.self) var signupDataModel
+//    @State private var inputText: String = ""
     @FocusState private var isFocused: Bool
     @State private var lengthCheck: Bool = false
     @State private var hasAllowedCharactersOnly: Bool = false
-    @State private var isDuplicated: Bool = false
     private var isButtonEnabled: Bool {
            return lengthCheck && hasAllowedCharactersOnly
        }
@@ -23,7 +23,7 @@ struct SignupStep2View: View {
     //MARK: - View
     var body: some View {
         
-        //        @Bindable var signupDataModel = signupDataModel
+                @Bindable var signupDataModel = signupDataModel
         ZStack (alignment: .bottomTrailing) {
             VStack{
                 HStack{
@@ -75,7 +75,7 @@ struct SignupStep2View: View {
                         
                         HStack{
                             
-                            TextField("ex.momogum12._.", text: $inputText /*$signupDataModel.nickname*/ ,onEditingChanged: { editing in
+                            TextField("ex.momogum12._.", text: /*$inputText*/ $signupDataModel.nickname ,onEditingChanged: { editing in
                                 if editing {
                                     isFocused = true
                                 }
@@ -83,13 +83,14 @@ struct SignupStep2View: View {
                             .modifier(SignupTextfieldModifer())
                             .focused($isFocused)
                             .foregroundStyle(isFocused ? Color.black : Color.signupDescriptionGray)
-                            .onChange(of: inputText /*signupDataModel.nickname*/) { _ , newValue in
+                            .onChange(of: /*inputText*/ signupDataModel.nickname) { _ , newValue in
                                 validateInput2(newValue)
                             }
 
-                            if !inputText.isEmpty {
+                            if /*inputText*/!signupDataModel.nickname.isEmpty {
                                 Button(action: {
-                                    inputText = "" // 입력 내용 초기화
+                                    /*inputText = ""*/ // 입력 내용 초기화
+                                    signupDataModel.nickname = ""
                                 }) {
                                     Image(systemName: "xmark.circle")
                                         .foregroundColor(.gray)
@@ -125,7 +126,7 @@ struct SignupStep2View: View {
                         
                         
                         VStack{
-                            if isButtonEnabled && isDuplicated{
+                            if isButtonEnabled && authViewModel.isUsernameDuplicated==false{
                                 Text("사용 가능한 아이디입니다:)")
                                     .font(.system(size:16))
                                     .fontWeight(.regular)
@@ -166,11 +167,10 @@ struct SignupStep2View: View {
                         .padding(.leading, 43)
                         .foregroundStyle(Color.placeholderGray)
                         
-                        if isButtonEnabled && isDuplicated{
+                        if isButtonEnabled && authViewModel.isUsernameDuplicated==false{
                             Button{
                                 path = []
-                              
-                                print(path)
+                                print(signupDataModel.creatUser())
                                 
                             }label: {
                                 Text("완료")
@@ -180,18 +180,15 @@ struct SignupStep2View: View {
                                     .frame(maxWidth: .infinity, alignment: .trailing)
                                     .foregroundStyle(!isButtonEnabled ? Color.black_4: Color.momogumRed)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                                    
                             }
                             .padding(.trailing, 47)
                             .padding(.bottom, 93)
                         }
                         else{
                             Button{
-                                //                            print(signupDataModel.creatUser())
-                                if !isDuplicated{
-                                    print(isDuplicated)
-                                    isDuplicated = true
-                                    
-                                }
+                          
+                                authViewModel.checkUsernameisDuplicated()
                                 
                             }label:{
                                 Text("중복확인")
@@ -199,7 +196,7 @@ struct SignupStep2View: View {
                             .font(.mmg(.subheader3))
                             .foregroundStyle(isButtonEnabled ? Color.Red_2 : Color.black_4)
                             .disabled(!isButtonEnabled)
-                            .disabled(isDuplicated)
+                            .disabled(authViewModel.isUsernameDuplicated==false)
                             .padding(.trailing, 47)
                             .padding(.bottom, 93)
                         }

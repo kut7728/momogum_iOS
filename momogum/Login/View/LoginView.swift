@@ -48,7 +48,9 @@ struct LoginView: View {
                                         print("기존 유저 로그인 완료")
                                     }
                                 } else {
-                                    isLoggedIn = true // 백엔드쪽오류로 일단은 열어놓기
+                                    path.append(.SignupStartView)
+
+//                                    isLoggedIn = true // 백엔드쪽오류로 일단은 열어놓기
                                     print("❌ 유저 확인 실패")
                                 }
                             }  } else {
