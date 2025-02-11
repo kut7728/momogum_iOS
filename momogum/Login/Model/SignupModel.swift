@@ -18,7 +18,7 @@ struct SignupModel: Codable {
 struct SignupResponseModel: Codable {
     let isSuccess: Bool
     let code, message: String
-    let result: Result
+    let result: SignupResult
     
 
 
@@ -26,6 +26,9 @@ struct SignupResponseModel: Codable {
 
 
 // MARK: - Result
-struct Result: Codable {
+struct SignupResult: Codable {
     let accessToken, refreshToken: String
 }
+
+
+// signup완료 버튼 클릭시 바로 전환 signup완료 버튼 클릭하게되면 로그인이 진행되어야하는데

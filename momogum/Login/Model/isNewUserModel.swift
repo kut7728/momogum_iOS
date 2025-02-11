@@ -16,11 +16,11 @@ struct KakaoLoginModel: Codable {
 struct IsNewUserResponseModel: Codable {
     let isSuccess: Bool
     let code, message: String
-    let result: UserResult
+    let result: IsNewUserResult
 }
 
 // MARK: - UserResult
-struct UserResult: Codable {
+struct IsNewUserResult: Codable {
     let id: Int?  //  id가 null일 수 있으므로 Optional 처리
     let name: String
     let nickname: String?  //  null이 가능하므로 Optional 처리
