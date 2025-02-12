@@ -42,11 +42,10 @@ struct AppointCreate4View: View {
                         ApmInvitedFriends(pickedFriends: viewModel.pickedFriends, isEditing: true)
                     }
                     
-                    
-                    Rectangle()
-                        .frame(width: 200, height: 150)
-                        .foregroundStyle(.black_5)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    Image("basic1")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 200)
                         .padding(.vertical, 30)
                         .overlay {
                             Button {
@@ -58,11 +57,9 @@ struct AppointCreate4View: View {
                                     .contentShape(Rectangle())
                                 
                             }
-                            .offset(x: 80, y: -55)
+                            .offset(x: 80, y: -50)
                             
                         }
-                    
-                    
                     
                     VStack (spacing: 20) {
                         HStack {
@@ -159,6 +156,7 @@ struct AppointCreate4View: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 24))
                         }
                         .padding(.vertical, 20)
+                        .disabled(!isButtonShowing)
                     }
                     .padding(.horizontal, 30)
                 }

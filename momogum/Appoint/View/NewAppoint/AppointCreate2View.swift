@@ -13,28 +13,27 @@ struct AppointCreate2View: View {
     @State var isPicked: Bool = false
     @Binding var path: [String]
     
+    /// 약속생성 4단계에서 편집으로 넘어왔을때를 판별
     private var isEditingBeforeEnd: Bool { path.dropLast().last == "create4"}
-
     
+    /// 카드 선택 로직
     private func selectCard(_ value: String) {
-        if appointViewModel.pickedImage != value {
-            appointViewModel.pickedImage = value
+        if appointViewModel.pickedCard != value {
+            appointViewModel.pickedCard = value
             withAnimation {
                 isPicked = true
             }
         } else {
-            appointViewModel.pickedImage = ""
+            appointViewModel.pickedCard = ""
             withAnimation {
                 isPicked = false
             }
         }
     }
-    
+        
     var body: some View {
         @Bindable var viewModel = appointViewModel
         
-        
-
         ApmBackgroundView(path: $path) {
             VStack {
                 Text("어울리는 식사 카드를 골라주세요")
@@ -50,27 +49,32 @@ struct AppointCreate2View: View {
                         
                         ScrollView (.horizontal, showsIndicators: false) {
                             HStack {
-                                ForEach(0..<5) { i in
-                                    Rectangle()
-                                        .frame(width: 170, height: 120)
-                                        .foregroundStyle(.black_5)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                ForEach(ApmCard.basic, id: \.self) { image in
+                                    Image(image)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 170)
                                         .overlay{
-                                            if appointViewModel.pickedImage == String(i) {
+                                            if appointViewModel.pickedCard == image {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(lineWidth: 3)
                                                     .foregroundStyle(.Red_2)
                                             }
                                         }
                                         .onTapGesture {
-                                            selectCard(String(i))
+                                            selectCard(image)
                                         }
                                         .padding(1)
                                 }
                             }
                         }
                         
-                        
+                        Spacer()
+                            .frame(width: 30)
+                    }
+                    .padding(.leading, 20)
+                    
+                    VStack {
                         Text("재미")
                             .font(.mmg(.subheader4))
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -78,48 +82,53 @@ struct AppointCreate2View: View {
                         
                         ScrollView (.horizontal, showsIndicators: false) {
                             HStack {
-                                ForEach(6..<10) { i in
-                                    Rectangle()
-                                        .frame(width: 170, height: 120)
-                                        .foregroundStyle(.black_5)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                ForEach(ApmCard.fun, id: \.self) { image in
+                                    Image(image)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 170)
                                         .overlay{
-                                            if appointViewModel.pickedImage == String(i) {
+                                            if appointViewModel.pickedCard == image {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(lineWidth: 3)
                                                     .foregroundStyle(.Red_2)
                                             }
                                         }
                                         .onTapGesture {
-                                            selectCard(String(i))
+                                            selectCard(image)
                                         }
                                         .padding(1)
                                 }
                             }
                         }
                         
-                        
-                        Text("진중")
+                        Spacer()
+                            .frame(width: 30)
+                    }
+                    .padding(.leading, 20)
+                    
+                    VStack {
+                        Text("이벤트")
                             .font(.mmg(.subheader4))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, 20)
                         
                         ScrollView (.horizontal, showsIndicators: false) {
                             HStack {
-                                ForEach(10..<15) { i in
-                                    Rectangle()
-                                        .frame(width: 170, height: 120)
-                                        .foregroundStyle(.black_5)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                ForEach(ApmCard.event, id: \.self) { image in
+                                    Image(image)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(width: 170)
                                         .overlay{
-                                            if appointViewModel.pickedImage == String(i) {
+                                            if appointViewModel.pickedCard == image {
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .stroke(lineWidth: 3)
                                                     .foregroundStyle(.Red_2)
                                             }
                                         }
                                         .onTapGesture {
-                                            selectCard(String(i))
+                                            selectCard(image)
                                         }
                                         .padding(1)
                                 }
@@ -131,7 +140,7 @@ struct AppointCreate2View: View {
                     }
                     .padding(.leading, 20)
                 }
-
+                
             }
             if isPicked {
                 ApmHoveringNavButton(navLinkValue: isEditingBeforeEnd ? "" : "create3")
@@ -143,5 +152,5 @@ struct AppointCreate2View: View {
 #Preview {
     AppointCreate2View(path: AppointView(isTabBarHidden: .constant(true)).$path)
         .environment(NewAppointViewModel())
-
+    
 }

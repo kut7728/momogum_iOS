@@ -32,13 +32,14 @@ struct AppointCheckingView: View {
                 VStack {
                     /// 초대장
                     VStack (alignment: .leading) {
+                        
                         /// 초대장 이미지
-                        Rectangle()
-                            .frame(width: 300, height: 150)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .foregroundStyle(.black_6)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        Image(appoint.pickedCard)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 170)
                             .padding(.vertical, 20)
+                            .frame(maxWidth: .infinity, alignment: .center)
                         
                         /// 선택된 친구들
                         ApmInvitedFriends(pickedFriends: appoint.pickedFriends, isEditing: false)

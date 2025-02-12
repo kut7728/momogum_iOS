@@ -8,6 +8,7 @@
 import SwiftUI
 import Alamofire
 
+// MARK: - Appoint Sending Data
 struct SendingData: Codable {
     let name: String
     let menu: String
@@ -16,8 +17,26 @@ struct SendingData: Codable {
     let note: String
 }
 
+// MARK: - AppointCreateResult
+struct ApiResponse: Codable {
+    let isSuccess: Bool
+    let code, message: String
+    let result: Result
+}
+
+// MARK: - Result
+struct Result: Codable {
+    let appointmentID: Int
+
+    enum CodingKeys: String, CodingKey {
+        case appointmentID = "appointmentId"
+    }
+}
+
+
 @Observable
 class NewAppointViewModel {
+    /// 약속 7요소
     var appointName: String = ""
     var menuName: String = ""
     var pickedDate: Date = Date()
@@ -25,39 +44,24 @@ class NewAppointViewModel {
     var note: String = ""
     
     var pickedFriends: [String] = []
-    var pickedImage: String = ""
+    var pickedCard: String = ""
     
-    
+    /// 전체 친구 목록
     var friends: [String] = ["친구1", "친구2", "친구3", "친구4", "친구5", "친구6", "친구7", "친구8", "친구9", "친구10"]
-    var ApmCards: [ApmCard] = []
-
     
+   
     
-    /// 약속잡기 초대장 이미지 로드
-    func loadAppointmentCard() {
-        let urls = ["\(BaseAPI)/appointment/card/fun", "\(BaseAPI)/appointment/card/basic"]
-        
-        for url in urls {
-            AF.request(url, method: .get).responseString() { response in
-                switch response.result {
-                case .success(let data):
-                    print("성공적으로 데이터를 받았습니다: \(data)")
-                case .failure(let error):
-                    print("요청 실패: \(error.localizedDescription)")
-                }
-            }
-        }
-        print("================")
-        
-    }
-    
-    /// 초대장을 발송 및 저장소 초기화
+    // MARK: - 초대장 발송 및 저장소 초기화
     func createAppoint() {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let dateString = dateFormatter.string(from: self.pickedDate)  // 현재 시간을 ISO 8601 형식 문자열로 변환
+
         
         let parm: Parameters = [
             "name": self.appointName,
             "menu": self.menuName,
-            "date": "2025-02-01T09:26:34.192Z",
+            "date": dateString,
             "location": self.placeName,
             "notes": self.note
         ]
@@ -69,25 +73,23 @@ class NewAppointViewModel {
                    method: .post,
                    parameters: parm,
                    encoding: JSONEncoding.default,
-                   headers: ["Content-Type": "application/json"]).responseString { response in
+                   headers: ["Content-Type": "application/json"]).responseDecodable(of: ApiResponse.self) { [self] response in
             
             switch response.result {
             case .success(let responseBody):
                 print("Response received successfully: \(responseBody)")
+                self.printingForDebug()
+                self.resetAppoint()
             case .failure(let error):
-                print("Error: \(error)")
+                print("Error: \(error.localizedDescription)")
                 return
             }
         }
-        
-        
-        printingForDebug()
-        resetAppoint()
     }
     
     
     
-    /// 새 약속잡기를 취소한 경우 저장소 초기화
+    // MARK: - 새 약속잡기를 취소한 경우 저장소 초기화
     func resetAppoint() {
         appointName = ""
         menuName = ""
@@ -95,10 +97,10 @@ class NewAppointViewModel {
         placeName = ""
         note = ""
         pickedFriends = []
-        pickedImage = "default image"
+        pickedCard = "default image"
     }
     
-    /// 디버그를 위한 약속잡기 임시저장 데이터 출력
+    // MARK: - 디버그를 위한 약속잡기 임시저장 데이터 출력
     func printingForDebug() {
         print(appointName)
         print(menuName)
@@ -106,6 +108,6 @@ class NewAppointViewModel {
         print(placeName)
         print(note)
         print(pickedFriends)
-        print(pickedImage)
+        print(pickedCard)
     }
 }

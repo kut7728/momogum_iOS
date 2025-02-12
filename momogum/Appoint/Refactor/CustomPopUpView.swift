@@ -34,7 +34,7 @@ struct CustomPopUpView: View {
                     .font(.mmg(.Body3))
                     .foregroundStyle(.black_2)
                     .multilineTextAlignment(.center)
-                    .padding(.vertical, 12)
+                    .padding(12)
                 
                 Divider()
                 
@@ -51,6 +51,7 @@ struct CustomPopUpView: View {
                             .padding(.vertical, 8)
                             .frame(width: 100)
                     })
+                    .frame(maxWidth: .infinity, alignment: .center)
                     
                     Divider()
                     
@@ -65,6 +66,8 @@ struct CustomPopUpView: View {
                             .padding(.vertical, 8)
                             .frame(width: 100)
                     })
+                    .frame(maxWidth: .infinity, alignment: .center)
+
                     
                     
                 }
