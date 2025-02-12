@@ -19,12 +19,16 @@ struct AccountSearchResult: Codable, Identifiable {
     let userName: String
     let userNickName: String
     let userImageURL: String
+    let searchFollowName: [String]
+    let searchFollowCount: Int
 
     enum CodingKeys: String, CodingKey {
         case id = "userId"
         case userName
         case userNickName
         case userImageURL
+        case searchFollowName
+        case searchFollowCount
     }
 }
 

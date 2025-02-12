@@ -15,7 +15,7 @@ struct KeywordSearchAPIResponse: Codable {
     let result: [KeywordSearchResult]
 }
 
-struct KeywordSearchResult: Codable, Identifiable {
+struct KeywordSearchResult: Codable, Identifiable, Equatable { // Equatable 추가
     let id: Int
     let foodImageURL: String
     let userImageURL: String
@@ -29,5 +29,11 @@ struct KeywordSearchResult: Codable, Identifiable {
         case foodName
         case isRevisit
     }
+
+    // Equatable 프로토콜 구현 (id가 같으면 동일한 객체로 인식)
+    static func == (lhs: KeywordSearchResult, rhs: KeywordSearchResult) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
+
 
