@@ -278,8 +278,8 @@ struct MyProfileView: View {
                     }
                 
                 SettingsPopupView(showPopup: $showPopup, showLogoutPopup: $showLogoutPopup, showDelPopup: $showDelPopup)
-                    .padding(.bottom, UIScreen.main.bounds.height <= 812 ? 450 : 505)
-                    .padding(.leading, UIScreen.main.bounds.height <= 812 ? 180 : 195)
+                    .padding(.bottom, UIScreen.main.bounds.height <= 812 ? 450 : 535)
+                    .padding(.leading, UIScreen.main.bounds.height <= 812 ? 180 : 205)
                     .padding(.trailing, 37)
             } else if showLogoutPopup {
                 Color.black.opacity(0.001)

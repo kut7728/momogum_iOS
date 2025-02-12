@@ -36,7 +36,7 @@ struct LogoutPopupView: View {
                 .padding(.trailing, 36)
                 
                 
-                VerticalDivider()
+                VerticalDivider().padding(.top, 10)
                 
                 // 로그아웃
                 Button {
@@ -61,7 +61,7 @@ struct LogoutPopupView: View {
 
 struct VerticalDivider: View {
     var width: CGFloat = 1
-    var height: CGFloat = 37
+    var height: CGFloat = 27
     
     var body: some View {
         Divider()

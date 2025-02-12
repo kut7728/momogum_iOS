@@ -9,10 +9,12 @@ import SwiftUI
 
 struct MyFollower: View {
     @Bindable var followViewModel: FollowViewModel
-    
+    @Binding var showPopup: Bool
     @State private var showCloseButton = false
     @State private var isEditing = false // 텍스트필드 활성화 여부
-    @State private var selectedUserID: String? = nil // 선택된 유저 ID
+    
+    @Binding var profileUserID: String?
+    @Binding var popupUserID: String?
     
     var body: some View {
         NavigationStack {
@@ -21,11 +23,12 @@ struct MyFollower: View {
                     searchBar
                     // 팔로워 목록
                     ForEach(followViewModel.filteredFollowers, id: \.self) { userID in
-                        FollowerCell(followViewModel: followViewModel, userID: userID) {
+                        FollowerCell(followViewModel: followViewModel, showPopup: $showPopup, popupUserID: $popupUserID, userID: userID)
+                        {
                             followViewModel.removeFollower(userID)
                         }
                         .onTapGesture {
-                            selectedUserID = userID
+                            profileUserID = userID
                         }
                         .onAppear {
                             if userID == followViewModel.filteredFollowers.last {
@@ -39,7 +42,7 @@ struct MyFollower: View {
                 }
                 .listStyle(PlainListStyle())
             }
-            .navigationDestination(item: $selectedUserID) { userID in
+            .navigationDestination(item: $profileUserID) { userID in
                 OtherProfileView(
                     userID: userID,
                     isFollowing: followViewModel.isFollowing(userID),

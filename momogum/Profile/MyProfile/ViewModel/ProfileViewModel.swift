@@ -46,47 +46,47 @@ class ProfileViewModel {
     
     // 유저 프로필 로드
     func fetchUserProfile(userId: Int) {
-            UserProfileManager.shared.fetchUserProfile(userId: userId) { result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success(let userProfile):
-                        self.userName = userProfile.name
-                        self.userID = userProfile.nickname
-                        self.userBio = userProfile.about ?? ""
-                        
-                        self.draftUserName = self.userName
-                        self.draftUserID = self.userID
-                        self.draftUserBio = self.userBio
-
-                        // 프로필 이미지 로드
-                        if let profileImageURL = userProfile.profileImage, !profileImageURL.isEmpty {
-                            self.loadImageAsync(from: profileImageURL)
-                        }
-                    case .failure(let error):
-                        print("❌ 유저 프로필 로드 실패: \(error.localizedDescription)")
+        UserProfileManager.shared.fetchUserProfile(userId: userId) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let userProfile):
+                    self.userName = userProfile.name
+                    self.userID = userProfile.nickname
+                    self.userBio = userProfile.about ?? ""
+                    
+                    self.draftUserName = self.userName
+                    self.draftUserID = self.userID
+                    self.draftUserBio = self.userBio
+                    
+                    // 프로필 이미지 로드
+                    if let profileImageURL = userProfile.profileImage, !profileImageURL.isEmpty {
+                        self.loadImageAsync(from: profileImageURL)
                     }
+                case .failure(let error):
+                    print("❌ 유저 프로필 로드 실패: \(error.localizedDescription)")
                 }
             }
         }
-
-        // 프로필 이미지 로드
-        private func loadImageAsync(from urlString: String) {
-            AF.request(urlString)
-                .validate()
-                .responseData { response in
-                    switch response.result {
-                    case .success(let imageData):
-                        if let image = UIImage(data: imageData) {
-                            DispatchQueue.main.async {
-                                self.profileImage = image
-                                self.currentPreviewImage = image
-                            }
+    }
+    
+    // 프로필 이미지 로드
+    private func loadImageAsync(from urlString: String) {
+        AF.request(urlString)
+            .validate()
+            .responseData { response in
+                switch response.result {
+                case .success(let imageData):
+                    if let image = UIImage(data: imageData) {
+                        DispatchQueue.main.async {
+                            self.profileImage = image
+                            self.currentPreviewImage = image
                         }
-                    case .failure(let error):
-                        print("❌ 프로필 이미지 로드 실패: \(error.localizedDescription)")
                     }
+                case .failure(let error):
+                    print("❌ 프로필 이미지 로드 실패: \(error.localizedDescription)")
                 }
-        }
+            }
+    }
     
     // 임시 프로필 이미지 변경
     func convertPreviewImage(from uiImage: UIImage) {

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct FollowerCell: View {
     @Bindable var followViewModel: FollowViewModel
+    @Binding var showPopup: Bool
+    @Binding var popupUserID: String?
     var userID: String
     var onRemove: () -> Void
     
@@ -75,9 +77,10 @@ struct FollowerCell: View {
             }
             
             // X 버튼
-            
             Button {
-                onRemove()
+//                selectedUserID = userID // 선택된 유저 ID 저장
+                popupUserID = userID
+                showPopup = true
             } label: {
                 Image("close_s")
                     .resizable()
