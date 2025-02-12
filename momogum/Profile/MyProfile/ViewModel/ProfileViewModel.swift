@@ -90,8 +90,9 @@ class ProfileViewModel {
     
     // 임시 프로필 이미지 변경
     func convertPreviewImage(from uiImage: UIImage) {
-        self.currentPreviewImage = uiImage
-        self.uiImage = uiImage
+        DispatchQueue.main.async {
+            self.currentPreviewImage = uiImage
+        }
     }
     
     // 확정 (완료 버튼 클릭 시 호출)
