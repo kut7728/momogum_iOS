@@ -12,7 +12,6 @@ struct LoginView: View {
     @FocusState private var isFocused: Bool // TextField의 포커스 상태
     @FocusState private var isFocusedPWD: Bool
     @State private var path: [Route] = [] //path 설정
-    @Binding var isLoggedIn: Bool
     var body: some View {
         
         NavigationStack(path: $path){
@@ -39,16 +38,16 @@ struct LoginView: View {
                             print("카카오 로그인 성공!")
                             
                             authViewModel.checkIsNewUser { isSuccess, isNew in
-                                if isSuccess {
-                                    if isNew {
+                                if isSuccess { //로그인 성공 true
+                                    if isNew { //신규인경우 true
                                         path.append(.SignupStartView)
                                         print("신규 유저입니다. 회원가입이 필요합니다.")
-                                    } else {
-                                        isLoggedIn = true
+                                    } else { // true false  기존유저
+                                        AuthManager.shared.isLoggedIn = true
                                         print("기존 유저 로그인 완료")
                                     }
                                 } else {
-                                    isLoggedIn = true // 백엔드쪽오류로 일단은 열어놓기
+//                                    path.append(.SignupStartView)
                                     print("❌ 유저 확인 실패")
                                 }
                             }  } else {
@@ -70,9 +69,8 @@ struct LoginView: View {
                         
                     case.SignupStep2View:
                         SignupStep2View(path: $path)
-                        
-                    case.MainTabView:
-                        MainTabView()
+                    case.SignupEndView:
+                        SignupEndView(path: $path)
                     }
                     
                 }
@@ -97,5 +95,5 @@ struct LoginView: View {
 
 
 #Preview {
-    LoginView(isLoggedIn: .constant(false))
+    LoginView()
 }

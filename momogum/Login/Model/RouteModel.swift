@@ -10,5 +10,5 @@ enum Route: Hashable{
     case  SignupStartView
     case  SignupStep1View
     case  SignupStep2View
-    case  MainTabView
+    case  SignupEndView
 }

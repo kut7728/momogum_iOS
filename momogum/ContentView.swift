@@ -9,15 +9,15 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var showMainView = false
-    @State private var isLoggedIn = false  // 로그인 상태 관리
+    @ObservedObject var authManager = AuthManager.shared
     @State var signupDataModel = SignupDataModel()
     var body: some View {
         ZStack{
             if showMainView{
-                if isLoggedIn{
+                if authManager.isLoggedIn{
                     MainTabView()
                 } else{
-                    LoginView(isLoggedIn: $isLoggedIn)
+                    LoginView()
                         .environment(signupDataModel)
                 }
                 
