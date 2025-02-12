@@ -56,7 +56,7 @@ struct FollowerCell: View {
                                 .stroke(Color.black_4, lineWidth: 1)
                         )
                 }
-                .padding(.trailing, 30)
+                .padding(.trailing, 25)
             } else {
                 Button {
                     followViewModel.follow(userID)
@@ -71,7 +71,17 @@ struct FollowerCell: View {
                                 .padding(6)
                         )
                 }
-                .padding(.trailing, 30)
+                .padding(.trailing, 25)
+            }
+            
+            // X 버튼
+            
+            Button {
+                onRemove()
+            } label: {
+                Image("close_s")
+                    .resizable()
+                    .frame(width: 24, height: 24)
             }
         }
         .frame(maxWidth: .infinity)

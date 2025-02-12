@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Alamofire
 
 @Observable
 class ProfileViewModel {
@@ -15,8 +16,8 @@ class ProfileViewModel {
     
     // 기본 프로필 여부 체크
     var isDefaultProfileImage: Bool {
-            return currentPreviewImage?.pngData() == UIImage(named: "defaultProfile")?.pngData()
-        }
+        return currentPreviewImage?.pngData() == UIImage(named: "defaultProfile")?.pngData()
+    }
     
     // 유저 정보 (확정)
     var userName: String
@@ -28,11 +29,10 @@ class ProfileViewModel {
     var draftUserID: String
     var draftUserBio: String
     
-    init() {
-        self.userName = ""
+    init(userId: Int) {
+        self.userName = "" // 임시
         self.userID = ""
         self.userBio = ""
-        
         
         self.draftUserName = ""
         self.draftUserID = ""
@@ -41,33 +41,52 @@ class ProfileViewModel {
         self.profileImage = UIImage(named: "defaultProfile")
         self.currentPreviewImage = self.profileImage
         
-        // 더미 데이터 적용
-        if let dummyUser = User.dummyUser.result {
-            self.userName = dummyUser.name
-            self.userID = dummyUser.nickname
-            self.userBio = dummyUser.about ?? ""
-            self.draftUserName = self.userName
-            self.draftUserID = self.userID
-            self.draftUserBio = self.userBio
-            
-            // 프로필 이미지 로드
-            if let profileImageURL = URL(string: dummyUser.profileImage!) {
-                loadImageAsync(from: profileImageURL)
-            }
-        }
+        fetchUserProfile(userId: userId)
     }
     
-    // 이미지 로드
-    private func loadImageAsync(from url: URL) {
-        DispatchQueue.global(qos: .background).async {
-            if let imageData = try? Data(contentsOf: url), let image = UIImage(data: imageData) {
+    // 유저 프로필 로드
+    func fetchUserProfile(userId: Int) {
+            UserProfileManager.shared.fetchUserProfile(userId: userId) { result in
                 DispatchQueue.main.async {
-                    self.profileImage = image
-                    self.currentPreviewImage = image
+                    switch result {
+                    case .success(let userProfile):
+                        self.userName = userProfile.name
+                        self.userID = userProfile.nickname
+                        self.userBio = userProfile.about ?? ""
+                        
+                        self.draftUserName = self.userName
+                        self.draftUserID = self.userID
+                        self.draftUserBio = self.userBio
+
+                        // 프로필 이미지 로드
+                        if let profileImageURL = userProfile.profileImage, !profileImageURL.isEmpty {
+                            self.loadImageAsync(from: profileImageURL)
+                        }
+                    case .failure(let error):
+                        print("❌ 유저 프로필 로드 실패: \(error.localizedDescription)")
+                    }
                 }
             }
         }
-    }
+
+        // 프로필 이미지 로드
+        private func loadImageAsync(from urlString: String) {
+            AF.request(urlString)
+                .validate()
+                .responseData { response in
+                    switch response.result {
+                    case .success(let imageData):
+                        if let image = UIImage(data: imageData) {
+                            DispatchQueue.main.async {
+                                self.profileImage = image
+                                self.currentPreviewImage = image
+                            }
+                        }
+                    case .failure(let error):
+                        print("❌ 프로필 이미지 로드 실패: \(error.localizedDescription)")
+                    }
+                }
+        }
     
     // 임시 프로필 이미지 변경
     func convertPreviewImage(from uiImage: UIImage) {

@@ -18,7 +18,7 @@ struct MyProfileView: View {
     @State private var showLogoutPopup = false
     @State private var showDelPopup = false
     
-    @State var viewModel: ProfileViewModel = ProfileViewModel()
+    @State var viewModel: ProfileViewModel = ProfileViewModel(userId: 1) // 기본값 설정 (임시)
     @State var followViewModel: FollowViewModel = FollowViewModel()
     
     @Binding var isTabBarHidden: Bool
