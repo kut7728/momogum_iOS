@@ -38,17 +38,16 @@ struct LoginView: View {
                             print("카카오 로그인 성공!")
                             
                             authViewModel.checkIsNewUser { isSuccess, isNew in
-                                if isSuccess {
-                                    if isNew {
+                                if isSuccess { //로그인 성공 true
+                                    if isNew { //신규인경우 true
                                         path.append(.SignupStartView)
                                         print("신규 유저입니다. 회원가입이 필요합니다.")
-                                    } else {
+                                    } else { // true false  기존유저
                                         AuthManager.shared.isLoggedIn = true
                                         print("기존 유저 로그인 완료")
                                     }
                                 } else {
 //                                    path.append(.SignupStartView)
-                                    AuthManager.shared.isLoggedIn = true
                                     print("❌ 유저 확인 실패")
                                 }
                             }  } else {

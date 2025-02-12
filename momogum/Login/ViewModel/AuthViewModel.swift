@@ -7,8 +7,7 @@ final class AuthViewModel: ObservableObject {
     @Published var isNewUser: Bool?
     @Published var errorMessage: String?
     @Published var isSignedUp = false
-    @Published var isUsernameDuplicated: Bool? = nil // ✅ 중복 여부 저장
-    @Published var kakaoAccessToken: String = ""
+    @Published var isUsernameDuplicated: Bool? = nil //  중복 여부 저장
     @Published var signupData = SignupDataModel()
 
     ///
@@ -16,48 +15,71 @@ final class AuthViewModel: ObservableObject {
     ///
     ///
     ///신규회원 구분 함수 첫번째값은 통신성공여부, 둘째값은 실제 신규회원인지의 여부 newUser값
-    func checkIsNewUser(completion: @escaping (Bool,Bool) -> Void) {
-            guard !kakaoAccessToken.isEmpty else {
-                print(" 카카오 액세스 토큰이 없습니다.")
-                completion(false,false)
-                return
-            }
+    /// 신규 유저 확인 로직
+       func checkIsNewUser(completion: @escaping (Bool, Bool) -> Void) {
+           guard let accessToken = AuthManager.shared.kakaoAccessToken, !accessToken.isEmpty else {
+               print("❌ 저장된 카카오 액세스 토큰이 없음")
+               completion(false, false)
+               return
+           }
 
-            let kakaoLoginModel = KakaoLoginModel(provider: "kakao", accessToken: kakaoAccessToken)
+           let kakaoLoginModel = KakaoLoginModel(provider: "kakao", accessToken: accessToken)
+           print("🛠️ 전송할 데이터: \(kakaoLoginModel)")
 
-            AuthService.shared.checkIsNewUser(kakaoLoginModel: kakaoLoginModel) { result in
-                switch result {
-                case .success(let response):
-                    print(" 유저 정보 확인 성공: \(response)")
-                    AuthManager.shared.UUID = response.result.id //식별값 저장
-                    self.isNewUser = response.result.newUser
-                    completion(true,response.result.newUser)
-                case .failure(let error):
-                    print(" 유저 확인 실패: \(error.localizedDescription)")
-                    completion(false,false)
-                }
-            }
-        }
+           AuthService.shared.checkIsNewUser(kakaoLoginModel: kakaoLoginModel) { result in
+                   switch result {
+                   case .success(let response):
+                       print(" 유저 정보 확인 성공: \(response)")
+
+                       switch response.result {
+                                   case .user(let userResult):  // 신규 유저인 경우
+                                       AuthManager.shared.UUID = userResult.id //추후 아이디 가져오는 방법 바꿀예정
+                                       self.isNewUser = userResult.newUser // 신규유저인경우 true값 반환
+                                    
+                                       completion(true, userResult.newUser)
+
+                                   case .token(let tokenResult):  // 기존 유저인 경우
+                                       print("기존 유저 로그인 - 액세스 토큰 저장")
+                                       AuthManager.shared.kakaoAccessToken = tokenResult.accessToken
+                                       completion(true, false)
+                                   }
+
+
+                   case .failure(let error):
+                       print(" 유저 확인 실패: \(error.localizedDescription)")
+                       completion(false, false)
+                   }
+               
+           }
+       }
+
     
     
     
 
     
     func signup() {
+        guard let accessToken = AuthManager.shared.kakaoAccessToken, !accessToken.isEmpty else {
+            print(" 저장된 카카오 액세스 토큰이 없음")
+            return
+        }
+        let signupModel = SignupModel(accessToken: accessToken, name: signupData.name, nickname: signupData.nickname)
+
         
-        let signupModel = signupData.createSignupModel()
-//        let accessToken = kakaoAccessToken
             AuthService.shared.signup(signupModel: signupModel) { [weak self] result in
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let response):
                         if response.isSuccess {
                             self?.isSignedUp = true
-                        } else {
+                            print("회원가입 성공")
+                        } else { 
                             self?.errorMessage = response.message
+                            print("중복된 ID")
                         }
                     case .failure(let error):
                         self?.errorMessage = error.localizedDescription
+                        print("회원가입 실패")
                     }
                 }
             }
@@ -72,7 +94,9 @@ final class AuthViewModel: ObservableObject {
                     completion(false)
                 } else if let oauthToken = oauthToken {
                     print("카카오톡 로그인 성공, accessToken: \(oauthToken.accessToken)")
-                    self.kakaoAccessToken = oauthToken.accessToken  //  accessToken 저장
+                    AuthManager.shared.kakaoAccessToken = oauthToken.accessToken  //  accessToken 저장
+                    
+                    print("✅ 카카오 액세스 토큰 저장 완료: \(AuthManager.shared.kakaoAccessToken ?? "없음")")
                     completion(true)
                 }
             }
@@ -82,10 +106,12 @@ final class AuthViewModel: ObservableObject {
                     print(" 카카오 계정 로그인 실패: \(error.localizedDescription)")
                     completion(false)
                 } else if let oauthToken = oauthToken {
-                    print(" 카카오 계정 로그인 성공, accessToken: \(oauthToken.accessToken)")
-                    self.kakaoAccessToken = oauthToken.accessToken  //  accessToken 저장
-                    print(self.kakaoAccessToken)// 카카오 토큰값 저장됐는지 확인
-                    completion(true)
+                    DispatchQueue.main.async {
+                        print(" 카카오 계정 로그인 성공, accessToken: \(oauthToken.accessToken)")
+                        AuthManager.shared.kakaoAccessToken = oauthToken.accessToken  //  accessToken 저장
+                        print(" 카카오 액세스 토큰 저장 완료: \(AuthManager.shared.kakaoAccessToken ?? "없음")")
+                        completion(true)
+                    }
                 }
             }
         }
@@ -126,5 +152,12 @@ final class AuthViewModel: ObservableObject {
         }
     }
 
+    
+    
+    
+//     토큰 저장: AuthManager.shared.kakaoAccessToken = oauthToken.accessToken
+//     토큰 가져오기: AuthManager.shared.kakaoAccessToken
+//     토큰 삭제: AuthManager.shared.kakaoAccessToken = nil
+//     자동 로그인: checkAutoLogin()
 }
 

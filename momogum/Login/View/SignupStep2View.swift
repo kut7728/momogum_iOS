@@ -10,7 +10,7 @@ import SwiftUI
 struct SignupStep2View: View {
     //MARK: - Properties
     @Environment(\.dismiss) var dismiss
-    @ObservedObject var authViewModel = AuthViewModel()
+    @StateObject var authViewModel = AuthViewModel()
     @Environment(SignupDataModel.self) var signupDataModel
 //    @State private var inputText: String = ""
     @FocusState private var isFocused: Bool
@@ -169,6 +169,7 @@ struct SignupStep2View: View {
                         
                         if isButtonEnabled && authViewModel.isUsernameDuplicated==false{
                             Button{
+                                authViewModel.signup()
                                 path.append(.SignupEndView)
                                 print(signupDataModel.creatUser())
                                 

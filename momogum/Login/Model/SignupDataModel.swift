@@ -10,6 +10,7 @@ import Foundation
 // 사용자로부터 받는 데이터
 @Observable
 class SignupDataModel{
+
     var accessToken: String = ""
     var name = ""
     var nickname = ""
