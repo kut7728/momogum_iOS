@@ -74,11 +74,11 @@ struct CustomTabItem: View {
         VStack {
             Image(systemName: icon)
                 .font(.system(size: 22))
-                .foregroundColor(selectedTab == tab ? Color.red : Color.gray)
+                .foregroundColor(selectedTab == tab ? Color.Red_2 : Color.black_3)
 
             Text(title)
                 .font(.system(size: 12))
-                .foregroundColor(selectedTab == tab ? Color.red : Color.gray)
+                .foregroundColor(selectedTab == tab ? Color.Red_2 : Color.black_3)
         }
         .onTapGesture {
             selectedTab = tab
