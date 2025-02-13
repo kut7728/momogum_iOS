@@ -17,11 +17,6 @@ struct ApmInvitedFriends: View {
                 Image("emptyAvatar")
                     .resizable()
                     .frame(width: 40, height: 40)
-//                    .overlay {
-//                        Circle()
-//                            .stroke(lineWidth: 1)
-//                            .foregroundStyle(.black_4)
-//                    }
             }
                 
             
