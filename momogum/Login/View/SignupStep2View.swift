@@ -167,7 +167,7 @@ struct SignupStep2View: View {
                         .padding(.leading, 43)
                         .foregroundStyle(Color.placeholderGray)
                         
-                        if isButtonEnabled && authViewModel.isUsernameDuplicated==false{
+                        if isButtonEnabled && authViewModel.isUsernameDuplicated==false{ // 만약 조건에 들어맞고, 중복된 아이디가아니면
                             Button{
                                 authViewModel.signup()
                                 path.append(.SignupEndView)
@@ -186,7 +186,7 @@ struct SignupStep2View: View {
                             .padding(.trailing, 47)
                             .padding(.bottom, 93)
                         }
-                        else{
+                        else{  //조건에 맞지않고 + //조건에 맞는데 true인경우
                             Button{
                           
                                 authViewModel.checkUsernameisDuplicated()

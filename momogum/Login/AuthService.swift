@@ -10,7 +10,7 @@ final class AuthService {
     ///  신규 유저 확인 (API 요청)
     func checkIsNewUser(kakaoLoginModel: KakaoLoginModel, completion: @escaping (Result<IsNewUserResponseModel, APIError>) -> Void) {
           let url = "\(BaseAPI)/auth/login/kakao"
-          let headers: HTTPHeaders = ["Content-Type": "application/json"]
+          let headers: HTTPHeaders = ["Content-Type": "application/json", "Cache-Control": "no-cache"]
 
           AF.request(url, method: .post, parameters: kakaoLoginModel, encoder: JSONParameterEncoder.default, headers: headers)
               .validate()
@@ -63,7 +63,7 @@ final class AuthService {
     
     func checkDuplicateUsername(username: String, completion: @escaping (Result<Bool, APIError>) -> Void) {
            let url = "\(BaseAPI)/auth/check-nickname?nickname=\(username)"
-           let headers: HTTPHeaders = ["Content-Type": "application/json"]
+           let headers: HTTPHeaders = ["Content-Type": "application/json", "Cache-Control": "no-cache"]
 
            AF.request(url, method: .get, headers: headers)
                .validate()

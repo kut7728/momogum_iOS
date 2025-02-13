@@ -54,7 +54,11 @@ final class AuthViewModel: ObservableObject {
        }
 
     
-    
+    func resetSignupData() {
+        self.signupData.name = ""
+        self.signupData.nickname = ""
+        self.isUsernameDuplicated = nil
+    }
     
 
     

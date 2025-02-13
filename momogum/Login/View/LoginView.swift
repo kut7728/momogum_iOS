@@ -41,6 +41,7 @@ struct LoginView: View {
                                 if isSuccess { //로그인 성공 true
                                     if isNew { //신규인경우 true
                                         path.append(.SignupStartView)
+                                        authViewModel.resetSignupData()
                                         print("신규 유저입니다. 회원가입이 필요합니다.")
                                     } else { // true false  기존유저
                                         AuthManager.shared.isLoggedIn = true
