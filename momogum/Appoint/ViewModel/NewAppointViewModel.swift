@@ -17,15 +17,14 @@ struct SendingData: Codable {
     let note: String
 }
 
-// MARK: - AppointCreateResult
+// MARK: - Response Structure
 struct ApiResponse: Codable {
     let isSuccess: Bool
     let code, message: String
-    let result: Result
+    let result: ApmResult
 }
 
-// MARK: - Result
-struct Result: Codable {
+struct ApmResult: Codable {
     let appointmentID: Int
 
     enum CodingKeys: String, CodingKey {
@@ -33,7 +32,7 @@ struct Result: Codable {
     }
 }
 
-
+// MARK: - class
 @Observable
 class NewAppointViewModel {
     /// 약속 7요소
@@ -55,6 +54,7 @@ class NewAppointViewModel {
     func createAppoint() {
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+//        dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         let dateString = dateFormatter.string(from: self.pickedDate)  // 현재 시간을 ISO 8601 형식 문자열로 변환
 
         
@@ -80,6 +80,8 @@ class NewAppointViewModel {
                 print("Response received successfully: \(responseBody)")
                 self.printingForDebug()
                 self.resetAppoint()
+                print(responseBody.result.appointmentID)
+                
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
                 return

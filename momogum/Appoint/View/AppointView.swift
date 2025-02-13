@@ -22,7 +22,6 @@ struct AppointView: View {
                 VStack (alignment: .leading) {
                     Button {
                         path.append("create1")
-                        newAppointViewModel.loadAppointmentCard()
                         isTabBarHidden = true
                     } label: {
                         Rectangle()
