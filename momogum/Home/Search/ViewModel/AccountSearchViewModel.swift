@@ -15,13 +15,17 @@ class AccountSearchViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     private var cancellables = Set<AnyCancellable>()
-    
+
     private var BaseAPI: String {
         return Bundle.main.object(forInfoDictionaryKey: "BASE_API") as? String ?? ""
     }
 
     // 계정 검색 API 호출
-    func searchAccounts() {
+    func searchAccounts(reset: Bool = false) {
+        if reset {
+            accountResults = []
+        }
+        
         guard !searchQuery.isEmpty else {
             self.errorMessage = "검색어를 입력하세요."
             return
@@ -36,7 +40,13 @@ class AccountSearchViewModel: ObservableObject {
             return
         }
 
-        urlComponents.queryItems = [URLQueryItem(name: "request", value: searchQuery)]
+        // 현재 로그인한 사용자의 UUID
+        let userUUID = AuthManager.shared.UUID.map { String($0) } ?? "0"  // UUID가 없으면 기본값 "0" 사용
+
+        urlComponents.queryItems = [
+            URLQueryItem(name: "request", value: searchQuery),
+            URLQueryItem(name: "userId", value: userUUID)
+        ]
 
         guard let url = urlComponents.url else {
             self.errorMessage = "URL 생성 실패"
@@ -44,8 +54,16 @@ class AccountSearchViewModel: ObservableObject {
             return
         }
 
-        URLSession.shared.dataTaskPublisher(for: url)
+        print("🔹 계정 검색 API 요청 URL: \(url)") // 디버깅용 요청 URL 출력
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
+            .handleEvents(receiveOutput: { data in
+                print("✅ API 응답 데이터: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
+            })
             .decode(type: AccountSearchAPIResponse.self, decoder: JSONDecoder())
             .map { $0.result }
             .receive(on: DispatchQueue.main)
@@ -53,6 +71,7 @@ class AccountSearchViewModel: ObservableObject {
                 self.isLoading = false
                 if case .failure(let error) = completion {
                     self.errorMessage = "계정 검색 실패: \(error.localizedDescription)"
+                    print("❌ API 요청 실패: \(error.localizedDescription)") // 오류 로그 추가
                 }
             }, receiveValue: { results in
                 self.accountResults = results
@@ -60,10 +79,11 @@ class AccountSearchViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    // 검색어 초기화 메서드 추가
+    // 검색어 초기화 시 리스트도 초기화
     func clearSearch() {
         self.searchQuery = ""
         self.accountResults = []
         self.errorMessage = nil
+        print("🔹 검색어 및 결과 초기화 완료")
     }
 }
