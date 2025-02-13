@@ -67,6 +67,16 @@ struct FollowerCell: View {
             .onAppear {
                 isFollowing = followViewModel.isFollowing(userID) // 초기 상태 설정
             }
+            
+            // X 버튼
+            Button {
+                popupUserID = userID
+                showPopup = true
+            } label: {
+                Image("close_s")
+                    .resizable()
+                    .frame(width: 24, height: 24)
+            }
         }
         .frame(maxWidth: .infinity)
     }

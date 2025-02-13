@@ -59,12 +59,16 @@ class FollowViewModel {
     
     // 즉시 반영되는 팔로우 (Follower)
     func follow(_ userID: String) {
+        if pendingUnfollow.contains(userID) {
+            pendingUnfollow.removeAll { $0 == userID } // 예약된 언팔로우 취소
+            followingCount += 1 // 예약된 언팔로우가 취소된 경우 다시 카운트 증가
+        }
         if !followingUsers.contains(userID) {
-            followingUsers.append(userID)
+            followingUsers.append(userID) // 리스트에 다시 추가
             followingCount += 1
         }
-        pendingUnfollow.removeAll { $0 == userID } // 예약된 언팔로우 취소
     }
+
     
     // 즉시 반영되는 언팔로우 (Follower)
     func unfollow(_ userID: String) {

@@ -113,7 +113,7 @@ struct FollowView: View {
             if showCompletedPopup {
                 UnfollowCompletedPopup()
                     .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                             withAnimation {
                                 showCompletedPopup = false
                             }
