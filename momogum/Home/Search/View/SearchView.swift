@@ -8,15 +8,22 @@
 import SwiftUI
 
 struct SearchView: View {
-    @StateObject private var accountViewModel = AccountSearchViewModel() // 계정 검색 뷰모델
-    @StateObject private var keywordViewModel = KeywordSearchViewModel() // 키워드 검색 뷰모델
-    @State private var selectedButton: String = "계정" // 🔹 직접 선언하여 사용
-    @State private var isEditing: Bool = false // 텍스트 필드 편집 상태
-    @Environment(\.presentationMode) var presentationMode // 뒤로가기 기능
+    @StateObject private var accountViewModel = AccountSearchViewModel()
+    @StateObject private var keywordViewModel = KeywordSearchViewModel()
+    @State private var selectedButton: String = "계정"
+    @State private var isEditing: Bool = false
+    @Environment(\.presentationMode) var presentationMode
+    @FocusState private var isFocused: Bool // 키보드 포커스 상태 추가
+
+    let columns = [
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
+    ]
 
     var body: some View {
         VStack {
             VStack {
+                // 검색 필드
                 HStack {
                     if !isEditing {
                         Image(systemName: "magnifyingglass")
@@ -25,24 +32,37 @@ struct SearchView: View {
                             .padding(.leading, 8)
                     }
                     
-                    TextField("계정 및 키워드 검색", text: selectedButton == "계정" ? $accountViewModel.searchQuery : $keywordViewModel.searchQuery, onEditingChanged: { editing in
-                        withAnimation {
-                            isEditing = editing
+                    TextField(
+                        "계정 및 키워드 검색",
+                        text: selectedButton == "계정" ? $accountViewModel.searchQuery : $keywordViewModel.searchQuery,
+                        onEditingChanged: { editing in
+                            withAnimation {
+                                isEditing = editing
+                            }
+                        },
+                        onCommit: {
+                            isFocused = false // 엔터 입력 시 키보드 숨기기
+                            if selectedButton == "계정" {
+                                accountViewModel.searchAccounts(reset: true)
+                            } else {
+                                keywordViewModel.searchKeywords(reset: true)
+                            }
                         }
-                    })
+                    )
                     .font(.mmg(.subheader4))
                     .foregroundColor(.primary)
                     .padding(8)
                     .textInputAutocapitalization(.never)
+                    .focused($isFocused) // 키보드 포커스 적용
                     
                     if isEditing {
                         Button(action: {
                             withAnimation {
-                                accountViewModel.clearSearch() // 🔹 오류 해결됨!
-                                keywordViewModel.clearSearch() // 🔹 오류 해결됨!
+                                accountViewModel.clearSearch()
+                                keywordViewModel.clearSearch()
                                 isEditing = false
                             }
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                            isFocused = false
                         }) {
                             Image("close_cc")
                                 .resizable()
@@ -58,18 +78,18 @@ struct SearchView: View {
                 )
                 .padding(.horizontal, 16)
                 .padding(.top, 24)
-                
+
                 if isEditing {
                     VStack {
                         Divider()
                             .background(Color.gray)
                             .padding(.top, 20)
-                        
+
+                        // 계정 / 키워드 버튼
                         HStack(spacing: 48) {
                             Button(action: {
-                                selectedButton = "계정" // 🔹 버튼 선택 시 변경
-                                accountViewModel.searchQuery = ""
-                                keywordViewModel.searchQuery = ""
+                                selectedButton = "계정"
+                                accountViewModel.clearSearch()
                             }) {
                                 VStack {
                                     Text("계정")
@@ -84,11 +104,11 @@ struct SearchView: View {
                                         .padding(.top, 2)
                                 }
                             }
-                            
+
                             Button(action: {
-                                selectedButton = "키워드" // 🔹 버튼 선택 시 변경
-                                accountViewModel.searchQuery = ""
-                                keywordViewModel.searchQuery = ""
+                                selectedButton = "키워드"
+                                keywordViewModel.clearSearch()
+                                keywordViewModel.searchKeywords(reset: true)
                             }) {
                                 VStack {
                                     Text("키워드")
@@ -106,52 +126,20 @@ struct SearchView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
-                        
-                        // 🔹 검색 결과 표시 (계정)
-                        if selectedButton == "계정" {
-                            VStack(spacing: 16) {
-                                if accountViewModel.isLoading {
-                                    ProgressView()
-                                } else if let error = accountViewModel.errorMessage {
-                                    Text(error)
-                                        .foregroundColor(.red)
-                                } else {
-                                    ForEach(accountViewModel.accountResults) { account in
-                                        AccountCell(account: account)
-                                    }
-                                }
-                            }
-                            .padding(.top, 34)
-                        }
-                        
-                        // 🔹 검색 결과 표시 (키워드)
-                        if selectedButton == "키워드" {
-                            ScrollView(.vertical, showsIndicators: false) {
-                                LazyVGrid(columns: [
-                                    GridItem(.flexible(), spacing: 16),
-                                    GridItem(.flexible(), spacing: 16)
-                                ], spacing: 16) {
-                                    if keywordViewModel.isLoading {
-                                        ProgressView()
-                                    } else if let error = keywordViewModel.errorMessage {
-                                        Text(error)
-                                            .foregroundColor(.red)
-                                    } else {
-                                        ForEach(keywordViewModel.keywordResults) { keyword in
-                                            KeywordCell(keyword: keyword)
-                                        }
-                                    }
-                                }
-                                .padding(.horizontal, 16)
-                            }
-                            .padding(.top, 34)
-                        }
                     }
                     .transition(.opacity)
                 }
             }
+            .onTapGesture {
+                isFocused = false // 다른 곳을 터치하면 키보드 숨기기
+            }
+
             Spacer()
         }
+        .onAppear {
+            isFocused = false // 초기에는 키보드를 숨긴 상태로 설정
+        }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -166,16 +154,19 @@ struct SearchView: View {
                     Spacer()
                         .frame(width: 130)
                     
-                    Text("검색하기")
+                    Text("검색하기") // 기존 텍스트 유지
                         .font(.mmg(.subheader3))
                         .foregroundColor(.black)
                 }
             }
         }
     }
+
+    // 키보드를 숨기는 함수
+    private func hideKeyboard() {
+        isFocused = false
+    }
 }
-
-
 
 #Preview {
     SearchView()
