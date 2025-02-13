@@ -9,8 +9,8 @@ import SwiftUI
 
 struct FollowingCell: View {
     @Bindable var followViewModel: FollowViewModel
+    @State private var isFollowing: Bool = false
     var userID: String
-    var onRemove: () -> Void
     
     var body: some View {
         HStack(alignment: .center, spacing: 0){
@@ -37,42 +37,31 @@ struct FollowingCell: View {
             
             Spacer()
             
-            // 팔로우 / 팔로잉 버튼
-            if followViewModel.isFollowing(userID) {
-                Button {
-                    followViewModel.unfollow(userID)
-                    onRemove()  // 리스트에서 제거
-                } label: {
-                    RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 72, height: 28)
-                        .foregroundStyle(Color.black_6)
-                        .overlay(
-                            Text("팔로잉")
-                                .font(.mmg(.subheader4))
-                                .foregroundStyle(Color.Red_2)
-                                .padding(6)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .stroke(Color.black_4, lineWidth: 1)
-                        )
+            Button {
+                isFollowing.toggle()
+                if isFollowing {
+                    followViewModel.follow(userID) // 즉시 반영
+                } else {
+                    followViewModel.delayedUnfollow(userID) // 뒤로가기 시 반영
                 }
-                .padding(.trailing, 30)
-            } else {
-                Button {
-                    followViewModel.follow(userID)
-                } label: {
-                    RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 72, height: 28)
-                        .foregroundStyle(Color.Red_2)
-                        .overlay(
-                            Text("팔로우")
-                                .font(.mmg(.subheader4))
-                                .foregroundStyle(Color.black_6)
-                                .padding(6)
-                        )
-                }
-                .padding(.trailing, 30)
+            } label: {
+                RoundedRectangle(cornerRadius: 4)
+                    .frame(width: 72, height: 28)
+                    .foregroundStyle(isFollowing ? Color.black_6 : Color.Red_2)
+                    .overlay(
+                        Text(isFollowing ? "팔로잉" : "팔로우")
+                            .font(.mmg(.subheader4))
+                            .foregroundStyle(isFollowing ? Color.Red_2 : Color.black_6)
+                            .padding(6)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(isFollowing ? Color.black_4 : Color.clear, lineWidth: 1)
+                    )
+            }
+            .padding(.trailing, 30)
+            .onAppear {
+                isFollowing = followViewModel.isFollowing(userID)
             }
         }
         .frame(maxWidth: .infinity)

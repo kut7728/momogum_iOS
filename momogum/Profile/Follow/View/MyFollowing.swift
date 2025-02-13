@@ -21,9 +21,7 @@ struct MyFollowing: View {
                     searchBar
                     // 팔로워 목록
                     ForEach(followViewModel.filteredFollowing, id: \.self) { userID in
-                        FollowingCell(followViewModel: followViewModel, userID: userID) {
-                            followViewModel.unfollow(userID)
-                        }
+                        FollowingCell(followViewModel: followViewModel, userID: userID)
                         .onTapGesture {
                             selectedUserID = userID
                         }

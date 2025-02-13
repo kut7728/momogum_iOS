@@ -16,6 +16,10 @@ class FollowViewModel {
     var loadedFollowers = 20 // 초기 로딩 개수
     var allFollowers: [String] = [] // 전체 팔로워 리스트
     var followingUsers: [String] = [] // 팔로우한 유저 목록
+    private var pendingUnfollow: [String] = [] // 언팔로우 예약된 유저 목록
+    
+    
+// MARK: - 검색
     
     // 검색된 팔로워 목록
     var filteredFollowers: [String] {
@@ -48,24 +52,42 @@ class FollowViewModel {
     
     // 팔로우 상태 확인
     func isFollowing(_ userID: String) -> Bool {
-        return followingUsers.contains(userID)
+        return followingUsers.contains(userID) && !pendingUnfollow.contains(userID)
     }
     
-    // 팔로우
+    // MARK: - Follower
+    
+    // 즉시 반영되는 팔로우 (Follower)
     func follow(_ userID: String) {
         if !followingUsers.contains(userID) {
             followingUsers.append(userID)
             followingCount += 1
         }
+        pendingUnfollow.removeAll { $0 == userID } // 예약된 언팔로우 취소
     }
     
-    // 언팔로우 (리스트에서 삭제)
+    // 즉시 반영되는 언팔로우 (Follower)
     func unfollow(_ userID: String) {
         if let index = followingUsers.firstIndex(of: userID) {
             followingUsers.remove(at: index)
             followingCount -= 1
-            //            removeFollower(userID) // 리스트에서 삭제
         }
+    }
+    
+    // MARK: - Following
+    
+    // 뒤로가기 시 반영되는 언팔로우 (Following)
+    func delayedUnfollow(_ userID: String) {
+        if !pendingUnfollow.contains(userID) {
+            pendingUnfollow.append(userID)
+            followingCount -= 1
+        }
+    }
+    
+    // 최신 팔로우 목록 갱신 (뒤로가기 버튼을 눌렀을 때 실행)
+    func refreshFollowingList() {
+        followingUsers.removeAll { pendingUnfollow.contains($0) }
+        pendingUnfollow.removeAll() // 초기화
     }
     
     // 팔로워 삭제

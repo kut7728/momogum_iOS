@@ -24,6 +24,7 @@ struct FollowView: View {
                 HStack(alignment: .center, spacing: 0) {
                     // back 버튼
                     Button{
+                        followViewModel.refreshFollowingList()
                         dismiss()
                     } label: {
                         Image("back")
