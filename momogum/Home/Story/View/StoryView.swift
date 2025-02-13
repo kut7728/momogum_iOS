@@ -10,8 +10,10 @@ import SwiftUI
 struct StoryView: View {
     var userID: String
     @Binding var tabIndex: Int
-    @StateObject private var viewModel = StoryViewModel()  // ✅ 뷰 모델 연결
+    @StateObject private var viewModel = StoryViewModel()  // 뷰 모델 연결
     @Environment(\.dismiss) private var dismiss
+//    @Binding var isTabBarHidden: Bool
+    @State private var isGalleryPresented = false  // 상태 변수 추가
 
     var body: some View {
         NavigationStack {
@@ -26,11 +28,12 @@ struct StoryView: View {
                     .padding(.top, 1)
                     .padding(.bottom, 92)
                 
-                reactionIcons() // ✅ 이모지 아이콘
+                reactionIcons()
                 
-                // ✅ NavigationStack 사용하여 pop 방지
                 Button(action: {
-                    viewModel.startWritingStory()
+                    dismiss()
+                    tabIndex = 1
+
                 }) {
                     Text("바로 밥일기 작성하기")
                         .font(.mmg(.subheader3))
@@ -48,12 +51,11 @@ struct StoryView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity)
-            .navigationBarBackButtonHidden(true) // ✅ 기본 백 버튼 숨김
+            .navigationBarBackButtonHidden(true) // 기본 백 버튼 숨김
             .toolbar {
-                // 쉐브론 버튼 (기본 백 버튼 제거)
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
-                        dismiss() // 뒤로가기 동작
+                        dismiss()
                     }) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.black)
@@ -61,14 +63,6 @@ struct StoryView: View {
                     }
                 }
 
-                // 자동 생성되는 네비게이션 타이틀 제거
-                ToolbarItem(placement: .principal) {
-                    Text("")
-                        .frame(height: 0)
-                }
-            }
-            .navigationDestination(isPresented: $viewModel.navigateToGallery) {
-                GalleryPickerView(tabIndex: $tabIndex, isTabBarHidden: .constant(false))
             }
         }
     }
