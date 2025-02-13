@@ -122,11 +122,12 @@ final class AuthViewModel: ObservableObject {
                DispatchQueue.main.async {
                    switch result {
                    case .success(let isDuplicated):
-                       if isDuplicated {
+                       if isDuplicated { // 중복 값이 true면
+                           print(isDuplicated)
                            print("중복확인: 사용자가 있습니다.")
                            self?.isUsernameDuplicated = isDuplicated
                            
-                       }
+                       } //false면
                        else if !isDuplicated{
                            print("중복확인: 사용 가능한 아이디입니다!")
                            self?.isUsernameDuplicated = isDuplicated

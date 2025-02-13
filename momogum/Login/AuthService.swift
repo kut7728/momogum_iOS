@@ -77,6 +77,10 @@ final class AuthService {
                    case .failure(let error):
                        print(" 아이디 중복 확인 실패")
                        print("error: \(error.localizedDescription)")
+                       if let data = response.data {
+                           let responseString = String(data: data, encoding: .utf8)
+                           print(" 응답 바디: \(String(describing: responseString))")
+                       }
                        completion(.failure(self.handleError(error: error, response: response)))
                    }
                }

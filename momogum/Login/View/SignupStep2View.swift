@@ -176,7 +176,7 @@ struct SignupStep2View: View {
                             }label: {
                                 Text("완료")
                                     .disabled(!isButtonEnabled)
-                                //+백엔드 중복확인 api값
+                                    .disabled(authViewModel.isUsernameDuplicated==true)
                                     .font(.mmg(.subheader3))
                                     .frame(maxWidth: .infinity, alignment: .trailing)
                                     .foregroundStyle(!isButtonEnabled ? Color.black_4: Color.momogumRed)
