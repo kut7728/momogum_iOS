@@ -7,17 +7,20 @@
 
 import Foundation
 
-/// 초대장 모델, 8속성 [id, appointName, menuName, pickedDate, placeName, note, pickedFriends, isConfirmed]
+/// 초대장 모델, 10속성 [id / senderName, appointName, menuName, pickedDate, placeName, note, pickedFriends, pickedCard / isConfirmed]
 struct Appoint: Codable, Identifiable {
     let id: String
     
     var senderName: String
+    
     var appointName: String
     var menuName: String
     var pickedDate: Date
     var placeName: String
     var note: String
+    
     var pickedFriends: [String]
+    var pickedCard: String
     
     var isConfirmed: Bool = false
     
@@ -33,6 +36,7 @@ extension Appoint {
         pickedDate: Date(),
         placeName: "마포구 더미동",
         note: "꾸밈단계 더미단계",
-        pickedFriends: ["test", "test2", "test3"]
+        pickedFriends: ["test", "test2", "test3"],
+        pickedCard: "basic1"
     )
 }

@@ -25,6 +25,7 @@ struct ApmBackgroundView<Content: View>: View {
         ZStack (alignment: .bottomTrailing) {
             content
         }
+        .onAppear {KeyboardHider.hideKeyboard()}
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("약속잡기")
         .navigationBarBackButtonHidden(true)
