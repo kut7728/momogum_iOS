@@ -16,7 +16,6 @@ struct StoryView: View {
     @State private var isGalleryPresented = false  // 상태 변수 추가
 
     var body: some View {
-        NavigationStack {
             VStack {
                 Text("오늘의 한 끼는 어땠나요? 🍽️")
                     .font(.mmg(.Header3))
@@ -66,7 +65,6 @@ struct StoryView: View {
             }
         }
     }
-}
 
 // MARK: - UI 컴포넌트 분리
 extension StoryView {

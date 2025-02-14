@@ -11,13 +11,14 @@ struct HomeView: View {
     @Binding var tabIndex: Int
     @Binding var isTabBarHidden: Bool
     @StateObject private var viewModel = HomeViewModel()
+    @State private var path = NavigationPath() // 네비게이션 경로 추가
 
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     let normalButtonColor = Color(.black_5)
     let selectedButtonColor = Color(.Red_2)
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack {
                 headerView()
                 Spacer().frame(height: 40)
@@ -32,9 +33,17 @@ struct HomeView: View {
 
                 Spacer()
             }
+            .navigationDestination(for: String.self) { story in
+                if story == "내 스토리" {
+                    StoryView(userID: "유저아이디", tabIndex: $tabIndex)
+                } else {
+                    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
+                }
+            }
         }
     }
 }
+
 
 // ✅ MARK: - UI 컴포넌트 분리
 extension HomeView {
@@ -81,19 +90,21 @@ extension HomeView {
     private func storyScrollView() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                storyItem(title: "내 스토리", hasStory: false, destination: StoryView(userID: "", tabIndex: $tabIndex))
-                storyItem(title: "momogum._.", hasStory: true, destination: Story2View(userID: "", isTabBarHidden: .constant(false)))
+                storyItem(title: "내 스토리", hasStory: false)
+                storyItem(title: "momogum._.", hasStory: true)
             }
         }
     }
 
-    private func storyItem(title: String, hasStory: Bool, destination: some View) -> some View {
+
+    private func storyItem(title: String, hasStory: Bool) -> some View {
         VStack {
-            NavigationLink(destination: destination.onAppear { isTabBarHidden = true }
-                .onDisappear { isTabBarHidden = false }) {
+            Button(action: {
+                isTabBarHidden = true
+                path.append(title) // path에 추가해서 이동
+            }) {
                 ZStack {
                     if hasStory {
-                        // ✅ 스토리가 있는 경우 - 그라데이션 테두리 유지
                         Circle()
                             .strokeBorder(
                                 LinearGradient(gradient: Gradient(colors: [
@@ -104,7 +115,6 @@ extension HomeView {
                             )
                             .frame(width: 90, height: 90)
                     } else {
-                        // 스토리가 없는 경우 - 기본 회색 테두리 유지
                         Circle()
                             .strokeBorder(Color.gray.opacity(0.5), lineWidth: 6)
                             .frame(width: 90, height: 90)
@@ -121,6 +131,7 @@ extension HomeView {
         }
         .padding(.leading, 24)
     }
+
 
     private func categoryTitle() -> some View {
         HStack {
