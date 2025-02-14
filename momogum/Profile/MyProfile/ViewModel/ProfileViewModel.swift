@@ -29,6 +29,9 @@ class ProfileViewModel {
     var draftUserID: String
     var draftUserBio: String
     
+    // 밥일기 리스트
+    var mealDiaries: [MealDiary] = []
+    
     init(userId: Int) {
         self.userName = "" // 임시
         self.userID = ""
@@ -42,6 +45,7 @@ class ProfileViewModel {
         self.currentPreviewImage = self.profileImage
         
         fetchUserProfile(userId: userId)
+        fetchMealDiaries(userId: userId)
     }
     
     // 유저 프로필 로드
@@ -67,6 +71,25 @@ class ProfileViewModel {
                 }
             }
         }
+    }
+    
+    // 밥일기 로드
+    func fetchMealDiaries(userId: Int) {
+        UserProfileManager.shared.fetchMealDiaries(userId: userId) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let mealDiaries):
+                    self.updateMealDiaries(with: mealDiaries)
+                case .failure(let error):
+                    print("❌ 밥일기 로드 실패: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    // 밥일기 업데이트 함수
+    private func updateMealDiaries(with newMealDiaries: [MealDiary]) {
+        self.mealDiaries = newMealDiaries
     }
     
     // 프로필 이미지 로드

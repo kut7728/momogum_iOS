@@ -233,13 +233,13 @@ struct OtherProfileView: View {
                 
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(0..<30, id: \.self) { index in
-                            //                                NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
-                            //                                    .onAppear { isTabBarHidden = true }
-                            //                                    .onDisappear { isTabBarHidden = false }
-                            //                                ) {
-                            CardPostCell(selectedSegment: $selectedSegment)
-                        }
+//                        ForEach(0..<30, id: \.self) { index in
+//                            //                                NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
+//                            //                                    .onAppear { isTabBarHidden = true }
+//                            //                                    .onDisappear { isTabBarHidden = false }
+//                            //                                ) {
+//                            CardPostCell(selectedSegment: $selectedSegment)
+//                        }
                     }
                 }
                 .padding(.horizontal, 20)

@@ -134,7 +134,7 @@ struct MyProfileView: View {
                                     showFollowList = 1
                                     navigateToFollowView = true
                                 }
-                                    isTabBarHidden = true
+                                isTabBarHidden = true
                             }) {
                                 VStack(alignment: .center, spacing: 0){
                                     Text("팔로잉")
@@ -244,19 +244,29 @@ struct MyProfileView: View {
                             .onAppear { isTabBarHidden = true }
                             .onDisappear { isTabBarHidden = false }
                     }
-                                        
+                    
                     ScrollView {
-                        LazyVGrid(columns: columns, spacing: 20) {
-                            ForEach(0..<30, id: \.self) { index in
-                                NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
-                                    .onAppear { isTabBarHidden = true }
-                                    .onDisappear { isTabBarHidden = false }
-                                ) {
-                                    CardPostCell(selectedSegment: $selectedSegment)
+                        if viewModel.mealDiaries.isEmpty {
+                            VStack {
+                                Text(selectedSegment == 0 ? "아직 기록된 밥일기가 없어요. 첫 기록을 남겨볼까요?" : "저장된 밥일기가 없습니다. 지금 저장해보세요!")
+                                    .font(.mmg(.Caption2))
+                                    .foregroundColor(Color.black_4)
+                                    .padding(.top, 150)
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        } else {
+                            LazyVGrid(columns: columns, spacing: 20) {
+                                ForEach(viewModel.mealDiaries, id: \.mealDiaryId) { mealDiary in
+                                    NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
+                                        .onAppear { isTabBarHidden = true }
+                                        .onDisappear { isTabBarHidden = false }
+                                    ) {
+                                        CardPostCell(selectedSegment: $selectedSegment, mealDiary: mealDiary)
+                                    }
                                 }
                             }
+                            .padding(.horizontal, 20)
                         }
-                        .padding(.horizontal, 20)
                     }
                     
                 }

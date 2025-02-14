@@ -12,11 +12,11 @@ import Alamofire
 class UserProfileManager {
     static let shared = UserProfileManager()
     private init() {}
-
+    
     //  유저 프로필 로드
     func fetchUserProfile(userId: Int, completion: @escaping (Swift.Result<UserProfile, Error>) -> Void) {
         let url = "\(BaseAPI)/userProfiles/userId/\(userId)"
-
+        
         AF.request(url, method: .get)
             .validate(statusCode: 200..<300)
             .responseDecodable(of: User.self) { response in
@@ -34,9 +34,26 @@ class UserProfileManager {
                 }
             }
     }
+    
+    // 유저가 작성한 밥일기 로드
+    func fetchMealDiaries(userId: Int, completion: @escaping (Swift.Result<[MealDiary], Error>) -> Void) {
+        let url = "\(BaseAPI)/userProfiles/\(userId)/meal-diaries"
+        
+        AF.request(url, method: .get)
+            .validate(statusCode: 200..<300)
+            .responseDecodable(of: MealDiaryResponse.self) { response in
+                switch response.result {
+                case .success(let decodedResponse):
+                    completion(.success(decodedResponse.result))
+                case .failure(let error):
+                    print("❌ 밥일기 로드 실패: \(error.localizedDescription)")
+                    completion(.failure(error))
+                }
+            }
+    }
 }
 
-
+// 유저 프로필 에러
 enum UserProfileError: Error {
     case invalidURL // 잘못된 URL인 경우
     case noData // 서버에서 데이터를 못 받아온 경우
