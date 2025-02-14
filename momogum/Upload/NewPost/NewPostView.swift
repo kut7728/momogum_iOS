@@ -12,7 +12,7 @@ struct NewPostView: View {
     @Binding var isTabBarHidden: Bool
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel = NewPostViewModel()
-
+    
     let editedImage: UIImage
     let onReset: () -> Void
 
@@ -151,16 +151,29 @@ struct NewPostView: View {
                             }
 
                             if viewModel.newPost.selectedIcon != nil {
-                                NavigationLink(destination: DonePostView()) {
-                                    Text("밥일기 업로드 하기")
+                                Button(action: {
+                                    viewModel.setSelectedImage(editedImage) // 이미지 설정
+                                    viewModel.uploadMealDiarySingleRequest(image: editedImage) { success in
+                                        if success {
+                                            DispatchQueue.main.async {
+                                                isTabBarHidden = false
+                                                dismiss()
+                                            }
+                                        } else {
+                                            print("🚨 업로드 실패")
+                                        }
+                                    }
+                                }) {
+                                    Text(viewModel.isUploading ? "업로드 중..." : "밥일기 업로드 하기")
                                         .font(.system(size: 17, weight: .bold))
                                         .frame(width: 340, height: 58)
                                         .foregroundColor(.white)
-                                        .background(Color(hex: 0xE05A55))
+                                        .background(viewModel.isUploading ? Color.gray : Color(hex: 0xE05A55))
                                         .cornerRadius(16)
                                         .padding(.top, 44)
                                         .frame(maxWidth: .infinity, alignment: .center)
                                 }
+                                .disabled(viewModel.isUploading)
                                 .id("uploadButton")
                             }
                         }
