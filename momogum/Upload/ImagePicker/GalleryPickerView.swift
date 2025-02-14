@@ -27,17 +27,33 @@ struct GalleryPickerView: View {
                     if viewModel.isPermissionGranted {
                         ScrollView {
                             LazyVGrid(columns: gridItems, spacing: 8) {
-                                ForEach(viewModel.images, id: \UIImage.hash) { image in
-                                    NavigationLink(
-                                        destination: ImageEditorView(image: image, tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden)
-                                            .navigationBarBackButtonHidden(true)
-                                            .navigationBarHidden(true)
-                                    ) {
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .scaledToFill()
+                                ForEach(viewModel.images.indices, id: \.self) { index in
+                                    if let image = viewModel.images[index] {
+                                        NavigationLink(
+                                            destination: ImageEditorView(image: image, tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden)
+                                                .navigationBarBackButtonHidden(true)
+                                                .navigationBarHidden(true)
+                                        ) {
+                                            Image(uiImage: image)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: gridItemSize, height: gridItemSize)
+                                                .clipped()
+                                        }
+                                    } else {
+                                        Color.gray
                                             .frame(width: gridItemSize, height: gridItemSize)
-                                            .clipped()
+                                            .onAppear {
+                                                viewModel.loadImage(at: index)
+                                            }
+                                    }
+
+                                    // 🚀 스크롤이 끝에 도달하면 추가 로드!
+                                    if index == viewModel.images.count - 1 {
+                                        ProgressView()
+                                            .onAppear {
+                                                viewModel.loadMoreContent()
+                                            }
                                     }
                                 }
                             }
