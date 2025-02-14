@@ -159,6 +159,9 @@ extension Story2View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.black_5, lineWidth: 1)
         )
+        .onDisappear { // 뒤로 갈 때 탭 바 다시 보이게
+            isTabBarHidden = false
+        }
     }
 }
 

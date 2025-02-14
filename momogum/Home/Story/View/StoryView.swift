@@ -12,7 +12,7 @@ struct StoryView: View {
     @Binding var tabIndex: Int
     @StateObject private var viewModel = StoryViewModel()  // 뷰 모델 연결
     @Environment(\.dismiss) private var dismiss
-//    @Binding var isTabBarHidden: Bool
+    @Binding var isTabBarHidden: Bool
     @State private var isGalleryPresented = false  // 상태 변수 추가
 
     var body: some View {
@@ -63,6 +63,9 @@ struct StoryView: View {
                 }
 
             }
+            .onDisappear { // 뒤로 갈 때 탭바 다시 보이게
+                isTabBarHidden = false
+            }
         }
     }
 
@@ -90,5 +93,5 @@ extension StoryView {
 }
 
 #Preview {
-    StoryView(userID: "유저아이디", tabIndex: .constant(0))
+    StoryView(userID: "유저아이디", tabIndex: .constant(0), isTabBarHidden: .constant(false))
 }

@@ -33,9 +33,14 @@ struct HomeView: View {
 
                 Spacer()
             }
+            
+            .onAppear{ //홈뷰가 나타났을떄 탭바 보이게
+                isTabBarHidden = false
+            }
+            
             .navigationDestination(for: String.self) { story in
                 if story == "내 스토리" {
-                    StoryView(userID: "유저아이디", tabIndex: $tabIndex)
+                    StoryView(userID: "유저아이디", tabIndex: $tabIndex, isTabBarHidden: .constant(false))
                 } else {
                     Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
                 }
