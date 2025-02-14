@@ -59,6 +59,18 @@ struct MyCardView: View {
                             .aspectRatio(1, contentMode: .fit)
                             .frame(maxWidth: .infinity)
                             .background(Color.gray)
+                        
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                Image("good_fill")
+                                    .resizable()
+                                    .frame(width: 72, height: 72)
+                                    .foregroundColor(.yellow)
+                                    .padding(20)
+                            }
+                        }
 
                         if viewModel.myCard.showBookmark {
                             Text("저장됨")
