@@ -8,8 +8,11 @@ final class AuthViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isSignedUp = false
     @Published var isUsernameDuplicated: Bool? = nil //  중복 여부 저장
-    @Published var signupData = SignupDataModel()
+    @Published var signupData : SignupDataModel
 
+    init(signupData: SignupDataModel) {
+            self.signupData = signupData
+        }
     ///
     ///
     ///
@@ -76,6 +79,7 @@ final class AuthViewModel: ObservableObject {
                     case .success(let response):
                         if response.isSuccess {
                             self?.isSignedUp = true
+                            self?.resetSignupData()
                             print("회원가입 성공")
                         } else { 
                             self?.errorMessage = response.message
@@ -100,7 +104,7 @@ final class AuthViewModel: ObservableObject {
                     print("카카오톡 로그인 성공, accessToken: \(oauthToken.accessToken)")
                     AuthManager.shared.kakaoAccessToken = oauthToken.accessToken  //  accessToken 저장
                     
-                    print("✅ 카카오 액세스 토큰 저장 완료: \(AuthManager.shared.kakaoAccessToken ?? "없음")")
+                    print(" 카카오 액세스 토큰 저장 완료: \(AuthManager.shared.kakaoAccessToken ?? "없음")")
                     completion(true)
                 }
             }
@@ -122,8 +126,10 @@ final class AuthViewModel: ObservableObject {
     }
     
     func checkUsernameisDuplicated() {
-        AuthService.shared.checkDuplicateUsername(username: signupData.name) { [weak self] result in
-               DispatchQueue.main.async {
+
+        AuthService.shared.checkDuplicateUsername(username: signupData.nickname) { [weak self] result in
+            print(self?.signupData.nickname)
+            DispatchQueue.main.async {
                    switch result {
                    case .success(let isDuplicated):
                        if isDuplicated { // 중복 값이 true면

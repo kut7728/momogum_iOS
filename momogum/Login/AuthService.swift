@@ -5,7 +5,7 @@ import Alamofire
 final class AuthService {
     static let shared = AuthService()
     private init() {}
-
+    
     
     ///  신규 유저 확인 (API 요청)
     func checkIsNewUser(kakaoLoginModel: KakaoLoginModel, completion: @escaping (Result<IsNewUserResponseModel, APIError>) -> Void) {
@@ -62,15 +62,17 @@ final class AuthService {
     
     
     func checkDuplicateUsername(username: String, completion: @escaping (Result<Bool, APIError>) -> Void) {
-           let url = "\(BaseAPI)/auth/check-nickname?nickname=\(username)"
+        let url = "\(BaseAPI)/auth/check-nickname?nickname=\(username)"
            let headers: HTTPHeaders = ["Content-Type": "application/json", "Cache-Control": "no-cache"]
-
+        
            AF.request(url, method: .get, headers: headers)
                .validate()
                .responseDecodable(of: IsDuplicatedResponseModel.self) { response in
                    switch response.result {
                    case .success(let data):
                        print(" 아이디 중복 확인 성공")
+                       
+                       print("url: \(url)")
                        print("isSuccess: \(data.isSuccess), 중복 여부: \(data.result)")
                        completion(.success(data.result)) // `true`이면 중복, `false`이면 사용 가능
 
@@ -80,6 +82,7 @@ final class AuthService {
                        if let data = response.data {
                            let responseString = String(data: data, encoding: .utf8)
                            print(" 응답 바디: \(String(describing: responseString))")
+                           print("url: \(url)")
                        }
                        completion(.failure(self.handleError(error: error, response: response)))
                    }

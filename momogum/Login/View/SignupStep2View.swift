@@ -10,16 +10,19 @@ import SwiftUI
 struct SignupStep2View: View {
     //MARK: - Properties
     @Environment(\.dismiss) var dismiss
-    @StateObject var authViewModel = AuthViewModel()
+    @ObservedObject var authViewModel: AuthViewModel
     @Environment(SignupDataModel.self) var signupDataModel
-//    @State private var inputText: String = ""
+    //    @State private var inputText: String = ""
     @FocusState private var isFocused: Bool
     @State private var lengthCheck: Bool = false
     @State private var hasAllowedCharactersOnly: Bool = false
     private var isButtonEnabled: Bool {
-           return lengthCheck && hasAllowedCharactersOnly
-       }
+        return lengthCheck && hasAllowedCharactersOnly
+    }
     @Binding var path: [Route]
+    
+    
+    
     //MARK: - View
     var body: some View {
         
@@ -75,7 +78,7 @@ struct SignupStep2View: View {
                         
                         HStack{
                             
-                            TextField("ex.momogum12._.", text: /*$inputText*/ $signupDataModel.nickname ,onEditingChanged: { editing in
+                            TextField("ex.momogum12._.", text: /*$inputText*/ $authViewModel.signupData.nickname ,onEditingChanged: { editing in
                                 if editing {
                                     isFocused = true
                                 }
@@ -188,7 +191,8 @@ struct SignupStep2View: View {
                         }
                         else{  //조건에 맞지않고 + //조건에 맞는데 true인경우
                             Button{
-                          
+                                print(signupDataModel.creatUser())
+
                                 authViewModel.checkUsernameisDuplicated()
                                 
                             }label:{
@@ -234,7 +238,7 @@ struct SignupStep2View: View {
     }
 
 
-
-#Preview {
-    SignupStep2View( path: .constant([]))
-}
+//
+//#Preview {
+//    SignupStep2View( path: .constant([]))
+//}

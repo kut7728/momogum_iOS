@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct LoginView: View {
-    @StateObject var authViewModel = AuthViewModel()
+    @Environment(SignupDataModel.self) var signupDataModel
     @FocusState private var isFocused: Bool // TextField의 포커스 상태
     @FocusState private var isFocusedPWD: Bool
     @State private var path: [Route] = [] //path 설정
     var body: some View {
         
         NavigationStack(path: $path){
-            
+            let authViewModel = AuthViewModel(signupData: signupDataModel) 
+
             Text("머머금과 함께 밥일기를 공유하고, 식사고민을 해결해요!")
                 .font(.mmg(.subheader1))
                 .foregroundStyle(.momogumRed)
@@ -41,17 +42,16 @@ struct LoginView: View {
                                 if isSuccess { //로그인 성공 true
                                     if isNew { //신규인경우 true
                                         path.append(.SignupStartView)
-                                        authViewModel.resetSignupData()
                                         print("신규 유저입니다. 회원가입이 필요합니다.")
                                     } else { // true false  기존유저
                                         AuthManager.shared.isLoggedIn = true
                                         print("기존 유저 로그인 완료")
                                     }
                                 } else {
-//                                    path.append(.SignupStartView)
                                     print("❌ 유저 확인 실패")
                                 }
                             }  } else {
+                                
                                 print(" 카카오 로그인 실패")
                             }
                     }
@@ -66,10 +66,10 @@ struct LoginView: View {
                         SignupStartView(path: $path)
                         
                     case.SignupStep1View:
-                        SignupStep1View(path: $path)
+                        SignupStep1View(authViewModel: authViewModel, path: $path)
                         
                     case.SignupStep2View:
-                        SignupStep2View(path: $path)
+                        SignupStep2View(authViewModel: authViewModel, path: $path)
                     case.SignupEndView:
                         SignupEndView(path: $path)
                     }
