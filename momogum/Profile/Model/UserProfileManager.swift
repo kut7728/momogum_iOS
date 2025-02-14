@@ -51,6 +51,23 @@ class UserProfileManager {
                 }
             }
     }
+    
+    // 북마크한 밥일기 로드
+    func fetchBookmarkedMealDiaries(userId: Int, completion: @escaping (Swift.Result<[MealDiary], Error>) -> Void) {
+        let url = "\(BaseAPI)/userProfiles/\(userId)/bookmarked-meal-diaries"
+        
+        AF.request(url, method: .get)
+            .validate(statusCode: 200..<300)
+            .responseDecodable(of: MealDiaryResponse.self) { response in
+                switch response.result {
+                case .success(let decodedResponse):
+                    completion(.success(decodedResponse.result))
+                case .failure(let error):
+                    print("❌ 북마크한 밥일기 로드 실패: \(error.localizedDescription)")
+                    completion(.failure(error))
+                }
+            }
+    }
 }
 
 // 유저 프로필 에러

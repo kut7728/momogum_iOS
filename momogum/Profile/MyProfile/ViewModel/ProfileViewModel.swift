@@ -32,6 +32,9 @@ class ProfileViewModel {
     // 밥일기 리스트
     var mealDiaries: [MealDiary] = []
     
+    // 북마크한 밥일기 리스트
+    var bookmarkedMealDiaries: [MealDiary] = []
+    
     init(userId: Int) {
         self.userName = "" // 임시
         self.userID = ""
@@ -46,6 +49,7 @@ class ProfileViewModel {
         
         fetchUserProfile(userId: userId)
         fetchMealDiaries(userId: userId)
+        fetchBookmarkedMealDiaries(userId: userId)
     }
     
     // 유저 프로필 로드
@@ -67,7 +71,7 @@ class ProfileViewModel {
                         self.loadImageAsync(from: profileImageURL)
                     }
                 case .failure(let error):
-                    print("❌ 유저 프로필 로드 실패: \(error.localizedDescription)")
+                    print("유저 프로필 로드 실패: \(error.localizedDescription)")
                 }
             }
         }
@@ -81,7 +85,21 @@ class ProfileViewModel {
                 case .success(let mealDiaries):
                     self.updateMealDiaries(with: mealDiaries)
                 case .failure(let error):
-                    print("❌ 밥일기 로드 실패: \(error.localizedDescription)")
+                    print("밥일기 로드 실패: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    // 북마크한 밥일기 로드
+    func fetchBookmarkedMealDiaries(userId: Int) {
+        UserProfileManager.shared.fetchBookmarkedMealDiaries(userId: userId) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let bookmarkedMealDiaries):
+                    self.updateBookmarkedMealDiaries(with: bookmarkedMealDiaries)
+                case .failure(let error):
+                    print("북마크한 밥일기 로드 실패: \(error.localizedDescription)")
                 }
             }
         }
@@ -90,6 +108,11 @@ class ProfileViewModel {
     // 밥일기 업데이트 함수
     private func updateMealDiaries(with newMealDiaries: [MealDiary]) {
         self.mealDiaries = newMealDiaries
+    }
+    
+    // 북마크한 밥일기 업데이트
+    private func updateBookmarkedMealDiaries(with newBookmarkedMealDiaries: [MealDiary]) {
+        self.bookmarkedMealDiaries = newBookmarkedMealDiaries
     }
     
     // 프로필 이미지 로드
@@ -106,7 +129,7 @@ class ProfileViewModel {
                         }
                     }
                 case .failure(let error):
-                    print("❌ 프로필 이미지 로드 실패: \(error.localizedDescription)")
+                    print("프로필 이미지 로드 실패: \(error.localizedDescription)")
                 }
             }
     }

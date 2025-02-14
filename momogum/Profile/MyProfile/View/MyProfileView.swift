@@ -246,7 +246,7 @@ struct MyProfileView: View {
                     }
                     
                     ScrollView {
-                        if viewModel.mealDiaries.isEmpty {
+                        if (selectedSegment == 0 ? viewModel.mealDiaries : viewModel.bookmarkedMealDiaries).isEmpty {
                             VStack {
                                 Text(selectedSegment == 0 ? "아직 기록된 밥일기가 없어요. 첫 기록을 남겨볼까요?" : "저장된 밥일기가 없습니다. 지금 저장해보세요!")
                                     .font(.mmg(.Caption2))
@@ -256,7 +256,7 @@ struct MyProfileView: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                         } else {
                             LazyVGrid(columns: columns, spacing: 20) {
-                                ForEach(viewModel.mealDiaries, id: \.mealDiaryId) { mealDiary in
+                                ForEach(selectedSegment == 0 ? viewModel.mealDiaries : viewModel.bookmarkedMealDiaries, id: \.mealDiaryId) { mealDiary in
                                     NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
                                         .onAppear { isTabBarHidden = true }
                                         .onDisappear { isTabBarHidden = false }

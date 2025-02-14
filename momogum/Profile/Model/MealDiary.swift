@@ -18,9 +18,9 @@ struct MealDiaryResponse: Codable {
 // MealDiary 모델
 struct MealDiary: Codable {
     let mealDiaryId: Int64
-    let foodImageURLs: [String] // 음식 사진 배열
+    let foodImageURLs: [String] // 밥일기 사진
     let userImageURL: String // 유저 프로필 이미지 URL
-    let foodCategory: String // 음식 카테고리 (예: "KOREAN")
+    let foodCategory: String // 음식 카테고리
     let keyWord: [String] // 키워드 리스트
-    let isRevisit: String // 방문 여부 ("NOT_GOOD" 등)
+    let isRevisit: String // 또 올래요 스티커 여부
 }
