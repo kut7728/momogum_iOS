@@ -13,6 +13,7 @@ struct SignupStep1View: View {
     @Environment(\.dismiss) var dismiss
     @Environment(SignupDataModel.self) var signupDataModel
 //    @State private var inputText: String = ""
+    @ObservedObject var authViewModel: AuthViewModel
 
     @FocusState private var isFocused: Bool // TextField의 포커스 상태
     
@@ -77,7 +78,7 @@ struct SignupStep1View: View {
                     
                     VStack{
                         HStack{
-                            TextField("최대 12자 이내의 한글, 영문 사용 가능", text: /*$inputText*/ $signupDataModel.name,onEditingChanged: { editing in
+                            TextField("최대 12자 이내의 한글, 영문 사용 가능", text: /*$inputText*/ $authViewModel.signupData.name,onEditingChanged: { editing in
                                 if editing {
                                     isFocused = true
                                     
@@ -167,7 +168,7 @@ struct SignupStep1View: View {
     }
 
 }
-
-#Preview {
-    SignupStep1View(path: .constant([]))
-}
+//
+//#Preview {
+//    SignupStep1View(path: .constant([]))
+//}
