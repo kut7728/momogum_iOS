@@ -61,22 +61,22 @@ class AccountSearchViewModel: ObservableObject {
 
         URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
-            .handleEvents(receiveOutput: { data in
-                print("✅ API 응답 데이터: \(String(data: data, encoding: .utf8) ?? "Invalid Data")")
-            })
             .decode(type: AccountSearchAPIResponse.self, decoder: JSONDecoder())
             .map { $0.result }
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
+            .sink(receiveCompletion: { [weak self] completion in
+                guard let self = self else { return } // weak self 처리
                 self.isLoading = false
                 if case .failure(let error) = completion {
                     self.errorMessage = "계정 검색 실패: \(error.localizedDescription)"
-                    print("❌ API 요청 실패: \(error.localizedDescription)") // 오류 로그 추가
+                    print("❌ API 요청 실패: \(error.localizedDescription)")
                 }
-            }, receiveValue: { results in
+            }, receiveValue: { [weak self] results in
+                guard let self = self else { return } // weak self 처리
                 self.accountResults = results
             })
             .store(in: &cancellables)
+
     }
 
     // 검색어 초기화 시 리스트도 초기화
