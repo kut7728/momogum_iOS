@@ -126,9 +126,7 @@ final class AuthViewModel: ObservableObject {
     }
     
     func checkUsernameisDuplicated() {
-
         AuthService.shared.checkDuplicateUsername(username: signupData.nickname) { [weak self] result in
-            print(self?.signupData.nickname)
             DispatchQueue.main.async {
                    switch result {
                    case .success(let isDuplicated):
@@ -163,7 +161,14 @@ final class AuthViewModel: ObservableObject {
         }
     }
 
-    
+//    func fetchMyUUID(){
+//        AuthService.shared.fetchUUID(token: AuthManager.shared.momogumAccessToken{ [weak self] result in
+//            switch result {
+//            case .success(let response):
+//                if response.result.isSuccess
+//            }
+//        }
+//    }
     
     
 //     토큰 저장: AuthManager.shared.kakaoAccessToken = oauthToken.accessToken
