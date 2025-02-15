@@ -43,7 +43,7 @@ struct ReportDetailView: View {
             .cornerRadius(12)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.black_5, lineWidth: 1)
+                    .stroke(Color.black_4, lineWidth: 1)
             )
 
             Spacer()

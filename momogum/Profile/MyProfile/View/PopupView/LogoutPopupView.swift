@@ -22,7 +22,7 @@ struct LogoutPopupView: View {
             
             Divider().frame(width: 252)
             
-            Spacer().frame(width: 300, height: 8)
+            Spacer().frame(width: 300, height: 15)
             
             HStack(alignment: .center, spacing: 0){
                 // 돌아가기
