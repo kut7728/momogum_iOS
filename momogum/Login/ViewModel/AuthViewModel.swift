@@ -20,8 +20,8 @@ final class AuthViewModel: ObservableObject {
     ///신규회원 구분 함수 첫번째값은 통신성공여부, 둘째값은 실제 신규회원인지의 여부 newUser값
     /// 신규 유저 확인 로직
        func checkIsNewUser(completion: @escaping (Bool, Bool) -> Void) {
-           guard let accessToken = AuthManager.shared.kakaoAccessToken, !accessToken.isEmpty else {
-               print("❌ 저장된 카카오 액세스 토큰이 없음")
+           guard let accessToken = AuthManager.shared.momogumAccessToken, !accessToken.isEmpty else {
+               print(" 저장된 카카오 액세스 토큰이 없음")
                completion(false, false)
                return
            }
@@ -43,7 +43,7 @@ final class AuthViewModel: ObservableObject {
 
                                    case .token(let tokenResult):  // 기존 유저인 경우
                                        print("기존 유저 로그인 - 액세스 토큰 저장")
-                                       AuthManager.shared.kakaoAccessToken = tokenResult.accessToken
+                                       AuthManager.shared.momogumAccessToken = tokenResult.accessToken
                                        completion(true, false)
                                    }
 
@@ -66,7 +66,7 @@ final class AuthViewModel: ObservableObject {
 
     
     func signup() {
-        guard let accessToken = AuthManager.shared.kakaoAccessToken, !accessToken.isEmpty else {
+        guard let accessToken = AuthManager.shared.momogumAccessToken, !accessToken.isEmpty else {
             print(" 저장된 카카오 액세스 토큰이 없음")
             return
         }
@@ -102,9 +102,9 @@ final class AuthViewModel: ObservableObject {
                     completion(false)
                 } else if let oauthToken = oauthToken {
                     print("카카오톡 로그인 성공, accessToken: \(oauthToken.accessToken)")
-                    AuthManager.shared.kakaoAccessToken = oauthToken.accessToken  //  accessToken 저장
+                    AuthManager.shared.momogumAccessToken = oauthToken.accessToken  //  accessToken 저장
                     
-                    print(" 카카오 액세스 토큰 저장 완료: \(AuthManager.shared.kakaoAccessToken ?? "없음")")
+                    print(" 카카오 액세스 토큰 저장 완료: \(AuthManager.shared.momogumAccessToken ?? "없음")")
                     completion(true)
                 }
             }
@@ -116,8 +116,8 @@ final class AuthViewModel: ObservableObject {
                 } else if let oauthToken = oauthToken {
                     DispatchQueue.main.async {
                         print(" 카카오 계정 로그인 성공, accessToken: \(oauthToken.accessToken)")
-                        AuthManager.shared.kakaoAccessToken = oauthToken.accessToken  //  accessToken 저장
-                        print(" 카카오 액세스 토큰 저장 완료: \(AuthManager.shared.kakaoAccessToken ?? "없음")")
+                        AuthManager.shared.momogumAccessToken = oauthToken.accessToken  //  accessToken 저장
+                        print(" 카카오 액세스 토큰 저장 완료: \(AuthManager.shared.momogumAccessToken ?? "없음")")
                         completion(true)
                     }
                 }
