@@ -59,7 +59,7 @@ class NewPostViewModel: ObservableObject {
         
         let categoryMapping: [String: String] = [
             "한식": "KOREAN", "중식": "CHINESE", "일식": "JAPANESE", "양식": "WESTERN",
-            "패스트푸드": "FASTFOOD", "카페": "CAFE", "기타": "ETC"
+            "패스트푸드": "FAST_FOOD", "카페": "CAFE", "기타": "ETC"
         ]
         
         let foodCategory = categoryMapping[newPost.selectedCategory ?? "기타"] ?? "ETC"
