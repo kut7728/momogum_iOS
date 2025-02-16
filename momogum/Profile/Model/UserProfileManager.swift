@@ -38,15 +38,26 @@ class UserProfileManager {
     // 유저가 작성한 밥일기 로드
     func fetchMealDiaries(userId: Int, completion: @escaping (Swift.Result<[ProfileMealDiary], Error>) -> Void) {
         let url = "\(BaseAPI)/userProfiles/\(userId)/meal-diaries"
-        
+
         AF.request(url, method: .get)
             .validate(statusCode: 200..<300)
             .responseDecodable(of: ProfileMealDiaryResponse.self) { response in
                 switch response.result {
                 case .success(let decodedResponse):
-                    completion(.success(decodedResponse.result))
+                    let safeMealDiaries = decodedResponse.result.map { diary in
+                        ProfileMealDiary(
+                            mealDiaryId: diary.mealDiaryId,
+                            foodImageURLs: diary.foodImageURLs ?? [],
+                            userImageURL: diary.userImageURL,
+                            foodCategory: diary.foodCategory,
+                            keyWord: diary.keyWord,
+                            isRevisit: diary.isRevisit
+                        )
+                    }
+                    completion(.success(safeMealDiaries))
+                    
                 case .failure(let error):
-                    //print("❌ 밥일기 로드 실패: \(error.localizedDescription)")
+                    print("❌ 밥일기 로드 실패: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }

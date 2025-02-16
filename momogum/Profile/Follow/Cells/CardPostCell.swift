@@ -14,7 +14,7 @@ struct CardPostCell: View {
     var body: some View {
         ZStack{
             // 밥일기 이미지
-            if let firstImageURL = mealDiary.foodImageURLs.first, let url = URL(string: firstImageURL) {
+            if let firstImageURL = mealDiary.foodImageURLs?.first, let url = URL(string: firstImageURL) {
                 AsyncImage(url: url) { image in
                     image.resizable()
                 } placeholder: {
@@ -24,6 +24,12 @@ struct CardPostCell: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 166, height: 241)
                 .cornerRadius(8)
+            } else {
+                Image("cardExample")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 166, height: 241)
+                    .cornerRadius(8)
             }
             
             Rectangle()
@@ -43,7 +49,7 @@ struct CardPostCell: View {
                 // 식사메뉴
                 Text(mealDiary.keyWord.first ?? "")
                     .font(.mmg(.Caption1))
-                    .frame(width: 130, height: .infinity, alignment: .leading)
+                    .frame(width: 130, height: 15, alignment: .leading)
                     .foregroundColor(Color.black_1)
                     .padding(.top, 162)
                     .lineLimit(1)
@@ -65,17 +71,17 @@ struct CardPostCell: View {
                     // 식사메뉴
                     Text(mealDiary.keyWord.first ?? "")
                         .font(.mmg(.Caption1))
-                        .frame(width: 90, height: .infinity, alignment: .leading)
+                        .frame(width: 90, height: 15, alignment: .leading)
                         .foregroundColor(Color.black_1)
                         .lineLimit(1)
                 }
-                .frame(width: 130, height: .infinity, alignment: .leading)
+                .frame(width: 130, height: 40, alignment: .leading)
                 .padding(.top, 162)
                 .padding(.trailing, 10)
             }
             
             // 또 올래요 스티커
-            if mealDiary.isRevisit != "NOT_GOOD" {
+            if mealDiary.isRevisit == "GOOD" {
                 Image("good_fill")
                     .resizable()
                     .frame(width: 36,height: 36)
