@@ -36,12 +36,12 @@ class UserProfileManager {
     }
     
     // 유저가 작성한 밥일기 로드
-    func fetchMealDiaries(userId: Int, completion: @escaping (Swift.Result<[MealDiary], Error>) -> Void) {
+    func fetchMealDiaries(userId: Int, completion: @escaping (Swift.Result<[ProfileMealDiary], Error>) -> Void) {
         let url = "\(BaseAPI)/userProfiles/\(userId)/meal-diaries"
         
         AF.request(url, method: .get)
             .validate(statusCode: 200..<300)
-            .responseDecodable(of: MealDiaryResponse.self) { response in
+            .responseDecodable(of: ProfileMealDiaryResponse.self) { response in
                 switch response.result {
                 case .success(let decodedResponse):
                     completion(.success(decodedResponse.result))
@@ -53,12 +53,12 @@ class UserProfileManager {
     }
     
     // 북마크한 밥일기 로드
-    func fetchBookmarkedMealDiaries(userId: Int, completion: @escaping (Swift.Result<[MealDiary], Error>) -> Void) {
+    func fetchBookmarkedMealDiaries(userId: Int, completion: @escaping (Swift.Result<[ProfileMealDiary], Error>) -> Void) {
         let url = "\(BaseAPI)/userProfiles/\(userId)/bookmarked-meal-diaries"
         
         AF.request(url, method: .get)
             .validate(statusCode: 200..<300)
-            .responseDecodable(of: MealDiaryResponse.self) { response in
+            .responseDecodable(of: ProfileMealDiaryResponse.self) { response in
                 switch response.result {
                 case .success(let decodedResponse):
                     completion(.success(decodedResponse.result))

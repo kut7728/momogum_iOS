@@ -1,5 +1,5 @@
 //
-//  MealDiary.swift
+//  ProfileMealDiary.swift
 //  momogum
 //
 //  Created by 류한비 on 2/14/25.
@@ -8,15 +8,15 @@
 import Foundation
 
 // MealDiary API 응답 모델
-struct MealDiaryResponse: Codable {
+struct ProfileMealDiaryResponse: Codable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: [MealDiary] // 밥일기 리스트
+    let result: [ProfileMealDiary] // 밥일기 리스트
 }
 
 // MealDiary 모델
-struct MealDiary: Codable {
+struct ProfileMealDiary: Codable {
     let mealDiaryId: Int64
     let foodImageURLs: [String] // 밥일기 사진
     let userImageURL: String // 유저 프로필 이미지 URL

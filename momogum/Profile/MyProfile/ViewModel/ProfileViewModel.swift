@@ -30,10 +30,10 @@ class ProfileViewModel {
     var draftUserBio: String
     
     // 밥일기 리스트
-    var mealDiaries: [MealDiary] = []
+    var mealDiaries: [ProfileMealDiary] = []
     
     // 북마크한 밥일기 리스트
-    var bookmarkedMealDiaries: [MealDiary] = []
+    var bookmarkedMealDiaries: [ProfileMealDiary] = []
     
     init(userId: Int) {
         self.userName = "" // 임시
@@ -106,12 +106,12 @@ class ProfileViewModel {
     }
     
     // 밥일기 업데이트 함수
-    private func updateMealDiaries(with newMealDiaries: [MealDiary]) {
+    private func updateMealDiaries(with newMealDiaries: [ProfileMealDiary]) {
         self.mealDiaries = newMealDiaries
     }
     
     // 북마크한 밥일기 업데이트
-    private func updateBookmarkedMealDiaries(with newBookmarkedMealDiaries: [MealDiary]) {
+    private func updateBookmarkedMealDiaries(with newBookmarkedMealDiaries: [ProfileMealDiary]) {
         self.bookmarkedMealDiaries = newBookmarkedMealDiaries
     }
     

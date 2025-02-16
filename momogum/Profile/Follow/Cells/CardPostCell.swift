@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CardPostCell: View {
     @Binding var selectedSegment: Int
-    var mealDiary: MealDiary
+    var mealDiary: ProfileMealDiary
     
     var body: some View {
         ZStack{
@@ -86,7 +86,7 @@ struct CardPostCell: View {
 }
 
 #Preview {
-    CardPostCell(selectedSegment: .constant(1), mealDiary: MealDiary(
+    CardPostCell(selectedSegment: .constant(1), mealDiary: ProfileMealDiary(
         mealDiaryId: 1,
         foodImageURLs: ["https://i.pinimg.com/736x/ce/1a/bb/ce1abb170c23b41ae415f590351174ad.jpg"],
         userImageURL: "https://i.pinimg.com/736x/f0/51/e0/f051e0c2829fc33cb50fd4db098c3b89.jpg",
