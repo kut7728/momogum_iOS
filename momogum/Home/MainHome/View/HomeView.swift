@@ -44,7 +44,7 @@ struct HomeView: View {
                 if story == "내 스토리" {
                     StoryView(userID: "유저아이디", tabIndex: $tabIndex, isTabBarHidden: .constant(false))
                 } else {
-                    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
+//                    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
                 }
             }
             .onAppear{
@@ -100,7 +100,7 @@ extension HomeView {
     private func storyScrollView() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                storyItem(title: "내 스토리", hasStory: false, destination: StoryView(userID: "", tabIndex: $tabIndex))
+                storyItem(title: "내 스토리", hasStory: false, destination: StoryView(userID: "", tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden))
 //                storyItem(title: "momogum._.", hasStory: true, destination: Story2View(userID: "", isTabBarHidden: .constant(false)))
                 
                 let sortedStories = Array(storyViewModel.groupedStories).sorted(by: { $0.key < $1.key })
