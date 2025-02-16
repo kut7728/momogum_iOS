@@ -1,10 +1,3 @@
-//
-//  CategorySelectionView.swift
-//  momogum
-//
-//  Created by 조승연 on 1/22/25.
-//
-
 import SwiftUI
 
 struct MealCategoryView: View {
@@ -15,23 +8,29 @@ struct MealCategoryView: View {
         VStack(alignment: .leading) {
             Text("식사 카테고리 선택")
                 .font(.headline)
-                .padding(.leading, 16)
+                .padding(.leading, 24)
 
-            Spacer().frame(height: 28)
+            Spacer().frame(height: 20)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
                     ForEach(categories, id: \.self) { category in
-                        MealCell(
-                            category: category,
-                            isSelected: selectedCategory == category
-                        )
-                        .onTapGesture {
-                            selectedCategory = category
-                        }
+                        Text(category)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(selectedCategory == category ? .white : .black)
+                            .frame(width: 60, height: 32)
+                            .background(selectedCategory == category ? Color.momogumRed : Color.placeholderGray3)
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.borderGray, lineWidth: 1)
+                            )
+                            .onTapGesture {
+                                selectedCategory = category
+                            }
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 22)
             }
         }
     }

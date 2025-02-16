@@ -22,10 +22,13 @@ class ImageEditorViewModel: ObservableObject {
     }
 
     func updateScale(_ scale: CGFloat, frameSize: CGFloat) {
-        let newScale = max(1.0, min(3.0, scale))
-        if newScale != self.scale {
-            self.scale = newScale
-            adjustOffset(frameSize: frameSize)
+        let newScale = max(1.0, min(3.0, self.scale + (scale - self.scale) * 0.05))
+        
+        withAnimation(.easeOut(duration: 0.5)) {
+            if newScale != self.scale {
+                self.scale = newScale
+                adjustOffset(frameSize: frameSize)
+            }
         }
     }
 
@@ -40,12 +43,14 @@ class ImageEditorViewModel: ObservableObject {
         )
 
         let newOffset = CGSize(
-            width: min(max(-maxOffset.width, offset.width + translation.width), maxOffset.width),
-            height: min(max(-maxOffset.height, offset.height + translation.height), maxOffset.height)
+            width: min(max(-maxOffset.width, offset.width + translation.width * 0.05), maxOffset.width),
+            height: min(max(-maxOffset.height, offset.height + translation.height * 0.05), maxOffset.height)
         )
 
-        if newOffset != offset {
-            offset = newOffset
+        withAnimation(.easeOut(duration: 0.5)) {
+            if newOffset != offset {
+                offset = newOffset
+            }
         }
     }
 
@@ -59,10 +64,12 @@ class ImageEditorViewModel: ObservableObject {
             height: max(0, (scaledImageSize.height - frameSize) / 2)
         )
 
-        offset = CGSize(
-            width: min(max(-maxOffset.width, offset.width), maxOffset.width),
-            height: min(max(-maxOffset.height, offset.height), maxOffset.height)
-        )
+        withAnimation(.easeOut(duration: 0.5)) {
+            offset = CGSize(
+                width: min(max(-maxOffset.width, offset.width), maxOffset.width),
+                height: min(max(-maxOffset.height, offset.height), maxOffset.height)
+            )
+        }
     }
 
     func finalizeImage(frameSize: CGFloat) -> UIImage? {
@@ -91,8 +98,10 @@ class ImageEditorViewModel: ObservableObject {
     }
 
     func resetToOriginalImage() {
-        image = originalImage
-        scale = 1.0
-        offset = .zero
+        withAnimation(.easeOut(duration: 0.5)) {
+            image = originalImage
+            scale = 1.0
+            offset = .zero
+        }
     }
 }

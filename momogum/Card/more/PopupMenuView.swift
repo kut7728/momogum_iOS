@@ -31,7 +31,7 @@ struct PopupMenuView: View {
                 VStack(spacing: 0) {
                     Button(action: {
                         showPopup = false
-                        isTabBarHidden = true  // ✅ FixPostView로 이동할 때 탭바 숨김 적용
+                        isTabBarHidden = true
                         navigateToFixPostView = true
                     }) {
                         Text("수정")
@@ -65,12 +65,6 @@ struct PopupMenuView: View {
         }
         .navigationDestination(isPresented: $navigateToFixPostView) {
             FixPostView(isTabBarHidden: $isTabBarHidden, showSavedPopup: $showSavedPopup)
-                .onAppear {
-                    isTabBarHidden = true  // ✅ FixPostView로 이동 시 탭바 숨김 유지
-                }
-                .onDisappear {
-                    isTabBarHidden = false  // ✅ 뒤로 가면 탭바 다시 보이게 복구
-                }
         }
     }
 }
