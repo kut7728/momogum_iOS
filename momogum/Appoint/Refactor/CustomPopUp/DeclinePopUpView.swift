@@ -1,14 +1,20 @@
 import SwiftUI
 
-struct CustomPopUpView: View {
+struct DeclinePopUpView: View {
     // MARK: - properites
     // 해당 프로퍼티로 팝업을 띄울지 말지를 부모뷰의 state 값으로 전달 받을 예정
     @Binding var showPopUp: Bool
+    private var name: String
     
-    let title: String // 공지 이름
-    let message: String // 공지 내용
-    let btn1: String // 왼쪽 버튼 text
-    let btn2: String // 오른쪽 버튼 text
+    let title: String = "약속을 거절해요" // 공지 이름
+    var message: String {"'\(name)' 약속 정보를 다시 확인하거나 초대받을 수 없습니다." }// 공지 내용
+    let btn1: String = "돌아가기" // 왼쪽 버튼 text
+    let btn2: String = "거절하기" // 오른쪽 버튼 text
+    
+    init(showPopUp: Binding<Bool>, name: String) {
+        self._showPopUp = showPopUp
+        self.name = name
+    }
     
     // MARK: - body
     var body: some View {
@@ -88,11 +94,8 @@ struct CustomPopUpView: View {
 }
 
 #Preview {
-    CustomPopUpView(
+    DeclinePopUpView(
         showPopUp: .constant(false),
-        title: "공지",
-        message: "정말로 삭제를 하시겠습니까?",
-        btn1: "확인",
-        btn2: "취소"
+        name: "test"
     )
 }

@@ -16,6 +16,10 @@ struct AppointCheckingView: View {
     @State var showConfirmPopUp: Bool = false
     @State var showCanclePopUp: Bool = false
     
+    private var isOther: Bool { appoint.senderId != AuthManager.shared.UUID }
+    @State var showDeclinePopUp: Bool = false
+    @State var showApprovePopUp: Bool = false
+    
     let appoint: Appoint
     
     let dateFormatter = {
@@ -37,7 +41,7 @@ struct AppointCheckingView: View {
                         Image(appoint.pickedCard)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 170)
+                            .frame(width: 200)
                             .padding(.vertical, 20)
                             .frame(maxWidth: .infinity, alignment: .center)
                         
@@ -105,10 +109,14 @@ struct AppointCheckingView: View {
                     HStack {
                         Button {
                             withAnimation {
-                                showCanclePopUp = true
+                                if isOther {
+                                    showDeclinePopUp = true
+                                } else {
+                                    showCanclePopUp = true
+                                }
                             }
                         } label: {
-                            Text("약속 취소")
+                            Text(isOther ? "약속 거절" : "약속 취소")
                                 .font(.mmg(.subheader3))
                                 .frame(height: 50)
                                 .frame(maxWidth: .infinity)
@@ -116,7 +124,7 @@ struct AppointCheckingView: View {
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(lineWidth: 2)
                                 }
-                                .foregroundStyle(.Red_2)
+                                .foregroundStyle(isOther ? .black_3 : .Red_2)
                         }
                         
                         Spacer()
@@ -124,10 +132,14 @@ struct AppointCheckingView: View {
                         
                         Button {
                             withAnimation {
-                                showConfirmPopUp = true
+                                if isOther {
+                                    showApprovePopUp = true
+                                } else {
+                                    showConfirmPopUp = true
+                                }
                             }
                         } label: {
-                            Text("약속 확정")
+                            Text(isOther ? "약속 수락" : "약속 확정")
                                 .font(.mmg(.subheader3))
                                 .frame(height: 50)
                                 .frame(maxWidth: .infinity)
@@ -135,7 +147,7 @@ struct AppointCheckingView: View {
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(lineWidth: 2)
                                 }
-                                .foregroundStyle(.black_3)
+                                .foregroundStyle(isOther ? .Red_2 : .black_3)
                         }
                         
                     }
@@ -160,39 +172,19 @@ struct AppointCheckingView: View {
                     }
                 }
                 
-                if showConfirmPopUp {
-                    appointConfirmPopup()
-                }
                 
-                if showCanclePopUp {
-                    appointCancelPopup()
+                if showConfirmPopUp {
+                    ConfirmPopUpView(showPopUp: $showConfirmPopUp)
+                } else if showCanclePopUp {
+                    CanclePopUpView(showPopUp: $showCanclePopUp)
+                } else if showDeclinePopUp {
+                    DeclinePopUpView(showPopUp: $showDeclinePopUp, name: appoint.appointName)
+                } else if showApprovePopUp {
+                    ApprovePopUpView(showPopUp: $showApprovePopUp)
                 }
             }
         }
     }
-}
-
-// MARK: - extensions
-extension AppointCheckingView {
-    func appointConfirmPopup() -> some View {
-        CustomPopUpView(showPopUp: $showConfirmPopUp,
-                        title: "약속을 확정해요",
-                        message: "지금까지 초대를 수락한 참가자와 약속을 확정합니다. 더 이상 다른 참가자가 초대를 수락할 수 없습니다.",
-                        btn1: "돌아가기",
-                        btn2: "약속 확정")
-
-    }
-    
-    func appointCancelPopup() -> some View {
-        CustomPopUpView(showPopUp: $showCanclePopUp,
-                        title: "약속을 취소해요",
-                        message: "취소된 약속은 다시 불러올 수 없습니다.",
-                        btn1: "돌아가기",
-                        btn2: "약속 취소")
-
-    }
-    
-    
 }
 
 #Preview {
