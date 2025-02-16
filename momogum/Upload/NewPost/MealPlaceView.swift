@@ -21,12 +21,12 @@ struct MealPlaceView: View {
             TextField("ex. 머머금 식당", text: $mealPlace)
                 .font(.system(size: 16))
                 .foregroundColor(.black)
-                .padding(20)
-                .frame(width: 353, height: 48) 
+                .padding(.horizontal, 16)
+                .frame(width: 353, height: 48)
                 .background(
                     RoundedRectangle(cornerRadius: 8)
                         .fill(placeholderColor.opacity(0.2))
-                            )
+                )
         }
         .padding(.horizontal, 16)
     }
