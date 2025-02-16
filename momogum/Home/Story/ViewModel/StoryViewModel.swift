@@ -5,8 +5,7 @@ class StoryViewModel: ObservableObject {
     @Published var rawStories: [StoryResult] = []  //  여러 개의 친구들의 스토리를 저장
     @Published var selectedStory: StoryDetailResult?
     @Published var groupedStories : [String:[StoryResult]] = [:]
-    
-    
+    @Published var Mystories : MyStoryResult?
     // 회원 친구들의 스토리 전체 조회
     func fetchStory(for memberId: Int) {
         let url = "\(BaseAPI)/meal-stories/memberId/\(memberId)" // API 요청 URL
@@ -57,9 +56,14 @@ class StoryViewModel: ObservableObject {
             let sortedGroupedStories = grouped.mapValues { stories in
                 stories.sorted { !$0.viewed && $1.viewed} //뷰 기준 구분
             }
+                .sorted { lhs, rhs in
+                          let lhsHasUnviewed = lhs.value.contains { !$0.viewed }  // ✅ 왼쪽 그룹에 viewed == false가 있는지 확인
+                          let rhsHasUnviewed = rhs.value.contains { !$0.viewed }  // ✅ 오른쪽 그룹에 viewed == false가 있는지 확인
+                          return lhsHasUnviewed && !rhsHasUnviewed  // ✅ viewed == false가 포함된 닉네임이 앞쪽으로 정렬
+                      }
             
             DispatchQueue.main.async {
-                       self.groupedStories = sortedGroupedStories
+                       self.groupedStories = Dictionary(uniqueKeysWithValues: sortedGroupedStories)
                    }
         }
     }
@@ -69,4 +73,26 @@ class StoryViewModel: ObservableObject {
         return groupedStories[nickname]?.map { $0.id } ?? []  // 닉네임에 해당하는 모든 스토리 ID 반환
     }
 
+    
+    
+    func fetchMyStory(for memberId: Int) {
+        let url = "\(BaseAPI)/meal-stories/myStories/memberId/\(memberId)"
+        AF.request(url, method: .get)
+            .validate()
+            .responseDecodable(of: StoryDetailModel.self) { response in
+                switch response.result {
+                case .success(let data):
+                    DispatchQueue.main.async {
+//                        self.Mystories = data.result
+                        print("내 스토리 가져오기 성공: \(data.result.name)의 스토리")
+                    }
+                case .failure(let error):
+                    print(error)
+                    print("내 스토리 가져오기 실패: \(error.localizedDescription)")
+                }
+            }
+        
+        
+    }
+    
 }

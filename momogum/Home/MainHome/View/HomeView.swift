@@ -128,6 +128,7 @@ extension HomeView {
                             )
                             .onAppear(){
                                 print(story.viewed)
+                                print("StoryIDs : \(StoryIDList)")
                                 print(firstUnviewedStory)
                             }
                           
