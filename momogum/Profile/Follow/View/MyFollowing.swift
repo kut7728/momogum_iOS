@@ -21,9 +21,7 @@ struct MyFollowing: View {
                     searchBar
                     // 팔로워 목록
                     ForEach(followViewModel.filteredFollowing, id: \.self) { userID in
-                        FollowingCell(followViewModel: followViewModel, userID: userID) {
-                            followViewModel.unfollow(userID)
-                        }
+                        FollowingCell(followViewModel: followViewModel, userID: userID)
                         .onTapGesture {
                             selectedUserID = userID
                         }
@@ -42,7 +40,7 @@ struct MyFollowing: View {
             .navigationDestination(item: $selectedUserID) { userID in
                 OtherProfileView(userID: userID,
                        isFollowing: followViewModel.isFollowing(userID),
-                       followViewModel: followViewModel
+                                 viewModel: ProfileViewModel(userId: 1), followViewModel: followViewModel
                    )
             }
         }

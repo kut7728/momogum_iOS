@@ -41,7 +41,7 @@ class AccountSearchViewModel: ObservableObject {
         }
 
         // 현재 로그인한 사용자의 UUID
-        let userUUID = AuthManager.shared.UUID.map { String($0) } ?? "0"  // UUID가 없으면 기본값 "0" 사용
+        let userUUID = String(AuthManager.shared.UUID!)
 
         urlComponents.queryItems = [
             URLQueryItem(name: "request", value: searchQuery),

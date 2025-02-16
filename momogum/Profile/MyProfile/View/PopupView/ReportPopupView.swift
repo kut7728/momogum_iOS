@@ -72,20 +72,27 @@ struct ReportPopupView: View {
                     Text(text)
                         .font(.mmg(.Body3))
                         .foregroundStyle(Color.black_1)
-                        .padding(.vertical, 22)
                         .padding(.leading, 19)
                     
                     Spacer()
                 }
                 .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+                .padding(.vertical, 22)
                 .padding(.horizontal, 43)
+                
                 
                 Rectangle()
                     .frame(width: 300, height: 1)
                     .foregroundStyle(Color.black_4)
                     .padding(.leading, 43)
             }
+            .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
     }
+}
+
+#Preview {
+    ReportPopupView(showReportDetailPopup: .constant(false))
 }
