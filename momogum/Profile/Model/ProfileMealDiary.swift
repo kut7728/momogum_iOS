@@ -18,7 +18,7 @@ struct ProfileMealDiaryResponse: Codable {
 // MealDiary 모델
 struct ProfileMealDiary: Codable {
     let mealDiaryId: Int64
-    let foodImageURLs: [String] // 밥일기 사진
+    let foodImageURLs: [String]? // 밥일기 사진
     let userImageURL: String // 유저 프로필 이미지 URL
     let foodCategory: String // 음식 카테고리
     let keyWord: [String] // 식사메뉴
