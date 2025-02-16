@@ -22,11 +22,11 @@ struct DelAccPopupView: View {
                 .font(.mmg(.subheader4))
                 .foregroundColor(Color.black_2)
             
-            Spacer().frame(width: 300, height: 39)
+            Spacer().frame(width: 300, height: 40)
             
             Divider().frame(width: 252)
             
-            Spacer().frame(width: 300, height: 10)
+            Spacer().frame(width: 300, height: 15)
             
             HStack(alignment: .center, spacing: 0){
                 // 돌아가기
