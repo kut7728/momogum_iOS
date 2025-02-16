@@ -11,6 +11,8 @@ struct Story2View: View {
     @Binding var isTabBarHidden: Bool
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel = Story2ViewModel()
+    @StateObject var storyViewModel = StoryViewModel()
+    
     let nickname: String
     let storyIDList: [Int]
     @State private var currentIndex: Int = 0
@@ -37,6 +39,13 @@ struct Story2View: View {
             if viewModel.showPopup {
                 popupView()  // 신고 완료 팝업
             }
+        }
+        .onAppear(){
+            print(nickname)
+            print("storyIDList: \(storyIDList)")
+            StoryViewModel().fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex])
+            print("currentIndex: \(storyIDList[currentIndex])")
+            
         }
         .sheet(isPresented: $viewModel.showReportSheet) {
             ReportView(showReportSheet: $viewModel.showReportSheet, showPopup: $viewModel.showPopup)

@@ -14,7 +14,8 @@ struct StoryItemCell: View {
     let viewed: Bool
     let storyIDs: [Int]  //  닉네임에 해당하는 모든 스토리 ID 목록 추가
     let storyViewModel: StoryViewModel
-    let destination: AnyView 
+    let destination: AnyView
+    let hasUnViewedStory: Bool
     @Binding var isTabBarHidden: Bool
     var body: some View {
         VStack{
@@ -26,7 +27,7 @@ struct StoryItemCell: View {
              {
                 VStack {
                     ZStack {
-                        if !viewed {
+                        if hasUnViewedStory {
                             Circle()
                                 .strokeBorder(
                                     LinearGradient(gradient: Gradient(colors: [

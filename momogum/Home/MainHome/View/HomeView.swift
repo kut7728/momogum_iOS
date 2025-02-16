@@ -13,8 +13,7 @@ struct HomeView: View {
     @StateObject private var homeviewModel = HomeViewModel()
     @StateObject private var mealDiaryViewModel = MealDiaryViewModel()
     @State private var path = NavigationPath() // 네비게이션 경로 추가
-    
-    @ObservedObject var storyViewModel : StoryViewModel
+    @StateObject var storyViewModel : StoryViewModel
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     let normalButtonColor = Color(.black_5)
     let selectedButtonColor = Color(.Red_2)
@@ -50,6 +49,9 @@ struct HomeView: View {
             .onAppear{
                 storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
             }
+            .onDisappear {
+                storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
+                  }
         }
     }
 }
@@ -112,7 +114,6 @@ extension HomeView {
                         let firstUnviewedStory = stories.first{ !$0.viewed}
                         let storyToShow = firstUnviewedStory ?? stories.first
                         let hasUnviewedStory = stories.contains { !$0.viewed }
-                        
                         if let story = storyToShow{
                             
                             StoryItemCell(
@@ -121,8 +122,14 @@ extension HomeView {
                                 storyIDs: StoryIDList,
                                 storyViewModel: storyViewModel,
                                 destination: AnyView(Story2View(isTabBarHidden: $isTabBarHidden, nickname: nickname, storyIDList: StoryIDList)),
+                                hasUnViewedStory: hasUnviewedStory,
                                 isTabBarHidden: $isTabBarHidden
+                               
                             )
+                            .onAppear(){
+                                print(story.viewed)
+                                print(firstUnviewedStory)
+                            }
                           
                             
                             // StoryItem 을 넣을 예정

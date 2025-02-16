@@ -22,6 +22,7 @@ class StoryViewModel: ObservableObject {
                         print(" API 응답 성공, stories 개수: \(self.rawStories.count)")
                     }
                 case .failure(let error):
+                    print( error)
                     print("스토리 불러오기 실패: \(error.localizedDescription)")
                 }
             }
@@ -29,7 +30,7 @@ class StoryViewModel: ObservableObject {
     
     // 스토리 상세 내역 가져오기 PK값, mealDiaryStoryId
     func fetchStoryDetail(for memberId: Int,storyId: Int) {
-        let url = "\(BaseAPI)/meal-stories/memberId/\(memberId)/storyId\(storyId)"  //  상세 조회
+        let url = "\(BaseAPI)/meal-stories/memberId/\(memberId)/storyId/\(storyId)"  //  상세 조회
         self.selectedStory = nil
         print("개별 스토리 API 호출: \(url)")
         AF.request(url, method: .get)
@@ -42,6 +43,7 @@ class StoryViewModel: ObservableObject {
                         print("개별 스토리 응답 성공: \(data.result.name)의 스토리")
                     }
                 case .failure(let error):
+                    print(error)
                     print("개별 스토리 불러오기 실패: \(error.localizedDescription)")
                 }
             }
@@ -49,7 +51,7 @@ class StoryViewModel: ObservableObject {
     
     //데이터 분류
     func groupStories() {
-        DispatchQueue.global(qos: .userInitiated).async { //백그라운드 스레드에서 실행해야 하는 작업
+        DispatchQueue.global(qos: .userInitiated).async { //백그라운드 스레드에서 실행
             let grouped = Dictionary(grouping: self.rawStories){$0.nickname} //닉네임으로 그룹핑
             
             let sortedGroupedStories = grouped.mapValues { stories in
@@ -58,7 +60,6 @@ class StoryViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                        self.groupedStories = sortedGroupedStories
-                       print(" 닉네임 기준 그룹화 후, viewed 정렬 완료!")
                    }
         }
     }
