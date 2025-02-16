@@ -56,7 +56,7 @@ struct MyProfileView: View {
             .disabled(showPopup) // 팝업이 보일 때 메인 화면 비활성화
             
             // Popup
-            SettingsPopup()
+            ShowPopup()
             
         }
     }
@@ -315,7 +315,7 @@ private extension MyProfileView {
     }
     
     // Popup
-    private func SettingsPopup() -> some View {
+    private func ShowPopup() -> some View {
         ZStack{
             if showPopup {
                 Color.black.opacity(0.001)
