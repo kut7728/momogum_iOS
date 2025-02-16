@@ -14,6 +14,7 @@ class NewPostViewModel: ObservableObject {
     @Published var isUploading = false
     @Published var uploadSuccess = false
     @Published var errorMessage: String?
+    @Published var mealDiaryId: Int?
     var selectedImage: UIImage?
     
     func setSelectedImage(_ image: UIImage) {
@@ -106,6 +107,11 @@ class NewPostViewModel: ObservableObject {
             switch response.result {
             case .success(let result):
                 print("✅ 업로드 성공: \(result)")
+                if let mealDiaryId = result.result?.mealDiaryId {
+                    DispatchQueue.main.async {
+                        self.mealDiaryId = mealDiaryId  // ✅ mealDiaryId 저장
+                    }
+                }
                 completion(true)
             case .failure(let error):
                 if let data = response.data, let errorString = String(data: data, encoding: .utf8) {

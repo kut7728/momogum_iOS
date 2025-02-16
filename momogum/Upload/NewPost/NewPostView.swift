@@ -186,7 +186,9 @@ struct NewPostView: View {
                 }
             }
             .navigationDestination(isPresented: $isNavigateToDonePost) {
-                DonePostView()
+                if let mealDiaryId = viewModel.mealDiaryId {
+                    DonePostView(mealDiaryId: mealDiaryId)  
+                }
             }
         }
         .navigationBarHidden(true)

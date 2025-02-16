@@ -10,8 +10,9 @@ import SwiftUI
 struct MyCardView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var isTabBarHidden: Bool
-
     @StateObject private var viewModel = MyCardViewModel()
+    
+    var mealDiaryId: Int
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -50,7 +51,7 @@ struct MyCardView: View {
 
                     UserInfoView(viewModel: viewModel)
                         .padding(.leading, 22)
-                    
+
                     Spacer().frame(height: 10)
 
                     ZStack {
@@ -187,17 +188,12 @@ struct MyCardView: View {
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
-        
         .sheet(isPresented: $viewModel.showHeartBottomSheet) {
             HeartBottomSheetView()
                 .presentationDetents([.fraction(2/3)])
         }
         .onAppear {
-            viewModel.fetchMealDiary(mealDiaryId: 2, userId: 1) 
+            viewModel.fetchMealDiary(mealDiaryId: mealDiaryId, userId: 1)
         }
     }
-}
-
-#Preview {
-    MyCardView(isTabBarHidden: .constant(false))
 }
