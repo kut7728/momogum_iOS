@@ -14,6 +14,7 @@ struct HomeView: View {
     @StateObject private var mealDiaryViewModel = MealDiaryViewModel()
     @State private var path = NavigationPath() // 네비게이션 경로 추가
     
+    @ObservedObject var storyViewModel : StoryViewModel
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     let normalButtonColor = Color(.black_5)
     let selectedButtonColor = Color(.Red_2)
@@ -43,8 +44,11 @@ struct HomeView: View {
                 if story == "내 스토리" {
                     StoryView(userID: "유저아이디", tabIndex: $tabIndex, isTabBarHidden: .constant(false))
                 } else {
-                    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
+//                    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
                 }
+            }
+            .onAppear{
+                storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
             }
         }
     }
@@ -96,14 +100,46 @@ extension HomeView {
     private func storyScrollView() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                storyItem(title: "내 스토리", hasStory: false)
-                storyItem(title: "momogum._.", hasStory: true)
+                storyItem(title: "내 스토리", hasStory: false, destination: StoryView(userID: "", tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden))
+//                storyItem(title: "momogum._.", hasStory: true, destination: Story2View(userID: "", isTabBarHidden: .constant(false)))
+                
+                let sortedStories = Array(storyViewModel.groupedStories).sorted(by: { $0.key < $1.key })
+
+                ForEach(sortedStories, id:\.key){ (nickname , stories) in
+                    if !stories.isEmpty {
+
+                        let StoryIDList = storyViewModel.getStoryIDs(for: nickname)
+                        let firstUnviewedStory = stories.first{ !$0.viewed}
+                        let storyToShow = firstUnviewedStory ?? stories.first
+                        let hasUnviewedStory = stories.contains { !$0.viewed }
+                        
+                        if let story = storyToShow{
+                            
+                            StoryItemCell(
+                                nickname: nickname,
+                                viewed: story.viewed,
+                                storyIDs: StoryIDList,
+                                storyViewModel: storyViewModel,
+                                destination: AnyView(Story2View(isTabBarHidden: $isTabBarHidden, nickname: nickname, storyIDList: StoryIDList)),
+                                isTabBarHidden: $isTabBarHidden
+                            )
+                          
+                            
+                            // StoryItem 을 넣을 예정
+                            // 전달값으로는 nickname, 반드시 story.viewed, storyViewModel, mealDiaryStoryId의 목록을 전달해야함
+                            
+                        }
+                    }
+                    
+                }
             }
         }
     }
+   
+
     
-    
-    private func storyItem(title: String, hasStory: Bool) -> some View {
+    //홈뷰에 나타나는 스토리리스트
+    private func storyItem(title: String, hasStory: Bool, destination: some View) -> some View {
         VStack {
             Button(action: {
                 isTabBarHidden = true
@@ -234,6 +270,6 @@ extension HomeView {
 }
 
 
-#Preview {
-    HomeView(tabIndex: .constant(0), isTabBarHidden: .constant(false))
-}
+//#Preview {
+//    HomeView(tabIndex: .constant(0), isTabBarHidden: .constant(false))
+//}

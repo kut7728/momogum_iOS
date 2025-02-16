@@ -48,7 +48,7 @@ struct LoginView: View {
                                         print("기존 유저 로그인 완료")
                                     }
                                 } else {
-                                    print("❌ 유저 확인 실패")
+                                    print(" 유저 확인 실패")
                                 }
                             }  } else {
                                 
