@@ -48,7 +48,7 @@ struct OtherCardView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Spacer().frame(height: 70)
 
-                    UserInfoView()
+//                    UserInfoView()
                         .padding(.leading, 22)
                     
                     Spacer().frame(height: 10)
@@ -92,10 +92,10 @@ struct OtherCardView: View {
                     
                     HStack {
                         Spacer().frame(width: 10)
-                        HeartView(likeCount: $viewModel.otherCard.likeCount)
+//                        HeartView(likeCount: $viewModel.otherCard.likeCount)
                             .fixedSize()
                         Spacer().frame(width: 20)
-                        CommentView()
+//                        CommentView(viewModel: viewModel)
                         Spacer()
                         BookmarkView(showBookmark: $viewModel.otherCard.showBookmark)
                         Spacer().frame(width: 10)

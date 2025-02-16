@@ -48,26 +48,30 @@ struct MyCardView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Spacer().frame(height: 70)
 
-                    UserInfoView()
+                    UserInfoView(viewModel: viewModel)
                         .padding(.leading, 22)
                     
                     Spacer().frame(height: 10)
 
                     ZStack {
-                        Image("cardExample")
-                            .resizable()
-                            .aspectRatio(1, contentMode: .fit)
+                        if let imageUrl = viewModel.myCard.mealDiaryImageURL, let url = URL(string: imageUrl) {
+                            AsyncImage(url: url) { image in
+                                image.resizable().aspectRatio(1, contentMode: .fit)
+                            } placeholder: {
+                                Color.gray
+                            }
                             .frame(maxWidth: .infinity)
-                            .background(Color.gray)
+                        } else {
+                            Color.gray.frame(maxWidth: .infinity)
+                        }
                         
                         VStack {
                             Spacer()
                             HStack {
                                 Spacer()
-                                Image("good_fill")
+                                Image(viewModel.getRevisitImage())
                                     .resizable()
                                     .frame(width: 72, height: 72)
-                                    .foregroundColor(.yellow)
                                     .padding(20)
                             }
                         }
@@ -92,10 +96,10 @@ struct MyCardView: View {
                     
                     HStack {
                         Spacer().frame(width: 10)
-                        HeartView(likeCount: $viewModel.myCard.likeCount)
+                        HeartView(viewModel: viewModel)
                             .fixedSize()
                         Spacer().frame(width: 20)
-                        CommentView()
+                        CommentView(viewModel: viewModel)
                         Spacer()
                         BookmarkView(showBookmark: $viewModel.myCard.showBookmark)
                         Spacer().frame(width: 10)
@@ -113,7 +117,6 @@ struct MyCardView: View {
                             .foregroundColor(.black)
                             .padding(.leading, 28)
                             .padding(.top, 5)
-                            .opacity(viewModel.myCard.likeCount > 0 ? 1 : 0)
                             .frame(height: 20)
                     }
                     
@@ -126,7 +129,7 @@ struct MyCardView: View {
                                 .frame(width: 10, height: 13)
                                 .padding(.trailing, 5)
                             
-                            Text("식사장소")
+                            Text(viewModel.myCard.location)
                                 .font(.system(size: 16))
                                 .foregroundColor(.black)
                         }
@@ -137,7 +140,7 @@ struct MyCardView: View {
                                 .frame(width: 12, height: 13)
                                 .padding(.trailing, 5)
                             
-                            Text("메뉴1, 메뉴2, 메뉴3, 메뉴4, 메뉴5")
+                            Text(viewModel.myCard.keywords.joined(separator: ", "))
                                 .font(.system(size: 14))
                                 .foregroundColor(.gray)
                         }
@@ -188,6 +191,9 @@ struct MyCardView: View {
         .sheet(isPresented: $viewModel.showHeartBottomSheet) {
             HeartBottomSheetView()
                 .presentationDetents([.fraction(2/3)])
+        }
+        .onAppear {
+            viewModel.fetchMealDiary(mealDiaryId: 2, userId: 1) 
         }
     }
 }
