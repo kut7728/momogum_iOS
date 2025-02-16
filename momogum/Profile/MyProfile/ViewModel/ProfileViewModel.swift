@@ -129,7 +129,7 @@ class ProfileViewModel {
                         }
                     }
                 case .failure(let error):
-                    print("프로필 이미지 로드 실패: \(error.localizedDescription)")
+                    print("프로필 이미지 로드 실패: \(error.localizedDescription)") // 백에서 해결중
                 }
             }
     }
@@ -141,15 +141,34 @@ class ProfileViewModel {
         }
     }
     
-    // 확정 (완료 버튼 클릭 시 호출)
-    func saveUserData() {
-        DispatchQueue.main.async { [self] in
-            profileImage = currentPreviewImage
-            userName = draftUserName
-            userID = draftUserID
-            userBio = draftUserBio
+    
+    // 프로필 편집 확정 (완료 버튼 클릭 시 호출)
+    func saveUserData(userId: Int) {
+        DispatchQueue.main.async {
+            let updatedProfile = UserProfile(
+                id: Int64(userId),
+                name: self.draftUserName,
+                nickname: self.draftUserID,
+                about: self.draftUserBio,
+                profileImage: nil,
+                newUser: false
+            )
+            
+            UserProfileManager.shared.updateUserProfile(userId: userId, updatedProfile: updatedProfile) { result in
+                switch result {
+                case .success:
+                    print("✅ 프로필 업데이트 성공")
+                    self.profileImage = self.currentPreviewImage
+                    self.userName = self.draftUserName
+                    self.userID = self.draftUserID
+                    self.userBio = self.draftUserBio
+                case .failure(let error):
+                    print("❌ 프로필 업데이트 실패: \(error.localizedDescription)")
+                }
+            }
         }
     }
+    
     
     // 편집 취소 시 초기화
     func resetUserData() {

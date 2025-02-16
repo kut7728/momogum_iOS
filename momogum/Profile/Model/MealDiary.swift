@@ -21,6 +21,6 @@ struct MealDiary: Codable {
     let foodImageURLs: [String] // 밥일기 사진
     let userImageURL: String // 유저 프로필 이미지 URL
     let foodCategory: String // 음식 카테고리
-    let keyWord: [String] // 키워드 리스트
+    let keyWord: [String] // 식사메뉴
     let isRevisit: String // 또 올래요 스티커 여부
 }

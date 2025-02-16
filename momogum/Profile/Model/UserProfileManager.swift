@@ -46,7 +46,7 @@ class UserProfileManager {
                 case .success(let decodedResponse):
                     completion(.success(decodedResponse.result))
                 case .failure(let error):
-                    print("❌ 밥일기 로드 실패: \(error.localizedDescription)")
+                    //print("❌ 밥일기 로드 실패: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }
@@ -68,6 +68,30 @@ class UserProfileManager {
                 }
             }
     }
+    
+    // 유저 정보 편집
+    func updateUserProfile(userId: Int, updatedProfile: UserProfile, completion: @escaping (Result<Void, Error>) -> Void) {
+        let url = "\(BaseAPI)/userProfiles/\(userId)/profile"
+        let parameters: [String: Any?] = [
+            "nickname": updatedProfile.nickname,
+            "name": updatedProfile.name,
+            "about": updatedProfile.about?.isEmpty == true ? nil : updatedProfile.about
+        ]
+        
+        AF.request(url, method: .put, parameters: parameters, encoding: JSONEncoding.default)
+            .validate(statusCode: 200..<300)
+            .response { response in
+                switch response.result {
+                case .success:
+                    completion(.success(()))
+                case .failure(let error):
+                    print("❌ 프로필 편집 실패: \(error.localizedDescription)")
+                    completion(.failure(error))
+                }
+            }
+    }
+    
+    // 유저 프로필 이미지 업로드
 }
 
 // 유저 프로필 에러

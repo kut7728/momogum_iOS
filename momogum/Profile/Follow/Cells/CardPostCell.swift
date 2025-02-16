@@ -41,7 +41,7 @@ struct CardPostCell: View {
                 )
             if selectedSegment == 0{
                 // 식사메뉴
-                Text(mealDiary.foodCategory)
+                Text(mealDiary.keyWord.first ?? "")
                     .font(.mmg(.Caption1))
                     .frame(width: 130, height: .infinity, alignment: .leading)
                     .foregroundColor(Color.black_1)
@@ -63,7 +63,7 @@ struct CardPostCell: View {
                     .padding(.trailing, 8)
                     
                     // 식사메뉴
-                    Text(mealDiary.foodCategory)
+                    Text(mealDiary.keyWord.first ?? "")
                         .font(.mmg(.Caption1))
                         .frame(width: 90, height: .infinity, alignment: .leading)
                         .foregroundColor(Color.black_1)
@@ -91,7 +91,7 @@ struct CardPostCell: View {
         foodImageURLs: ["https://i.pinimg.com/736x/ce/1a/bb/ce1abb170c23b41ae415f590351174ad.jpg"],
         userImageURL: "https://i.pinimg.com/736x/f0/51/e0/f051e0c2829fc33cb50fd4db098c3b89.jpg",
         foodCategory: "KOREAN",
-        keyWord: ["spicy", "delicious"],
+        keyWord: ["스시스시스시스시", "delicious"],
         isRevisit: "NOT_GOOD"
     ))
 }

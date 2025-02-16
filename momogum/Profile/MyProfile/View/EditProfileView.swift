@@ -217,7 +217,7 @@ private extension EditProfileView {
             HStack{
                 Spacer()
                 Button{
-                    viewModel.saveUserData() // 확정
+                    viewModel.saveUserData(userId: 1)
                     navigationPath.removeLast(1)
                 } label : {
                     Rectangle()
