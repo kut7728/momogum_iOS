@@ -8,20 +8,19 @@
 import Foundation
 
 // 공통 API 응답 구조
-struct MealDiaryResponse: Codable {
+struct MealDiaryResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: MealDiaryResult
-}
-
-// 공통 Result 구조
-struct MealDiaryResult: Codable {
-    let viewMealDiaryResponseList: [MealDiary]
+    let result: ResultData
+    
+    struct ResultData: Decodable {  // 중첩 구조체로 변경하여 중복 선언 문제 해결
+        let viewMealDiaryResponseList: [MealDiary]
+    }
 }
 
 // 식사 일기 모델
-struct MealDiary: Codable, Identifiable {
+struct MealDiary: Decodable, Identifiable {
     let id: Int
     let foodImageURLs: [String]
     let userImageURL: String
@@ -38,4 +37,5 @@ struct MealDiary: Codable, Identifiable {
         case isRevisit
     }
 }
+
 
