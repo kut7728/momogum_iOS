@@ -8,11 +8,14 @@
 import SwiftUI
 
 struct Story2View: View {
-    var userID: String
     @Binding var isTabBarHidden: Bool
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel = Story2ViewModel()
-
+    let nickname: String
+    let storyIDList: [Int]
+    @State private var currentIndex: Int = 0
+    @State private var selectedStoryID: Int?
+//    @Binding var path: String
     var body: some View {
         ZStack {
             Color(.black_5)
@@ -159,9 +162,12 @@ extension Story2View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.black_5, lineWidth: 1)
         )
+        .onDisappear { // 뒤로 갈 때 탭 바 다시 보이게
+            isTabBarHidden = false
+        }
     }
 }
 
-#Preview {
-    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
-}
+//#Preview {
+//    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
+//}

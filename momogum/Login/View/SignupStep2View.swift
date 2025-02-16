@@ -173,9 +173,9 @@ struct SignupStep2View: View {
                         if isButtonEnabled && authViewModel.isUsernameDuplicated==false{ // 만약 조건에 들어맞고, 중복된 아이디가아니면
                             Button{
                                 authViewModel.signup()
-                                path.append(.SignupEndView)
+//                                authViewModel.checkIsNewUser(completion: <#T##(Bool, Bool) -> Void#>
                                 print(signupDataModel.creatUser())
-                                
+                                path.append(.SignupEndView)
                             }label: {
                                 Text("완료")
                                     .disabled(!isButtonEnabled)
