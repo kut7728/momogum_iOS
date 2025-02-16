@@ -10,6 +10,7 @@ import SwiftUI
 struct Story2View: View {
     @Binding var isTabBarHidden: Bool
     @Environment(\.presentationMode) var presentationMode
+    @StateObject private var storyviewModel = StoryViewModel()
     @StateObject private var viewModel = Story2ViewModel()
     let nickname: String
     let storyIDList: [Int]
@@ -38,6 +39,13 @@ struct Story2View: View {
                 popupView()  // 신고 완료 팝업
             }
         }
+        .onAppear {
+            if let firstStoryID = storyIDList.first, let memberId = AuthManager.shared.UUID {
+                storyviewModel.fetchStoryDetail(for: memberId, storyId: firstStoryID)
+            } else {
+                print("Error: storyIDList is empty or memberId is nil")
+            }
+        }
         .sheet(isPresented: $viewModel.showReportSheet) {
             ReportView(showReportSheet: $viewModel.showReportSheet, showPopup: $viewModel.showPopup)
                 .presentationDetents([.fraction(3/4)])
@@ -60,7 +68,7 @@ extension Story2View {
 
             VStack {
                 HStack {
-                    Text("유저아이디")
+                    Text(storyviewModel.selectedStory?.name ?? "유저아이디")
                         .font(.mmg(.subheader4))
                         .bold()
                         .padding(.top, 22)
@@ -73,7 +81,7 @@ extension Story2View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Text("식당이름")
+                Text(storyviewModel.selectedStory?.location ?? "식당이름")
                     .font(.mmg(.Caption3))
                     .foregroundColor(.black_2)
                     .padding(.leading, 12)
@@ -110,14 +118,19 @@ extension Story2View {
                 .padding(.top, 44)
 
             VStack(alignment: .leading) {
-                Image("post_image")
-                    .resizable()
+                if let imageUrl = storyviewModel.selectedStory?.mealDiaryImageLinks.first, let url = URL(string: imageUrl) {
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                    } placeholder: {
+                        ProgressView()
+                    }
                     .frame(width: 328, height: 328)
                     .clipped()
                     .padding(.top, 35)
                     .padding(.leading, 17)
+                }
 
-                Text("진짜 최고로 맛있다...✨")
+                Text(storyviewModel.selectedStory?.description ?? "진짜 최고로 맛있다...✨")
                     .font(.mmg(.subheader3))
                     .padding(.top, 32)
                     .padding(.leading, 17)

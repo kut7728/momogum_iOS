@@ -133,7 +133,18 @@ struct SearchView: View {
             .onTapGesture {
                 isFocused = false // 다른 곳을 터치하면 키보드 숨기기
             }
-
+            
+            // 검색 결과 표시
+            if selectedButton == "계정" {
+                List(accountViewModel.accountResults) { account in
+                    AccountCell(account: account)
+                }
+            } else {
+                List(keywordViewModel.keywordResults) { keyword in
+                    KeywordCell(keyword: keyword)
+                }
+            }
+            
             Spacer()
         }
         .onAppear {
@@ -154,7 +165,7 @@ struct SearchView: View {
                     Spacer()
                         .frame(width: 130)
                     
-                    Text("검색하기") // 기존 텍스트 유지
+                    Text("검색하기")
                         .font(.mmg(.subheader3))
                         .foregroundColor(.black)
                 }
