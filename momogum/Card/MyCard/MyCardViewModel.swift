@@ -189,6 +189,32 @@ class MyCardViewModel: ObservableObject {
         myCard.showBookmark.toggle()
     }
     
+    func toggleLikeAPI(mealDiaryId: Int) {
+        let url = "\(BaseAPI)/meal-diaries/likes/userId/1/mealDiaryId/\(mealDiaryId)"
+
+        let currentLikeState = myCard.isLiked  // 현재 좋아요 상태 저장
+        let newLikeState = !currentLikeState   // 상태 반전
+
+        AF.request(url, method: .post, encoding: JSONEncoding.default)
+            .validate()
+            .responseDecodable(of: ResponseData.self) { response in
+                switch response.result {
+                case .success(let data):
+                    if data.isSuccess {
+                        DispatchQueue.main.async {
+                            self.myCard.isLiked = newLikeState
+                            self.myCard.likeCount += newLikeState ? 1 : -1
+                            print("✅ 좋아요 상태 변경 성공: \(newLikeState), 좋아요 개수: \(self.myCard.likeCount)")
+                        }
+                    } else {
+                        print("❌ 좋아요 토글 실패: \(data.message)")
+                    }
+                case .failure(let error):
+                    print("❌ 좋아요 API 호출 실패: \(error.localizedDescription)")
+                }
+            }
+    }
+    
     func toggleLike() {
         myCard.isLiked.toggle()
         myCard.likeCount += myCard.isLiked ? 1 : -1

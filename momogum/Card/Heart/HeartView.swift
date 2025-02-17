@@ -9,11 +9,12 @@ import SwiftUI
 
 struct HeartView: View {
     @ObservedObject var viewModel: MyCardViewModel
+    var mealDiaryId: Int
 
     var body: some View {
         HStack {
             Button(action: {
-                viewModel.toggleLike()
+                viewModel.toggleLikeAPI(mealDiaryId: mealDiaryId) // API 호출
             }) {
                 Image(viewModel.myCard.isLiked ? "heart_fill" : "heart")
                     .resizable()

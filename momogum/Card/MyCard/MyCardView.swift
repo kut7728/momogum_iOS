@@ -97,7 +97,7 @@ struct MyCardView: View {
                     
                     HStack {
                         Spacer().frame(width: 10)
-                        HeartView(viewModel: viewModel)
+                        HeartView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                             .fixedSize()
                         Spacer().frame(width: 20)
                         CommentView(viewModel: viewModel, mealDiaryId: mealDiaryId)
