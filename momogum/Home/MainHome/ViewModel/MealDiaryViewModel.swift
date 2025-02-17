@@ -11,13 +11,18 @@ class MealDiaryViewModel: ObservableObject {
     @Published var mealDiaries: [MealDiary] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
-
+    
     private var BaseAPI: String {
         return Bundle.main.object(forInfoDictionaryKey: "BASE_API") as? String ?? ""
     }
-
+    
+    private var currentPage: Int = 0 // 현재 페이지
+    private var hasMoreData: Bool = true // 더 가져올 데이터가 있는지 여부
+    
     // 네트워크 요청 함수
-    func fetchMealDiaries(category: String? = nil) {
+    func fetchMealDiaries(category: FoodCategory? = nil) {
+        guard !isLoading, hasMoreData else { return } // 이미 로딩 중이거나 더 이상 데이터가 없으면 return
+        
         isLoading = true
         errorMessage = nil
         
@@ -27,11 +32,11 @@ class MealDiaryViewModel: ObservableObject {
             return
         }
         
-        var endpoint: String
+        let endpoint: String
         if let category = category {
-            endpoint = "\(BaseAPI)/mainpage/\(category)?userID=\(userID)"
+            endpoint = "\(BaseAPI)/mainpage/\(category.rawValue)?userId=\(userID)&page=\(currentPage)"
         } else {
-            endpoint = "\(BaseAPI)/mainpage/revisit?userID=\(userID)"
+            endpoint = "\(BaseAPI)/mainpage/revisit?userId=\(userID)&page=\(currentPage)"
         }
         
         guard let url = URL(string: endpoint) else {
@@ -60,17 +65,25 @@ class MealDiaryViewModel: ObservableObject {
                 
                 do {
                     let decodedResponse = try JSONDecoder().decode(MealDiaryResponse.self, from: data)
-                    self.mealDiaries = decodedResponse.result.viewMealDiaryResponseList
+                    
+                    if decodedResponse.result.isEmpty {
+                        self.hasMoreData = false // 더 이상 불러올 데이터 없음
+                    } else {
+                        self.mealDiaries.append(contentsOf: decodedResponse.result)
+                        self.currentPage += 1 // 다음 페이지로 증가
+                    }
                 } catch {
                     self.errorMessage = "디코딩 오류: \(error.localizedDescription)"
                 }
             }
         }.resume()
     }
+    
+    // 새로운 카테고리를 선택하면, 데이터를 초기화하고 다시 불러옴
+    func resetData(category: FoodCategory? = nil) {
+        self.mealDiaries = []
+        self.currentPage = 0
+        self.hasMoreData = true
+        fetchMealDiaries(category: category)
+    }
 }
-
-
-
-//#Preview {
-//    MealDiaryViewModel()
-//}

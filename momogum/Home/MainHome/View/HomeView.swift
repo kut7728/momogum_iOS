@@ -44,7 +44,7 @@ struct HomeView: View {
                 if story == "내 스토리" {
                     StoryView(userID: "유저아이디", tabIndex: $tabIndex, isTabBarHidden: .constant(false))
                 } else {
-//                    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
+                    //                    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
                 }
             }
             .onAppear{
@@ -101,13 +101,13 @@ extension HomeView {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
                 storyItem(title: "내 스토리", hasStory: false, destination: StoryView(userID: "", tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden))
-//                storyItem(title: "momogum._.", hasStory: true, destination: Story2View(userID: "", isTabBarHidden: .constant(false)))
+                //                storyItem(title: "momogum._.", hasStory: true, destination: Story2View(userID: "", isTabBarHidden: .constant(false)))
                 
                 let sortedStories = Array(storyViewModel.groupedStories).sorted(by: { $0.key < $1.key })
-
+                
                 ForEach(sortedStories, id:\.key){ (nickname , stories) in
                     if !stories.isEmpty {
-
+                        
                         let StoryIDList = storyViewModel.getStoryIDs(for: nickname)
                         let firstUnviewedStory = stories.first{ !$0.viewed}
                         let storyToShow = firstUnviewedStory ?? stories.first
@@ -123,7 +123,7 @@ extension HomeView {
                                 destination: AnyView(Story2View(isTabBarHidden: $isTabBarHidden, nickname: nickname, storyIDList: StoryIDList)),
                                 isTabBarHidden: $isTabBarHidden
                             )
-                          
+                            
                             
                             // StoryItem 을 넣을 예정
                             // 전달값으로는 nickname, 반드시 story.viewed, storyViewModel, mealDiaryStoryId의 목록을 전달해야함
@@ -135,8 +135,8 @@ extension HomeView {
             }
         }
     }
-   
-
+    
+    
     
     //홈뷰에 나타나는 스토리리스트
     private func storyItem(title: String, hasStory: Bool, destination: some View) -> some View {
@@ -209,65 +209,81 @@ extension HomeView {
     private func foodDiaryGridView() -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(mealDiaryViewModel.mealDiaries) { diary in //`mealDiaries`를 반복
-                    NavigationLink(destination: OtherCardView(isTabBarHidden: $isTabBarHidden)) {
-                        VStack(spacing: 0) {
-                            ZStack(alignment: .topLeading) {
-                                AsyncImage(url: URL(string: diary.foodImageURLs.first ?? "")) { image in
-                                    image.resizable().scaledToFit()
-                                } placeholder: {
-                                    Image("post_image")
-                                        .resizable()
-                                        .frame(width: 166, height: 166)
-                                }
-                                .frame(width: 166, height: 166)
-                                
-                                if homeviewModel.selectedButtonIndex == 0 { // "또 올래요:)" 만 이미지 띄우기
-                                    Image("good_fill")
-                                        .resizable()
-                                        .frame(width: 36, height: 36)
-                                        .padding(.top, 123)
-                                        .padding(.leading, 122)
-                                }
-                            }
-                            
-                            ZStack {
-                                Color.white
-                                    .frame(width: 166, height: 75)
-                                
-                                HStack(spacing: 8) {
-                                    AsyncImage(url: URL(string: diary.userImageURL)) { image in
-                                        image.resizable().scaledToFill()
-                                    } placeholder: {
-                                        Image("pixelsImage")
-                                            .resizable()
-                                    }
-                                    .frame(width: 36, height: 36)
-                                    .clipShape(Circle())
-                                    
-                                    Text(diary.foodCategory)
-                                        .font(.mmg(.Caption1))
-                                        .foregroundColor(.black)
-                                    
-                                    Spacer()
-                                }
-                                .frame(width: 144, height: 36)
+                ForEach(mealDiaryViewModel.mealDiaries, id: \.id) { diary in
+                    FoodDiaryGridItemView(diary: diary, isTabBarHidden: $isTabBarHidden, homeviewModel: homeviewModel)
+                        .onAppear {
+                            if diary.id == mealDiaryViewModel.mealDiaries.last?.id && !mealDiaryViewModel.isLoading {
+                                mealDiaryViewModel.fetchMealDiaries()
                             }
                         }
-                        .frame(width: 166, height: 241)
-                        .cornerRadius(10)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.black_4, lineWidth: 1)
-                        )
-                    }
                 }
             }
             .padding(.horizontal, 16)
         }
     }
     
+    // 그리드 따로 빼기
+    private struct FoodDiaryGridItemView: View {
+        let diary: MealDiary
+        @Binding var isTabBarHidden: Bool
+        let homeviewModel: HomeViewModel // `let`으로 선언하여 값이 불변하도록 유지
+
+        var body: some View {
+            NavigationLink(destination: OtherCardView(isTabBarHidden: $isTabBarHidden)) {
+                VStack(spacing: 0) {
+                    ZStack(alignment: .topLeading) {
+                        AsyncImage(url: URL(string: diary.foodImageURLs.first ?? "")) { image in
+                            image.resizable().scaledToFit()
+                        } placeholder: {
+                            Image("post_image")
+                                .resizable()
+                                .frame(width: 166, height: 166)
+                        }
+                        .frame(width: 166, height: 166)
+
+                        if homeviewModel.selectedButtonIndex == 0 {
+                            Image("good_fill")
+                                .resizable()
+                                .frame(width: 36, height: 36)
+                                .padding(.top, 123)
+                                .padding(.leading, 122)
+                        }
+                    }
+
+                    ZStack {
+                        Color.white
+                            .frame(width: 166, height: 75)
+
+                        HStack(spacing: 8) {
+                            AsyncImage(url: URL(string: diary.userImageURL)) { image in
+                                image.resizable().scaledToFill()
+                            } placeholder: {
+                                Image("pixelsImage")
+                                    .resizable()
+                            }
+                            .frame(width: 36, height: 36)
+                            .clipShape(Circle())
+
+                            Text(diary.foodCategory.label)
+                                .font(.mmg(.Caption1))
+                                .foregroundColor(.black)
+
+                            Spacer()
+                        }
+                        .frame(width: 144, height: 36)
+                    }
+                }
+                .frame(width: 166, height: 241)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.black_4, lineWidth: 1)
+                )
+            }
+        }
+    }
 }
+
 
 
 //#Preview {
