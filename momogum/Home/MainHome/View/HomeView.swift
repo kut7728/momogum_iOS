@@ -122,7 +122,7 @@ extension HomeView {
                                 viewed: story.viewed,
                                 storyIDs: StoryIDList,
                                 storyViewModel: storyViewModel,
-                                destination: AnyView(Story2View(isTabBarHidden: $isTabBarHidden, nickname: nickname, storyIDList: StoryIDList)),
+                                destination: AnyView(Story2View(isTabBarHidden: $isTabBarHidden, nickname: nickname, storyIDList: StoryIDList,profileImageLink: story.profileImageLink)),
                                 hasUnViewedStory: hasUnviewedStory,
                                 profileImageLink: story.profileImageLink,
                                 isTabBarHidden: $isTabBarHidden

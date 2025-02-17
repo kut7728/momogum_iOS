@@ -12,10 +12,11 @@ struct Story2View: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var storyViewModel = StoryViewModel()
     @StateObject private var viewModel = Story2ViewModel()
-    
+    @State private var dragOffset: CGFloat = 0
     let nickname: String
     let storyIDList: [Int]
     @State private var currentIndex: Int = 0
+    let profileImageLink: String  
     @State private var selectedStory : StoryDetailResult?
 //    @Binding var path: String
     var body: some View {
@@ -50,7 +51,6 @@ struct Story2View: View {
         .onAppear(){
             print(nickname)
             print("storyIDList: \(storyIDList)")
-            StoryViewModel().fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex])
             print("currentIndex: \(storyIDList[currentIndex])")
             
         }
@@ -76,7 +76,7 @@ extension Story2View {
 
             VStack {
                 HStack {
-                    Text(storyViewModel.selectedStory?.name ?? "유저아이디")
+                    Text(nickname)
                         .font(.mmg(.subheader4))
                         .bold()
                         .padding(.top, 22)
@@ -146,7 +146,48 @@ extension Story2View {
                 Spacer()
             }
             .frame(width: 360, height: 534, alignment: .topLeading)
+            
+            GeometryReader { geometry in
+                HStack(spacing: 0) {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .frame(width: geometry.size.width / 2)
+                        .gesture(
+                            TapGesture()
+                                .onEnded {
+                                    previousStory()
+                                }
+                        )
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .frame(width: geometry.size.width / 2)
+                        .gesture(
+                            TapGesture()
+                                .onEnded {
+                                    nextStory()
+                                }
+                        )
+                }
+            } // 탭 범위 지정
         }
+//        .background(
+//            GeometryReader { geometry in
+//                Color.clear.contentShape(Rectangle())
+//                    .gesture(
+//                        DragGesture(minimumDistance: 0)
+//                            .onEnded { gesture in
+//                                let screenWidth = geometry.size.width
+//                                let tapX = gesture.location.x
+//
+//                                if tapX < screenWidth / 2 {
+//                                    previousStory()
+//                                } else {
+//                                    nextStory()
+//                                }
+//                            }
+//                    )
+//            }
+//        )
     }
 
     // 신고 접수 팝업
@@ -191,18 +232,22 @@ extension Story2View {
     
     
     private func previousStory() {
-        if currentIndex > 0 {
-            currentIndex -= 1
-            storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex-1])
-        }
-    }
+           if currentIndex > 0 {
+               withAnimation {
+                   currentIndex -= 1
+                   storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex])
+               }
+           }
+       }
 
     private func nextStory() {
-        if currentIndex < storyIDList.count - 1 {
-            currentIndex += 1
-            storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex+1])
+            if currentIndex < storyIDList.count - 1 {
+                withAnimation {
+                    currentIndex += 1
+                    storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex])
+                }
+            }
         }
-    }
 }
 
 //#Preview {
