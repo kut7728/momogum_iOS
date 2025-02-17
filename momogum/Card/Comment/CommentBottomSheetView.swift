@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct CommentBottomSheetView: View {
-    @Environment(\.dismiss) var dismiss
+    @Environment(\ .dismiss) var dismiss
     @State private var newComment = ""
     @FocusState private var isFocused: Bool
-    @ObservedObject var viewModel = CommentViewModel()
+    @ObservedObject var viewModel: MyCardViewModel
     
     var mealDiaryId: Int
     
@@ -32,24 +32,34 @@ struct CommentBottomSheetView: View {
                 .padding(.top, 24)
             
             List {
-                ForEach(viewModel.comments, id: \.username) { comment in
+                ForEach(viewModel.comments.indices, id: \.self) { index in
+                    let comment = viewModel.comments[index]
                     VStack(spacing: 8) {
                         HStack {
-                            Image(systemName: "person.crop.circle.fill")
-                                .resizable()
+                            if let imagePath = comment.userProfileImagePath, let url = URL(string: imagePath) {
+                                AsyncImage(url: url) { image in
+                                    image.resizable().aspectRatio(contentMode: .fill)
+                                } placeholder: {
+                                    Image(systemName: "person.crop.circle.fill")
+                                        .resizable()
+                                        .foregroundColor(.gray)
+                                }
                                 .frame(width: 52, height: 52)
-                                .foregroundColor(.gray)
-                                .overlay(
-                                    Circle()
-                                        .stroke(comment.isHighlighted ? Color.red : Color.clear, lineWidth: 2)
-                                )
+                                .clipShape(Circle())
+                            } else {
+                                Image(systemName: "person.crop.circle.fill")
+                                    .resizable()
+                                    .frame(width: 52, height: 52)
+                                    .foregroundColor(.gray)
+                                    .clipShape(Circle())
+                            }
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 HStack {
-                                    Text(comment.username)
+                                    Text(comment.nickname)
                                         .font(.system(size: 16, weight: .bold))
                                     
-                                    Text(comment.time)
+                                    Text("방금")
                                         .font(.system(size: 14))
                                         .foregroundColor(.gray)
                                 }

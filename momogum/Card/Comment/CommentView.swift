@@ -20,7 +20,7 @@ struct CommentView: View {
             }) {
                 Image("comment")
                     .resizable()
-                    .frame(width: 24, height: 24)
+                    .frame(width: 20, height: 20)
             }
             
             Spacer().frame(width: 12)
@@ -29,8 +29,11 @@ struct CommentView: View {
                 .font(.system(size: 16))
         }
         .sheet(isPresented: $showCommentBottomSheet) {
-            CommentBottomSheetView(mealDiaryId: mealDiaryId) 
+            CommentBottomSheetView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                 .presentationDetents([.fraction(2/3)])
+        }
+        .onAppear {
+            viewModel.fetchMealDiary(mealDiaryId: mealDiaryId, userId: 1) 
         }
     }
 }

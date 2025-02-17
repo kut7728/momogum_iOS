@@ -23,31 +23,50 @@ class MyCardViewModel: ObservableObject {
         nickname: "",
         mealDiaryCreatedAt: ""
     )
-
+    
+    @Published var comments: [Comment] = []
     @Published var showPopup = false
     @Published var showDeleteConfirm = false
     @Published var showDeleted = false
     @Published var showHeartBottomSheet = false
+    
+    struct Comment: Codable {
+        let userProfileImagePath: String?
+        let nickname: String
+        let content: String
+    }
+    
+    struct ResponseData: Codable {
+        let isSuccess: Bool
+        let code: String
+        let message: String
+        let result: ResultData?
+    }
 
+    struct ResultData: Codable {
+        let commentId: Int?
+    }
+    
     func fetchMealDiary(mealDiaryId: Int, userId: Int) {
         let url = "\(BaseAPI)/meal-diaries?mealDairyId=\(mealDiaryId)&userId=\(userId)"
-
+        
         AF.request(url, method: .get)
             .validate()
             .responseData { response in
                 switch response.result {
                 case .success(let data):
                     do {
-                        // ✅ 서버 응답 JSON 확인용
                         if let jsonString = String(data: data, encoding: .utf8) {
-                            print("✅ 서버 응답 JSON: \(jsonString)")
+                             print("✅ API 응답: \(jsonString)")
                         }
-
-                        // ✅ JSON을 Dictionary 형태로 변환
+                        
                         if let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                           let result = jsonObject["result"] as? [String: Any] {
-
+                            let result = jsonObject["result"] as? [String: Any] {
+                                
                             DispatchQueue.main.async {
+                                let commentCount = result["mealDiaryCommentCount"] as? Int ?? 0
+                                print("✅ 불러온 댓글 개수: \(commentCount)")
+                                
                                 self.myCard = MyCardModel(
                                     likeCount: result["mealDiaryLikeCount"] as? Int ?? 0,
                                     isLiked: result["like"] as? Bool ?? false,
@@ -57,14 +76,25 @@ class MyCardViewModel: ObservableObject {
                                     isRevisit: result["isRevisit"] as? String ?? "NOT_GOOD",
                                     location: result["location"] as? String ?? "",
                                     keywords: result["keywords"] as? [String] ?? [],
-                                    commentCount: result["mealDiaryCommentCount"] as? Int ?? 0,
+                                    commentCount: commentCount,
                                     userProfileImageLink: result["userProfileImageLink"] as? String,
                                     nickname: result["nickname"] as? String ?? "유저아이디",
                                     mealDiaryCreatedAt: result["mealDiaryCreatedAt"] as? String ?? "날짜 없음"
                                 )
+                                if let commentsArray = result["comments"] as? [[String: Any]] {
+                                    self.objectWillChange.send()
+                                    self.comments = commentsArray.map { commentDict in
+                                        Comment(
+                                            userProfileImagePath: commentDict["userProfileImagePath"] as? String,
+                                            nickname: commentDict["nickname"] as? String ?? "익명",
+                                            content: commentDict["content"] as? String ?? ""
+                                        )
+                                    }
+                                    print("✅ 불러온 댓글: \(self.comments)")
+                                } else {
+                                    print("❌ comments 배열 없음")
+                                }
                             }
-                        } else {
-                            print("❌ JSON 파싱 실패: 예상된 형식과 다름")
                         }
                     } catch {
                         print("❌ JSON 파싱 오류: \(error.localizedDescription)")
@@ -74,7 +104,34 @@ class MyCardViewModel: ObservableObject {
                 }
             }
     }
+    
+    func addComment(mealDiaryId: Int, comment: String) {
+        let url = "\(BaseAPI)/meal-diaries/comments"
+        let parameters: [String: Any] = [
+            "userId": 1,
+            "mealDiaryId": mealDiaryId,
+            "comment": comment
+        ]
 
+        AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default)
+            .validate()
+            .responseDecodable(of: ResponseData.self) { response in
+                switch response.result {
+                case .success(let data):
+                    if data.isSuccess {
+                        DispatchQueue.main.async {
+                            let newComment = Comment(userProfileImagePath: nil, nickname: self.myCard.nickname, content: comment)
+                            self.comments.append(newComment)
+                        }
+                    } else {
+                        print("❌ 댓글 추가 실패: \(data.message)")
+                    }
+                case .failure(let error):
+                    print("❌ 댓글 추가 실패: \(error.localizedDescription)")
+                }
+            }
+    }
+    
     func getRevisitImage() -> String {
         switch myCard.isRevisit {
         case "GOOD": return "good_fill"
@@ -85,20 +142,13 @@ class MyCardViewModel: ObservableObject {
     
     func deleteMealDiary(mealDiaryId: Int) {
         let url = "\(BaseAPI)/meal-diaries/mealDiaryId/\(mealDiaryId)/userId/1"
-        print("🛠️ 요청 URL: \(url)")
-
         AF.request(url, method: .delete)
             .validate()
             .responseData { response in
                 switch response.result {
                 case .success(let data):
-                    if let jsonString = String(data: data, encoding: .utf8) {
-                        print("✅ 삭제 응답 JSON: \(jsonString)")
-                    }
+                    print("✅ 삭제 응답 JSON: \(String(data: data, encoding: .utf8) ?? "")")
                 case .failure(let error):
-                    if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-                        print("❌ 서버 오류 응답 JSON: \(jsonString)")
-                    }
                     print("❌ 삭제 API 호출 실패: \(error.localizedDescription)")
                 }
             }
@@ -109,7 +159,7 @@ class MyCardViewModel: ObservableObject {
             showPopup.toggle()
         }
     }
-
+    
     func toggleBookmark() {
         myCard.showBookmark.toggle()
     }
@@ -118,20 +168,20 @@ class MyCardViewModel: ObservableObject {
         myCard.isLiked.toggle()
         myCard.likeCount += myCard.isLiked ? 1 : -1
     }
-
+    
     func resetLikeCount() {
         myCard.likeCount = 0
     }
-
+    
     func confirmDelete() {
         showDeleteConfirm = true
     }
-
+    
     func deletePost(mealDiaryId: Int) {
         showDeleteConfirm = false
         deleteMealDiary(mealDiaryId: mealDiaryId)
     }
-
+    
     func toggleHeartBottomSheet() {
         showHeartBottomSheet.toggle()
     }
