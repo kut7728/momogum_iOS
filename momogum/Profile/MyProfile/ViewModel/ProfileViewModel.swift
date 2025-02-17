@@ -6,46 +6,30 @@
 //
 
 import SwiftUI
+import Combine
 import Alamofire
 
-@Observable
-class ProfileViewModel {
-    var isLoaded = false // 중복 호출 방지 플래그
-    private var isFetchingMealDiaries = false // API 요청 중인지 확인
-    var profileImage: UIImage? // 확정된 프로필 이미지
-    var currentPreviewImage: UIImage? // 편집 중에 보여지는 미리보기 이미지
-    var uiImage: UIImage?
+class ProfileViewModel: ObservableObject {
+    @Published var isLoaded = false // 중복 호출 방지 플래그
+    @Published private var isFetchingMealDiaries = false // API 요청 중인지 확인
+    @Published var profileImage: UIImage? // 확정된 프로필 이미지
+    @Published var currentPreviewImage: UIImage? // 편집 중에 보여지는 미리보기 이미지
+    @Published var userName: String
+    @Published var userID: String
+    @Published var userBio: String
+    @Published var mealDiaries: [ProfileMealDiary] = []
+    @Published var bookmarkedMealDiaries: [ProfileMealDiary] = []
     
     // 기본 프로필 여부 체크
     var isDefaultProfileImage: Bool {
         return currentPreviewImage?.pngData() == UIImage(named: "defaultProfile")?.pngData()
     }
     
-    // 유저 정보 (확정)
-    var userName: String
-    var userID: String
-    var userBio: String
-    
-    // 유저 정보 (임시)
-    var draftUserName: String
-    var draftUserID: String
-    var draftUserBio: String
-    
-    // 밥일기 리스트
-    var mealDiaries: [ProfileMealDiary] = []
-    
-    // 북마크한 밥일기 리스트
-    var bookmarkedMealDiaries: [ProfileMealDiary] = []
-    
     init(userId: Int) {
-        self.userName = "" // 임시
+        self.userName = ""
         self.userID = ""
         self.userBio = ""
-        
-        self.draftUserName = ""
-        self.draftUserID = ""
-        self.draftUserBio = ""
-        
+
         self.profileImage = UIImage(named: "defaultProfile")
         self.currentPreviewImage = self.profileImage
         
@@ -63,17 +47,13 @@ class ProfileViewModel {
                     self.userName = userProfile.name
                     self.userID = userProfile.nickname
                     self.userBio = userProfile.about ?? ""
-                    
-                    self.draftUserName = self.userName
-                    self.draftUserID = self.userID
-                    self.draftUserBio = self.userBio
-                    
+
                     // 프로필 이미지 로드
                     if let profileImageURL = userProfile.profileImage, !profileImageURL.isEmpty {
                         self.loadImageAsync(from: profileImageURL)
                     }
                 case .failure(let error):
-                    print("유저 프로필 로드 실패: \(error.localizedDescription)")
+                    print("❌ 유저 프로필 로드 실패: \(error.localizedDescription)")
                 }
             }
         }
@@ -82,6 +62,7 @@ class ProfileViewModel {
     // 밥일기 로드
     func fetchMealDiaries(userId: Int) {
         guard !isFetchingMealDiaries && !isLoaded else {
+            print("⚠️ 이미 밥일기 데이터를 불러왔거나 요청 중입니다.")
             return
         }
         
@@ -92,9 +73,9 @@ class ProfileViewModel {
                 
                 switch result {
                 case .success(let mealDiaries):
-                    self.isLoaded = true // ✅ 한 번만 로드되도록 설정
+                    self.isLoaded = true
                     print("✅ 유저 \(userId)의 밥일기 로드 성공: \(mealDiaries.count)개")
-                    self.updateMealDiaries(with: mealDiaries)
+                    self.mealDiaries = mealDiaries
                 case .failure(let error):
                     print("❌ 유저 \(userId)의 밥일기 로드 실패: \(error.localizedDescription)")
                 }
@@ -108,22 +89,12 @@ class ProfileViewModel {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let bookmarkedMealDiaries):
-                    self.updateBookmarkedMealDiaries(with: bookmarkedMealDiaries)
+                    self.bookmarkedMealDiaries = bookmarkedMealDiaries
                 case .failure(let error):
-                    print("북마크한 밥일기 로드 실패: \(error.localizedDescription)")
+                    print("❌ 북마크한 밥일기 로드 실패: \(error.localizedDescription)")
                 }
             }
         }
-    }
-    
-    // 밥일기 업데이트 함수
-    private func updateMealDiaries(with newMealDiaries: [ProfileMealDiary]) {
-        self.mealDiaries = newMealDiaries
-    }
-    
-    // 북마크한 밥일기 업데이트
-    private func updateBookmarkedMealDiaries(with newBookmarkedMealDiaries: [ProfileMealDiary]) {
-        self.bookmarkedMealDiaries = newBookmarkedMealDiaries
     }
     
     // 프로필 이미지 로드
@@ -153,7 +124,6 @@ class ProfileViewModel {
         }
     }
     
-    
     // 프로필 편집 확정 (완료 버튼 클릭 시 호출)
     func saveUserData(userId: Int) {
         DispatchQueue.main.async {
@@ -179,9 +149,9 @@ class ProfileViewModel {
     private func updateProfileInfo(userId: Int, imageUrl: String?) {
         let updatedProfile = UserProfile(
             id: Int64(userId),
-            name: self.draftUserName,
-            nickname: self.draftUserID,
-            about: self.draftUserBio,
+            name: self.userName,
+            nickname: self.userID,
+            about: self.userBio,
             profileImage: imageUrl,
             newUser: false
         )
@@ -191,15 +161,11 @@ class ProfileViewModel {
             case .success:
                 print("✅ 프로필 업데이트 성공")
                 self.profileImage = self.currentPreviewImage
-                self.userName = self.draftUserName
-                self.userID = self.draftUserID
-                self.userBio = self.draftUserBio
             case .failure(let error):
                 print("❌ 프로필 업데이트 실패: \(error.localizedDescription)")
             }
         }
     }
-    
     
     // 편집 취소 시 초기화
     func resetUserData() {
@@ -211,13 +177,13 @@ class ProfileViewModel {
     
     // 이름, 아이디, 한줄소개 각각 초기화
     func resetUserName() {
-        draftUserName = userName
+        userName = userName
     }
     func resetUserID() {
-        draftUserID = userID
+        userID = userID
     }
     func resetUserBio() {
-        draftUserBio = userBio
+        userBio = userBio
     }
     
     // 기본 이미지로 임시 설정

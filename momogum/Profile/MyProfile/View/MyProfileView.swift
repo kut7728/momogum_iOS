@@ -20,7 +20,7 @@ struct MyProfileView: View {
     
     var mealDiary: ProfileMealDiary? = nil
     
-    @State var viewModel: ProfileViewModel = ProfileViewModel(userId: 1) // 기본값 설정 (임시)
+    @StateObject var viewModel = ProfileViewModel(userId: 1)
     @State var followViewModel: FollowViewModel = FollowViewModel()
     
     @Binding var isTabBarHidden: Bool

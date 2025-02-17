@@ -5,20 +5,16 @@
 //  Created by 류한비 on 1/24/25.
 //
 
-
 import SwiftUI
 import PhotosUI
 
 struct GalleryProfileView: View {
     @Binding var navigationPath: NavigationPath
-    @Bindable var profileViewModel: ProfileViewModel
-    
+    @ObservedObject var profileViewModel: ProfileViewModel
     @StateObject private var viewModel = GalleryPickerViewModel()
-    @Environment(\.presentationMode) var presentationMode
-    
+
     @State private var selectedImage: UIImage? // 선택된 이미지를 저장할 변수
-//    @State private var isActive = false
-    
+
     var body: some View {
         VStack {
             GeometryReader { geometry in
@@ -28,7 +24,7 @@ struct GalleryProfileView: View {
                     GridItem(.flexible(), spacing: 4)
                 ]
                 let gridItemSize = (geometry.size.width - 48) / 3
-                
+
                 ZStack(alignment: .top) {
                     if viewModel.isPermissionGranted {
                         ScrollView {
@@ -36,10 +32,8 @@ struct GalleryProfileView: View {
                                 ForEach(viewModel.images.indices, id: \.self) { index in
                                     if let image = viewModel.images[index] {
                                         Button {
-                                            if let image = viewModel.images[index] {
-                                                    selectedImage = image
-                                                    navigationPath.append(image)
-                                                }
+                                            selectedImage = image
+                                            navigationPath.append(image)
                                         } label: {
                                             Image(uiImage: image)
                                                 .resizable()
@@ -54,7 +48,7 @@ struct GalleryProfileView: View {
                                                 viewModel.loadImage(at: index)
                                             }
                                     }
-                                    
+
                                     if index == viewModel.images.count - 1 {
                                         ProgressView()
                                             .onAppear {
@@ -67,38 +61,11 @@ struct GalleryProfileView: View {
                             .padding(.horizontal, 16)
                         }
                     } else {
-                        Text("사진 권한이 필요합니다. 설정에서 권한을 허용해주세요.")
-                            .multilineTextAlignment(.center)
-                            .padding()
+                        PermissionAlert()
                     }
-                    
-                    VStack {
-                        HStack {
-                            Button(action: {
-                                profileViewModel.resetUserData()
-                                navigationPath.removeLast(1)
-                            }) {
-                                Image(systemName: "chevron.left")
-                                    .foregroundColor(.black)
-                                    .font(.title2)
-                            }
-                            .frame(width: 44, height: 44)
-                            
-                            Text("갤러리에서 선택")
-                                .font(.headline)
-                                .fontWeight(.bold)
-                                .foregroundColor(.black)
-                                .padding(.leading, -50)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                            
-                            Spacer()
-                        }
-                        .padding(.horizontal, 16)
-                        .frame(height: 60)
-                        .background(Color.white)
-                        
-                        Spacer()
-                    }
+
+                    // 상단 네비게이션 바
+                    GalleryNavigationBar()
                 }
                 .onAppear {
                     viewModel.requestPhotoLibraryPermission()
@@ -122,6 +89,49 @@ struct GalleryProfileView: View {
         .navigationBarHidden(true)
         .navigationDestination(for: UIImage.self) { image in
             EditImageView(selectedImage: image, navigationPath: $navigationPath, profileViewModel: profileViewModel)
+        }
+    }
+}
+
+// MARK: - Private Extensions
+private extension GalleryProfileView {
+
+    // 네비게이션 바
+    private func GalleryNavigationBar() -> some View {
+        VStack {
+            HStack {
+                Button(action: {
+                    profileViewModel.resetUserData()
+                    navigationPath.removeLast(1)
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                        .font(.title2)
+                }
+                .frame(width: 44, height: 44)
+
+                Text("갤러리에서 선택")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .frame(height: 60)
+            .background(Color.white)
+
+            Spacer()
+        }
+    }
+
+    // 사진 권한 필요 시 알림 메시지
+    private func PermissionAlert() -> some View {
+        VStack {
+            Text("사진 권한이 필요합니다. 설정에서 권한을 허용해주세요.")
+                .multilineTextAlignment(.center)
+                .padding()
         }
     }
 }

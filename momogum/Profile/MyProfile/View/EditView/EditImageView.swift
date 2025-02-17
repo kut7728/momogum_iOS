@@ -10,7 +10,7 @@ import SwiftUI
 
 struct EditImageView: View {
     @Binding var navigationPath: NavigationPath
-    @Bindable var profileViewModel: ProfileViewModel
+    @ObservedObject var profileViewModel: ProfileViewModel
     @StateObject private var viewModel: ImageEditorViewModel
     var selectedImage: UIImage?
     
@@ -23,7 +23,7 @@ struct EditImageView: View {
         let imageToUse = selectedImage ?? defaultImage
         _viewModel = StateObject(wrappedValue: ImageEditorViewModel(image: imageToUse))
         _navigationPath = navigationPath
-        self.profileViewModel = profileViewModel
+        self._profileViewModel = ObservedObject(initialValue: profileViewModel)
         self.selectedImage = imageToUse
     }
     
@@ -67,23 +67,25 @@ struct EditImageView: View {
                 VStack {
                     HStack {
                         // back 버튼
-                        Button{
+                        Button {
                             navigationPath.removeLast(1)
                         } label: {
                             Image("back")
                                 .resizable()
-                                .frame(width: 24,height: 24)
+                                .frame(width: 24, height: 24)
                         }
                         .padding(.trailing, 300)
                         
                         // cancel 버튼
-                        Button{
-                            profileViewModel.resetUserData()
-                            navigationPath.removeLast(2)
+                        Button {
+                            DispatchQueue.main.async {
+                                profileViewModel.resetUserData()
+                                navigationPath.removeLast(2)
+                            }
                         } label: {
                             Image("close")
                                 .resizable()
-                                .frame(width: 20,height: 20)
+                                .frame(width: 20, height: 20)
                         }
                     }
                     .padding(.horizontal, 30)
@@ -96,9 +98,11 @@ struct EditImageView: View {
                         Spacer()
                         Button {
                             if let finalizeImage = viewModel.finalizeImage(frameSize: frameSize) {
-                                profileViewModel.convertPreviewImage(from: finalizeImage)
+                                DispatchQueue.main.async {
+                                    profileViewModel.convertPreviewImage(from: finalizeImage)
+                                    navigationPath.removeLast(2)
+                                }
                             }
-                            navigationPath.removeLast(2)
                         } label: {
                             Rectangle()
                                 .frame(width: 105, height: 52)
