@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6845118A2D63918E005AE424 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 684511892D63918E005AE424 /* Config.xcconfig */; };
 		68CCB17F2D365F58006D55E6 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 68CCB17E2D365F58006D55E6 /* KakaoSDK */; };
 		68CCB1812D365F58006D55E6 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 68CCB1802D365F58006D55E6 /* KakaoSDKAuth */; };
 		68CCB1832D365F58006D55E6 /* KakaoSDKCert in Frameworks */ = {isa = PBXBuildFile; productRef = 68CCB1822D365F58006D55E6 /* KakaoSDKCert */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		684511892D63918E005AE424 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		6D82DE8A2D2C114C008386FE /* momogum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = momogum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D82DEAA2D2C1273008386FE /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,6 +62,7 @@
 		6D82DE812D2C114C008386FE = {
 			isa = PBXGroup;
 			children = (
+				684511892D63918E005AE424 /* Config.xcconfig */,
 				6D82DEAA2D2C1273008386FE /* .gitignore */,
 				6D82DE8C2D2C114C008386FE /* momogum */,
 				6D82DE8B2D2C114C008386FE /* Products */,
@@ -147,6 +150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6D82DEAB2D2C1273008386FE /* .gitignore in Resources */,
+				6845118A2D63918E005AE424 /* Config.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -165,8 +169,7 @@
 /* Begin XCBuildConfiguration section */
 		6D82DE982D2C114E008386FE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 6D82DE8C2D2C114C008386FE /* momogum */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReference = 684511892D63918E005AE424 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -230,8 +233,7 @@
 		};
 		6D82DE992D2C114E008386FE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 6D82DE8C2D2C114C008386FE /* momogum */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReference = 684511892D63918E005AE424 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -288,8 +290,7 @@
 		};
 		6D82DE9B2D2C114E008386FE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 6D82DE8C2D2C114C008386FE /* momogum */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReference = 684511892D63918E005AE424 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -321,8 +322,7 @@
 		};
 		6D82DE9C2D2C114E008386FE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 6D82DE8C2D2C114C008386FE /* momogum */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReference = 684511892D63918E005AE424 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

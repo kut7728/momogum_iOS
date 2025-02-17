@@ -163,27 +163,21 @@ class MyCardViewModel: ObservableObject {
     func toggleBookmarkAPI(mealDiaryId: Int) {
         let url = "\(BaseAPI)/meal-diaries/bookmarks/userId/1/mealDiaryId/\(mealDiaryId)"
         
-        let newBookmarkState = !myCard.showBookmark
+        let currentBookmarkState = myCard.showBookmark // 기존 북마크 상태 저장
+        let newBookmarkState = !currentBookmarkState  // 반전된 상태
 
         AF.request(url, method: .post, encoding: JSONEncoding.default)
             .validate()
-            .responseData { response in
+            .responseDecodable(of: ResponseData.self) { response in
                 switch response.result {
                 case .success(let data):
-                    if let jsonString = String(data: data, encoding: .utf8) {
-                        print("✅ 북마크 API 응답: \(jsonString)")
-                    }
-                    do {
-                        let decodedResponse = try JSONDecoder().decode(ResponseData.self, from: data)
+                    if data.isSuccess {
                         DispatchQueue.main.async {
-                            if decodedResponse.isSuccess {
-                                self.myCard.showBookmark = newBookmarkState
-                            } else {
-                                print("❌ 북마크 실패: \(decodedResponse.message)")
-                            }
+                            self.myCard.showBookmark = newBookmarkState
+                            print("✅ 북마크 상태 변경 성공: \(newBookmarkState)")
                         }
-                    } catch {
-                        print("❌ JSON 디코딩 오류: \(error.localizedDescription)")
+                    } else {
+                        print("❌ 북마크 토글 실패: \(data.message)")
                     }
                 case .failure(let error):
                     print("❌ 북마크 API 호출 실패: \(error.localizedDescription)")
