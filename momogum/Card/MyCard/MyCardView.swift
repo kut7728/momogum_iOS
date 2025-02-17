@@ -172,7 +172,13 @@ struct MyCardView: View {
             }
 
             if viewModel.showPopup {
-                PopupMenuView(showPopup: $viewModel.showPopup, isTabBarHidden: .constant(false), showSavedPopup: .constant(false))
+                PopupMenuView(
+                    showPopup: $viewModel.showPopup,
+                    isTabBarHidden: .constant(false),
+                    showSavedPopup: .constant(false),
+                    viewModel: viewModel,
+                    mealDiaryId: mealDiaryId
+                )
             }
 
             if viewModel.showDeleted {
@@ -194,6 +200,25 @@ struct MyCardView: View {
         }
         .onAppear {
             viewModel.fetchMealDiary(mealDiaryId: mealDiaryId, userId: 1)
+        }
+        .onChange(of: viewModel.showDeleted) {
+            if viewModel.showDeleted {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    let isTabBarHiddenBinding = Binding<Bool>(
+                        get: { isTabBarHidden },
+                        set: { isTabBarHidden = $0 }
+                    )
+                    changeRootView(to: MyProfileView(isTabBarHidden: isTabBarHiddenBinding))
+                }
+            }
+        }
+    }
+
+    private func changeRootView<Content: View>(to view: Content) {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            window.rootViewController = UIHostingController(rootView: view)
+            window.makeKeyAndVisible()
         }
     }
 }

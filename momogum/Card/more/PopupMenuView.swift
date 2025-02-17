@@ -14,12 +14,20 @@ struct PopupMenuView: View {
     @State private var showDeleteConfirmation = false
     @State private var showDeletedPopup = false
     @State private var navigateToFixPostView = false
+    
+    var viewModel: MyCardViewModel
+    var mealDiaryId: Int
 
     var body: some View {
         ZStack {
             if showDeleteConfirmation {
-                DeleteConfirmView(showDeleteConfirmation: $showDeleteConfirmation, showDeletedPopup: $showDeletedPopup)
-                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
+                DeleteConfirmView(
+                    showDeleteConfirmation: $showDeleteConfirmation,
+                    showDeletedPopup: $showDeletedPopup,
+                    viewModel: viewModel,
+                    mealDiaryId: mealDiaryId 
+                )
+                .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
             }
 
             if showDeletedPopup {

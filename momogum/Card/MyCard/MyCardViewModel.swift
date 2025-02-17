@@ -82,7 +82,28 @@ class MyCardViewModel: ObservableObject {
         default: return "soso_fill"
         }
     }
+    
+    func deleteMealDiary(mealDiaryId: Int) {
+        let url = "\(BaseAPI)/meal-diaries/mealDiaryId/\(mealDiaryId)/userId/1"
+        print("🛠️ 요청 URL: \(url)") // ✅ 요청 URL 확인
 
+        AF.request(url, method: .delete)
+            .validate()
+            .responseData { response in
+                switch response.result {
+                case .success(let data):
+                    if let jsonString = String(data: data, encoding: .utf8) {
+                        print("✅ 삭제 응답 JSON: \(jsonString)")
+                    }
+                case .failure(let error):
+                    if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
+                        print("❌ 서버 오류 응답 JSON: \(jsonString)")
+                    }
+                    print("❌ 삭제 API 호출 실패: \(error.localizedDescription)")
+                }
+            }
+    }
+    
     func togglePopup() {
         withAnimation {
             showPopup.toggle()
@@ -106,12 +127,9 @@ class MyCardViewModel: ObservableObject {
         showDeleteConfirm = true
     }
 
-    func deletePost() {
+    func deletePost(mealDiaryId: Int) {
         showDeleteConfirm = false
-        showDeleted = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.showDeleted = false
-        }
+        deleteMealDiary(mealDiaryId: mealDiaryId)
     }
 
     func toggleHeartBottomSheet() {
