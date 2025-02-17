@@ -83,7 +83,7 @@ class ProfileViewModel {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let mealDiaries):
-                    print("✅ 유저 \(userId)의 밥일기 로드 성공: \(mealDiaries.count)개") // 확인용입니당
+//                    print("✅ 유저 \(userId)의 밥일기 로드 성공: \(mealDiaries.count)개") // 확인용입니당
                     self.updateMealDiaries(with: mealDiaries)
                 case .failure(let error):
                     print("❌ 유저 \(userId)의 밥일기 로드 실패: \(error.localizedDescription)")

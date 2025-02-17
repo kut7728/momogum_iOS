@@ -6,7 +6,8 @@ class StoryViewModel: ObservableObject {
     @Published var selectedStory: StoryDetailResult?
     @Published var groupedStories : [String:[StoryResult]] = [:]
     @Published var sortedGroupedStories: [(key: String, value: [StoryResult])] = []  // 정렬된 데이터를 배열로 저장
-    @Published var Mystories : MyStoryResult?
+    @Published var Mystories : [MyStoryResult] = []
+    
     // 회원 친구들의 스토리 전체 조회
     func fetchStory(for memberId: Int) {
         let url = "\(BaseAPI)/meal-stories/memberId/\(memberId)" // API 요청 URL
@@ -88,12 +89,12 @@ class StoryViewModel: ObservableObject {
         let url = "\(BaseAPI)/meal-stories/myStories/memberId/\(memberId)"
         AF.request(url, method: .get)
             .validate()
-            .responseDecodable(of: StoryDetailModel.self) { response in
+            .responseDecodable(of: MyStoryModel.self) { response in
                 switch response.result {
                 case .success(let data):
                     DispatchQueue.main.async {
-//                        self.Mystories = data.result
-                        print("내 스토리 가져오기 성공: \(data.result.name)의 스토리")
+                        self.Mystories = data.result
+                        print("내 스토리 가져오기 성공: \(data.result)의 스토리")
                     }
                 case .failure(let error):
                     print(error)
