@@ -10,6 +10,8 @@ import Alamofire
 
 @Observable
 class ProfileViewModel {
+    var isLoaded = false // 중복 호출 방지 플래그
+    private var isFetchingMealDiaries = false // API 요청 중인지 확인
     var profileImage: UIImage? // 확정된 프로필 이미지
     var currentPreviewImage: UIImage? // 편집 중에 보여지는 미리보기 이미지
     var uiImage: UIImage?
@@ -79,11 +81,19 @@ class ProfileViewModel {
     
     // 밥일기 로드
     func fetchMealDiaries(userId: Int) {
+        guard !isFetchingMealDiaries && !isLoaded else {
+            return
+        }
+        
+        isFetchingMealDiaries = true
         UserProfileManager.shared.fetchMealDiaries(userId: userId) { result in
             DispatchQueue.main.async {
+                self.isFetchingMealDiaries = false
+                
                 switch result {
                 case .success(let mealDiaries):
-                    print("✅ 유저 \(userId)의 밥일기 로드 성공: \(mealDiaries.count)개") // 확인용입니당
+                    self.isLoaded = true // ✅ 한 번만 로드되도록 설정
+                    print("✅ 유저 \(userId)의 밥일기 로드 성공: \(mealDiaries.count)개")
                     self.updateMealDiaries(with: mealDiaries)
                 case .failure(let error):
                     print("❌ 유저 \(userId)의 밥일기 로드 실패: \(error.localizedDescription)")
@@ -128,10 +138,10 @@ class ProfileViewModel {
                             self.profileImage = image
                             self.currentPreviewImage = image
                         }
+                        print("✅ 프로필 이미지 로드 성공!")
                     }
                 case .failure(let error):
-                    print("")
-//                    print("프로필 이미지 로드 실패: \(error.localizedDescription)") // 백에서 해결중
+                    print("❌ 프로필 이미지 로드 실패: \(error.localizedDescription)")
                 }
             }
     }
@@ -147,26 +157,45 @@ class ProfileViewModel {
     // 프로필 편집 확정 (완료 버튼 클릭 시 호출)
     func saveUserData(userId: Int) {
         DispatchQueue.main.async {
-            let updatedProfile = UserProfile(
-                id: Int64(userId),
-                name: self.draftUserName,
-                nickname: self.draftUserID,
-                about: self.draftUserBio,
-                profileImage: nil,
-                newUser: false
-            )
-            
-            UserProfileManager.shared.updateUserProfile(userId: userId, updatedProfile: updatedProfile) { result in
-                switch result {
-                case .success:
-                    print("✅ 프로필 업데이트 성공")
-                    self.profileImage = self.currentPreviewImage
-                    self.userName = self.draftUserName
-                    self.userID = self.draftUserID
-                    self.userBio = self.draftUserBio
-                case .failure(let error):
-                    print("❌ 프로필 업데이트 실패: \(error.localizedDescription)")
+            if let newImage = self.currentPreviewImage, newImage != self.profileImage {
+                UserProfileManager.shared.uploadProfileImage(userId: userId, image: newImage) { [weak self] result in
+                    guard let self = self else { return }
+                    
+                    switch result {
+                    case .success(let uploadedImageUrl):
+                        print("✅ 프로필 이미지 업로드 성공: \(uploadedImageUrl)")
+                        self.updateProfileInfo(userId: userId, imageUrl: uploadedImageUrl)
+
+                    case .failure(let error):
+                        print("❌ 프로필 이미지 업로드 실패: \(error.localizedDescription)")
+                    }
                 }
+            } else {
+                self.updateProfileInfo(userId: userId, imageUrl: nil)
+            }
+        }
+    }
+    
+    private func updateProfileInfo(userId: Int, imageUrl: String?) {
+        let updatedProfile = UserProfile(
+            id: Int64(userId),
+            name: self.draftUserName,
+            nickname: self.draftUserID,
+            about: self.draftUserBio,
+            profileImage: imageUrl,
+            newUser: false
+        )
+        
+        UserProfileManager.shared.updateUserProfile(userId: userId, updatedProfile: updatedProfile) { result in
+            switch result {
+            case .success:
+                print("✅ 프로필 업데이트 성공")
+                self.profileImage = self.currentPreviewImage
+                self.userName = self.draftUserName
+                self.userID = self.draftUserID
+                self.userBio = self.draftUserBio
+            case .failure(let error):
+                print("❌ 프로필 업데이트 실패: \(error.localizedDescription)")
             }
         }
     }
