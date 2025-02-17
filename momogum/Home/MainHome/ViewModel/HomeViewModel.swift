@@ -16,7 +16,7 @@ class HomeViewModel: ObservableObject {
     
     // 필터 버튼 데이터
     let buttonLabels: [String] = [
-        "또올래요:)", "한식", "중식", "일식"/*, "양식",*/,
+        "또올래요:)", "한식", "중식", "일식", "양식",
         "아시안", "패스트푸드", "카페", "기타"
     ]
     
@@ -46,7 +46,7 @@ class HomeViewModel: ObservableObject {
         case "한식": return "KOREA"
         case "중식": return "CHINA"
         case "일식": return "JAPAN"
-//        case "양식": return "WESTERN"
+        case "양식": return "WESTERN"
         case "아시안": return "ASIAN"
         case "패스트푸드": return "FASTFOOD"
         case "카페": return "CAFE"
