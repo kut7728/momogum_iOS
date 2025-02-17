@@ -209,65 +209,81 @@ extension HomeView {
     private func foodDiaryGridView() -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(mealDiaryViewModel.mealDiaries) { diary in
-                    NavigationLink(destination: OtherCardView(isTabBarHidden: $isTabBarHidden)) {
-                        VStack(spacing: 0) {
-                            ZStack(alignment: .topLeading) {
-                                AsyncImage(url: URL(string: diary.foodImageURLs.first ?? "")) { image in
-                                    image.resizable().scaledToFit()
-                                } placeholder: {
-                                    Image("post_image")
-                                        .resizable()
-                                        .frame(width: 166, height: 166)
-                                }
-                                .frame(width: 166, height: 166)
-                                
-                                if homeviewModel.selectedButtonIndex == 0 { // 또 올래요만 아이콘 띄우기
-                                    Image("good_fill")
-                                        .resizable()
-                                        .frame(width: 36, height: 36)
-                                        .padding(.top, 123)
-                                        .padding(.leading, 122)
-                                }
-                            }
-                            
-                            ZStack {
-                                Color.white
-                                    .frame(width: 166, height: 75)
-                                
-                                HStack(spacing: 8) {
-                                    AsyncImage(url: URL(string: diary.userImageURL)) { image in
-                                        image.resizable().scaledToFill()
-                                    } placeholder: {
-                                        Image("pixelsImage")
-                                            .resizable()
-                                    }
-                                    .frame(width: 36, height: 36)
-                                    .clipShape(Circle())
-                                    
-                                    // `foodCategory.rawValue` => `label` 사용
-                                    Text(diary.foodCategory.label)
-                                        .font(.mmg(.Caption1))
-                                        .foregroundColor(.black)
-                                    
-                                    Spacer()
-                                }
-                                .frame(width: 144, height: 36)
+                ForEach(mealDiaryViewModel.mealDiaries, id: \.id) { diary in
+                    FoodDiaryGridItemView(diary: diary, isTabBarHidden: $isTabBarHidden, homeviewModel: homeviewModel)
+                        .onAppear {
+                            if diary.id == mealDiaryViewModel.mealDiaries.last?.id && !mealDiaryViewModel.isLoading {
+                                mealDiaryViewModel.fetchMealDiaries()
                             }
                         }
-                        .frame(width: 166, height: 241)
-                        .cornerRadius(10)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.black_4, lineWidth: 1)
-                        )
-                    }
                 }
             }
             .padding(.horizontal, 16)
         }
     }
+    
+    // 그리드 따로 빼기
+    private struct FoodDiaryGridItemView: View {
+        let diary: MealDiary
+        @Binding var isTabBarHidden: Bool
+        let homeviewModel: HomeViewModel // `let`으로 선언하여 값이 불변하도록 유지
+
+        var body: some View {
+            NavigationLink(destination: OtherCardView(isTabBarHidden: $isTabBarHidden)) {
+                VStack(spacing: 0) {
+                    ZStack(alignment: .topLeading) {
+                        AsyncImage(url: URL(string: diary.foodImageURLs.first ?? "")) { image in
+                            image.resizable().scaledToFit()
+                        } placeholder: {
+                            Image("post_image")
+                                .resizable()
+                                .frame(width: 166, height: 166)
+                        }
+                        .frame(width: 166, height: 166)
+
+                        if homeviewModel.selectedButtonIndex == 0 {
+                            Image("good_fill")
+                                .resizable()
+                                .frame(width: 36, height: 36)
+                                .padding(.top, 123)
+                                .padding(.leading, 122)
+                        }
+                    }
+
+                    ZStack {
+                        Color.white
+                            .frame(width: 166, height: 75)
+
+                        HStack(spacing: 8) {
+                            AsyncImage(url: URL(string: diary.userImageURL)) { image in
+                                image.resizable().scaledToFill()
+                            } placeholder: {
+                                Image("pixelsImage")
+                                    .resizable()
+                            }
+                            .frame(width: 36, height: 36)
+                            .clipShape(Circle())
+
+                            Text(diary.foodCategory.label)
+                                .font(.mmg(.Caption1))
+                                .foregroundColor(.black)
+
+                            Spacer()
+                        }
+                        .frame(width: 144, height: 36)
+                    }
+                }
+                .frame(width: 166, height: 241)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.black_4, lineWidth: 1)
+                )
+            }
+        }
+    }
 }
+
 
 
 //#Preview {
