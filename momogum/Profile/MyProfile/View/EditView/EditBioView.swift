@@ -14,8 +14,8 @@ struct EditBioView: View {
 
     private let maxLength = 40
 
-    // 편집 중인 한줄소개 (초기값: 현재 userBio)
-    @State private var draftBio: String
+    // 편집 중인 한줄소개
+    @State private var draftBio: String = ""
 
     init(navigationPath: Binding<NavigationPath>, viewModel: ProfileViewModel) {
         self._navigationPath = navigationPath
@@ -39,6 +39,9 @@ struct EditBioView: View {
         .edgesIgnoringSafeArea(.all)
         .toolbar(.hidden, for: .tabBar)
         .navigationBarBackButtonHidden()
+        .onAppear {
+            draftBio = ""
+        }
     }
 }
 

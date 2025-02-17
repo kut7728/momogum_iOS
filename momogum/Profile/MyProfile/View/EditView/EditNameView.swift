@@ -18,8 +18,8 @@ struct EditNameView: View {
 
     private let maxLength = 12
 
-    // 유저가 입력하는 이름 (초기값: 기존 이름 유지)
-    @State private var draftName: String
+    // 유저가 입력하는 이름
+    @State private var draftName: String = ""
 
     init(navigationPath: Binding<NavigationPath>, viewModel: ProfileViewModel) {
         self._navigationPath = navigationPath
@@ -46,6 +46,9 @@ struct EditNameView: View {
         .edgesIgnoringSafeArea(.all)
         .toolbar(.hidden, for: .tabBar)
         .navigationBarBackButtonHidden()
+        .onAppear {
+            draftName = ""
+        }
     }
 }
 

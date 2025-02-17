@@ -20,8 +20,8 @@ struct EditIDView: View {
 
     private let maxLength = 20
 
-    // 유저가 입력하는 ID (초기값: 기존 ID)
-    @State private var draftID: String
+    // 유저가 입력하는 ID
+    @State private var draftID: String = ""
 
     init(navigationPath: Binding<NavigationPath>, viewModel: ProfileViewModel) {
         self._navigationPath = navigationPath
@@ -48,6 +48,9 @@ struct EditIDView: View {
         .edgesIgnoringSafeArea(.all)
         .toolbar(.hidden, for: .tabBar)
         .navigationBarBackButtonHidden()
+        .onAppear {
+            draftID = ""
+        }
     }
 }
 
@@ -59,7 +62,7 @@ private extension EditIDView {
         HStack(alignment: .center){
             // Back 버튼
             Button{
-                navigationPath.removeLast(1) // 취소 시 돌아가기
+                navigationPath.removeLast(1)
             } label: {
                 Image("close_s")
                     .resizable()
