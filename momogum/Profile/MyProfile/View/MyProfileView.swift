@@ -18,6 +18,8 @@ struct MyProfileView: View {
     @State private var showLogoutPopup = false
     @State private var showDelPopup = false
     
+    var mealDiary: ProfileMealDiary? = nil
+    
     @State var viewModel: ProfileViewModel = ProfileViewModel(userId: 1) // 기본값 설정 (임시)
     @State var followViewModel: FollowViewModel = FollowViewModel()
     
@@ -281,9 +283,13 @@ private extension MyProfileView {
         .padding(.bottom, 41)
         .padding(.horizontal, 10)
         .navigationDestination(isPresented: $navigateToMyCardView) {
-            MyCardView(isTabBarHidden: $isTabBarHidden)
-                .onAppear { isTabBarHidden = true }
-                .onDisappear { isTabBarHidden = false }
+            if let mealDiary = mealDiary {
+                MyCardView(isTabBarHidden: $isTabBarHidden, mealDiaryId: Int(mealDiary.mealDiaryId))
+                    .onAppear { isTabBarHidden = true }
+                    .onDisappear { isTabBarHidden = false }
+            } else {
+                Text("잘못된 접근입니다.")
+            }
         }
     }
     
@@ -301,7 +307,7 @@ private extension MyProfileView {
             } else {
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(selectedSegment == 0 ? viewModel.mealDiaries : viewModel.bookmarkedMealDiaries, id: \.mealDiaryId) { mealDiary in
-                        NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
+                        NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden, mealDiaryId: Int(mealDiary.mealDiaryId))
                             .onAppear { isTabBarHidden = true }
                             .onDisappear { isTabBarHidden = false }
                         ) {

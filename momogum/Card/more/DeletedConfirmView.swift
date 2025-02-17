@@ -10,6 +10,8 @@ import SwiftUI
 struct DeleteConfirmView: View {
     @Binding var showDeleteConfirmation: Bool
     @Binding var showDeletedPopup: Bool
+    var viewModel: MyCardViewModel
+    var mealDiaryId: Int
     
     var body: some View {
         VStack {
@@ -45,6 +47,7 @@ struct DeleteConfirmView: View {
                     .background(Color.gray.opacity(0.3))
                 
                 Button(action: {
+                    viewModel.deletePost(mealDiaryId: mealDiaryId)
                     showDeleteConfirmation = false
                     showDeletedPopup = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -64,6 +67,6 @@ struct DeleteConfirmView: View {
         .cornerRadius(10)
         .shadow(radius: 5)
         .transition(.opacity)
-        .offset(y: -60) 
+        .offset(y: -60)
     }
 }

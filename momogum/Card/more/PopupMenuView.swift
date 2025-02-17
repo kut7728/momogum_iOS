@@ -14,17 +14,36 @@ struct PopupMenuView: View {
     @State private var showDeleteConfirmation = false
     @State private var showDeletedPopup = false
     @State private var navigateToFixPostView = false
+    
+    var viewModel: MyCardViewModel
+    var mealDiaryId: Int
 
     var body: some View {
         ZStack {
             if showDeleteConfirmation {
-                DeleteConfirmView(showDeleteConfirmation: $showDeleteConfirmation, showDeletedPopup: $showDeletedPopup)
-                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
+                DeleteConfirmView(
+                    showDeleteConfirmation: $showDeleteConfirmation,
+                    showDeletedPopup: $showDeletedPopup,
+                    viewModel: viewModel,
+                    mealDiaryId: mealDiaryId
+                )
+                .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
             }
 
             if showDeletedPopup {
-                DeletedPopupView(showDeletedPopup: $showDeletedPopup, showPopup: $showPopup)
-                    .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
+                DeletedPopupView(
+                    showDeletedPopup: $showDeletedPopup,
+                    showPopup: $showPopup
+                ) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        let isTabBarHiddenBinding = Binding<Bool>(
+                            get: { isTabBarHidden },
+                            set: { isTabBarHidden = $0 }
+                        )
+                        changeRootView(to: MyProfileView(isTabBarHidden: isTabBarHiddenBinding))
+                    }
+                }
+                .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
             }
 
             if !showDeleteConfirmation && !showDeletedPopup {
@@ -65,6 +84,14 @@ struct PopupMenuView: View {
         }
         .navigationDestination(isPresented: $navigateToFixPostView) {
             FixPostView(isTabBarHidden: $isTabBarHidden, showSavedPopup: $showSavedPopup)
+        }
+    }
+
+    private func changeRootView<Content: View>(to view: Content) {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            window.rootViewController = UIHostingController(rootView: view)
+            window.makeKeyAndVisible()
         }
     }
 }

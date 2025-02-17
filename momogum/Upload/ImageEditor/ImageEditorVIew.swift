@@ -12,7 +12,8 @@ struct ImageEditorView: View {
     @Binding var isTabBarHidden: Bool
     @Binding var tabIndex: Int
     @Environment(\.dismiss) var dismiss
-    @State private var navigationPath = NavigationPath()
+    @State private var navigateToNewPost = false
+    @State private var editedUIImage: UIImage? = nil
 
     init(image: UIImage, tabIndex: Binding<Int>, isTabBarHidden: Binding<Bool>) {
         _viewModel = StateObject(wrappedValue: ImageEditorViewModel(image: image))
@@ -21,7 +22,7 @@ struct ImageEditorView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+        NavigationStack {
             ZStack {
                 Color.white.ignoresSafeArea()
 
@@ -72,7 +73,6 @@ struct ImageEditorView: View {
 
                             Button(action: {
                                 isTabBarHidden = false
-
                                 if let window = UIApplication.shared.connectedScenes
                                     .compactMap({ $0 as? UIWindowScene })
                                     .flatMap({ $0.windows })
@@ -100,9 +100,9 @@ struct ImageEditorView: View {
                         Spacer()
 
                         Button(action: {
-                            if let editedImage = viewModel.finalizeImage(frameSize: frameSize) {
-                                viewModel.image = editedImage
-                                navigationPath.append(viewModel.image)
+                            if let finalizedImage = viewModel.finalizeImage(frameSize: frameSize) {
+                                editedUIImage = finalizedImage
+                                navigateToNewPost = true
                             }
                         }) {
                             Text("다음")
@@ -110,7 +110,7 @@ struct ImageEditorView: View {
                                 .foregroundColor(.white)
                                 .padding()
                                 .frame(width: 100)
-                                .background(Color.momogumRed)
+                                .background(Color.Red_2)
                                 .cornerRadius(8)
                         }
                         .padding(.bottom, 32)
@@ -120,21 +120,19 @@ struct ImageEditorView: View {
                     .zIndex(1)
                 }
             }
-            .navigationDestination(for: UIImage.self) { image in
-                NewPostView(
-                    tabIndex: $tabIndex,
-                    isTabBarHidden: .constant(false),
-                    editedImage: image,
-                    onReset: { viewModel.resetToOriginalImage() }
-                )
+            .navigationDestination(isPresented: $navigateToNewPost) {  
+                if let editedUIImage = editedUIImage {
+                    NewPostView(
+                        tabIndex: $tabIndex,
+                        isTabBarHidden: .constant(false),
+                        editedImage: editedUIImage,
+                        onReset: { viewModel.resetToOriginalImage() }
+                    )
+                }
             }
             .navigationBarBackButtonHidden(true)
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarHidden(true)
         }
     }
-}
-
-#Preview {
-    ImageEditorView(image: UIImage(systemName: "photo") ?? UIImage(), tabIndex: .constant(0), isTabBarHidden: .constant(false))
 }
