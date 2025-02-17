@@ -14,7 +14,9 @@ struct StoryItemCell: View {
     let viewed: Bool
     let storyIDs: [Int]  //  닉네임에 해당하는 모든 스토리 ID 목록 추가
     let storyViewModel: StoryViewModel
-    let destination: AnyView 
+    let destination: AnyView
+    let hasUnViewedStory: Bool
+    let profileImageLink: String
     @Binding var isTabBarHidden: Bool
     var body: some View {
         VStack{
@@ -26,7 +28,7 @@ struct StoryItemCell: View {
              {
                 VStack {
                     ZStack {
-                        if !viewed {
+                        if hasUnViewedStory {
                             Circle()
                                 .strokeBorder(
                                     LinearGradient(gradient: Gradient(colors: [
@@ -42,13 +44,21 @@ struct StoryItemCell: View {
                                 .frame(width: 90, height: 90)
                         }
                         
-                        Image("pixelsImage")  //  스토리 이미지 (추후 API 연결 가능)
-                            .resizable()
-                            .frame(width: 76, height: 76)
-                            .clipShape(Circle())
+                        AsyncImage(url: URL(string: profileImageLink)) { image in
+                                                image.resizable()
+                                                    .scaledToFill()
+                                            } placeholder: {
+                                                Image(systemName: "person.circle.fill")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .foregroundColor(.gray)
+                                            }
+                                            .frame(width: 76, height: 76)
+                                            .clipShape(Circle())
                     }
                     Text(nickname)
                         .bold()
+                        .foregroundColor(.black)
                         .font(.mmg(.Caption2))
                 }
                 .padding(.leading, 24)

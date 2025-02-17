@@ -10,12 +10,14 @@ import SwiftUI
 struct Story2View: View {
     @Binding var isTabBarHidden: Bool
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var storyviewModel = StoryViewModel()
+    @StateObject private var storyViewModel = StoryViewModel()
     @StateObject private var viewModel = Story2ViewModel()
+    @State private var dragOffset: CGFloat = 0
     let nickname: String
     let storyIDList: [Int]
     @State private var currentIndex: Int = 0
-    @State private var selectedStoryID: Int?
+    let profileImageLink: String  
+    @State private var selectedStory : StoryDetailResult?
 //    @Binding var path: String
     var body: some View {
         ZStack {
@@ -41,10 +43,16 @@ struct Story2View: View {
         }
         .onAppear {
             if let firstStoryID = storyIDList.first, let memberId = AuthManager.shared.UUID {
-                storyviewModel.fetchStoryDetail(for: memberId, storyId: firstStoryID)
+                storyViewModel.fetchStoryDetail(for: memberId, storyId: firstStoryID)
             } else {
                 print("Error: storyIDList is empty or memberId is nil")
             }
+        }
+        .onAppear(){
+            print(nickname)
+            print("storyIDList: \(storyIDList)")
+            print("currentIndex: \(storyIDList[currentIndex])")
+            
         }
         .sheet(isPresented: $viewModel.showReportSheet) {
             ReportView(showReportSheet: $viewModel.showReportSheet, showPopup: $viewModel.showPopup)
@@ -68,7 +76,7 @@ extension Story2View {
 
             VStack {
                 HStack {
-                    Text(storyviewModel.selectedStory?.name ?? "유저아이디")
+                    Text(nickname)
                         .font(.mmg(.subheader4))
                         .bold()
                         .padding(.top, 22)
@@ -81,7 +89,7 @@ extension Story2View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Text(storyviewModel.selectedStory?.location ?? "식당이름")
+                Text(storyViewModel.selectedStory?.location ?? "식당이름")
                     .font(.mmg(.Caption3))
                     .foregroundColor(.black_2)
                     .padding(.leading, 12)
@@ -118,7 +126,7 @@ extension Story2View {
                 .padding(.top, 44)
 
             VStack(alignment: .leading) {
-                if let imageUrl = storyviewModel.selectedStory?.mealDiaryImageLinks.first, let url = URL(string: imageUrl) {
+                if let imageUrl = storyViewModel.selectedStory?.mealDiaryImageLinks.first, let url = URL(string: imageUrl) {
                     AsyncImage(url: url) { image in
                         image.resizable()
                     } placeholder: {
@@ -130,7 +138,7 @@ extension Story2View {
                     .padding(.leading, 17)
                 }
 
-                Text(storyviewModel.selectedStory?.description ?? "진짜 최고로 맛있다...✨")
+                Text(storyViewModel.selectedStory?.description ?? "진짜 최고로 맛있다...✨")
                     .font(.mmg(.subheader3))
                     .padding(.top, 32)
                     .padding(.leading, 17)
@@ -138,7 +146,48 @@ extension Story2View {
                 Spacer()
             }
             .frame(width: 360, height: 534, alignment: .topLeading)
+            
+            GeometryReader { geometry in
+                HStack(spacing: 0) {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .frame(width: geometry.size.width / 2)
+                        .gesture(
+                            TapGesture()
+                                .onEnded {
+                                    previousStory()
+                                }
+                        )
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .frame(width: geometry.size.width / 2)
+                        .gesture(
+                            TapGesture()
+                                .onEnded {
+                                    nextStory()
+                                }
+                        )
+                }
+            } // 탭 범위 지정
         }
+//        .background(
+//            GeometryReader { geometry in
+//                Color.clear.contentShape(Rectangle())
+//                    .gesture(
+//                        DragGesture(minimumDistance: 0)
+//                            .onEnded { gesture in
+//                                let screenWidth = geometry.size.width
+//                                let tapX = gesture.location.x
+//
+//                                if tapX < screenWidth / 2 {
+//                                    previousStory()
+//                                } else {
+//                                    nextStory()
+//                                }
+//                            }
+//                    )
+//            }
+//        )
     }
 
     // 신고 접수 팝업
@@ -179,6 +228,26 @@ extension Story2View {
             isTabBarHidden = false
         }
     }
+    
+    
+    
+    private func previousStory() {
+           if currentIndex > 0 {
+               withAnimation {
+                   currentIndex -= 1
+                   storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex])
+               }
+           }
+       }
+
+    private func nextStory() {
+            if currentIndex < storyIDList.count - 1 {
+                withAnimation {
+                    currentIndex += 1
+                    storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex])
+                }
+            }
+        }
 }
 
 //#Preview {

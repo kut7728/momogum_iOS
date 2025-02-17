@@ -13,8 +13,7 @@ struct HomeView: View {
     @StateObject private var homeviewModel = HomeViewModel()
     @StateObject private var mealDiaryViewModel = MealDiaryViewModel()
     @State private var path = NavigationPath() // 네비게이션 경로 추가
-    
-    @ObservedObject var storyViewModel : StoryViewModel
+    @StateObject var storyViewModel : StoryViewModel
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     let normalButtonColor = Color(.black_5)
     let selectedButtonColor = Color(.Red_2)
@@ -50,6 +49,9 @@ struct HomeView: View {
             .onAppear{
                 storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
             }
+            .onDisappear {
+                storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
+                  }
         }
     }
 }
@@ -103,16 +105,16 @@ extension HomeView {
                 storyItem(title: "내 스토리", hasStory: false, destination: StoryView(userID: "", tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden))
                 //                storyItem(title: "momogum._.", hasStory: true, destination: Story2View(userID: "", isTabBarHidden: .constant(false)))
                 
-                let sortedStories = Array(storyViewModel.groupedStories).sorted(by: { $0.key < $1.key })
-                
+                let sortedStories = storyViewModel.sortedGroupedStories //정렬이 끝난 스토리값
+
                 ForEach(sortedStories, id:\.key){ (nickname , stories) in
+                    
                     if !stories.isEmpty {
                         
                         let StoryIDList = storyViewModel.getStoryIDs(for: nickname)
                         let firstUnviewedStory = stories.first{ !$0.viewed}
                         let storyToShow = firstUnviewedStory ?? stories.first
                         let hasUnviewedStory = stories.contains { !$0.viewed }
-                        
                         if let story = storyToShow{
                             
                             StoryItemCell(
@@ -120,9 +122,19 @@ extension HomeView {
                                 viewed: story.viewed,
                                 storyIDs: StoryIDList,
                                 storyViewModel: storyViewModel,
-                                destination: AnyView(Story2View(isTabBarHidden: $isTabBarHidden, nickname: nickname, storyIDList: StoryIDList)),
+                                destination: AnyView(Story2View(isTabBarHidden: $isTabBarHidden, nickname: nickname, storyIDList: StoryIDList,profileImageLink: story.profileImageLink)),
+                                hasUnViewedStory: hasUnviewedStory,
+                                profileImageLink: story.profileImageLink,
                                 isTabBarHidden: $isTabBarHidden
+                               
                             )
+                            .onAppear(){
+                                print(story.viewed)
+                                print("StoryIDs : \(StoryIDList)")
+                                print(firstUnviewedStory)
+                                print("📌 \(nickname) - \(stories.map { $0.viewed })")
+                            }
+                          
                             
                             
                             // StoryItem 을 넣을 예정
