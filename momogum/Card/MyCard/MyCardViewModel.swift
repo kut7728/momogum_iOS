@@ -85,7 +85,7 @@ class MyCardViewModel: ObservableObject {
     
     func deleteMealDiary(mealDiaryId: Int) {
         let url = "\(BaseAPI)/meal-diaries/mealDiaryId/\(mealDiaryId)/userId/1"
-        print("🛠️ 요청 URL: \(url)") // ✅ 요청 URL 확인
+        print("🛠️ 요청 URL: \(url)")
 
         AF.request(url, method: .delete)
             .validate()
