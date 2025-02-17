@@ -226,9 +226,9 @@ private extension MyProfileView {
                 case "EditProfileView":
                     EditProfileView(navigationPath: $navigationPath, viewModel: viewModel)
                 case "GalleryProfileView":
-                    GalleryProfileView(navigationPath: $navigationPath, viewModel: viewModel)
+                    GalleryProfileView(navigationPath: $navigationPath, profileViewModel: viewModel)
                 case "EditImageView":
-                    EditImageView(navigationPath: $navigationPath, viewModel: viewModel)
+                    EditImageView(selectedImage: viewModel.currentPreviewImage, navigationPath: $navigationPath, profileViewModel: viewModel)
                 case "EditNameView":
                     EditNameView(navigationPath: $navigationPath, viewModel: viewModel)
                 case "EditIDView":
@@ -306,7 +306,7 @@ private extension MyProfileView {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(selectedSegment == 0 ? viewModel.mealDiaries : viewModel.bookmarkedMealDiaries, id: \.mealDiaryId) { mealDiary in
+                    ForEach((selectedSegment == 0 ? viewModel.mealDiaries : viewModel.bookmarkedMealDiaries).reversed(), id: \.mealDiaryId) { mealDiary in
                         NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden, mealDiaryId: Int(mealDiary.mealDiaryId))
                             .onAppear { isTabBarHidden = true }
                             .onDisappear { isTabBarHidden = false }
@@ -332,7 +332,7 @@ private extension MyProfileView {
                     }
                 
                 SettingsPopupView(showPopup: $showPopup, showLogoutPopup: $showLogoutPopup, showDelPopup: $showDelPopup)
-                    .padding(.bottom, UIScreen.main.bounds.height <= 812 ? 450 : 535)
+                    .padding(.bottom, UIScreen.main.bounds.height <= 812 ? 450 : 525)
                     .padding(.leading, UIScreen.main.bounds.height <= 812 ? 180 : 205)
                     .padding(.trailing, 37)
             } else if showLogoutPopup {
