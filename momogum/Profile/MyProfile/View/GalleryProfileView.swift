@@ -5,56 +5,72 @@
 //  Created by 류한비 on 1/24/25.
 //
 
-
 import SwiftUI
 import PhotosUI
 
 struct GalleryProfileView: View {
     @Binding var navigationPath: NavigationPath
-    @Bindable var viewModel: ProfileViewModel
-    
-    @State private var selectedImages: [UIImage] = []
-    @State private var isPermissionGranted = false
-    @State private var showPermissionAlert = false
-    @State private var itemWidth: CGFloat = 0
-    
-    let gridItems: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
-    
+    @ObservedObject var profileViewModel: ProfileViewModel
+    @StateObject private var viewModel = GalleryPickerViewModel()
+
+    @State private var selectedImage: UIImage? // 선택된 이미지를 저장할 변수
+
     var body: some View {
         VStack {
             GeometryReader { geometry in
-                VStack(spacing: 0) {
-                    if isPermissionGranted {
+                let gridItems = [
+                    GridItem(.flexible(), spacing: 4),
+                    GridItem(.flexible(), spacing: 4),
+                    GridItem(.flexible(), spacing: 4)
+                ]
+                let gridItemSize = (geometry.size.width - 48) / 3
+
+                ZStack(alignment: .top) {
+                    if viewModel.isPermissionGranted {
                         ScrollView {
                             LazyVGrid(columns: gridItems, spacing: 4) {
-                                ForEach(selectedImages, id: \.self) { image in
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: itemWidth, height: itemWidth)
-                                        .clipped()
-                                        .onTapGesture {
-                                            handleImageSelection(image)
-                                            navigationPath.append("EditImageView")
+                                ForEach(viewModel.images.indices, id: \.self) { index in
+                                    if let image = viewModel.images[index] {
+                                        Button {
+                                            selectedImage = image
+                                            navigationPath.append(image)
+                                        } label: {
+                                            Image(uiImage: image)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: gridItemSize, height: gridItemSize)
+                                                .clipped()
                                         }
+                                    } else {
+                                        Color.gray
+                                            .frame(width: gridItemSize, height: gridItemSize)
+                                            .onAppear {
+                                                viewModel.loadImage(at: index)
+                                            }
+                                    }
+
+                                    if index == viewModel.images.count - 1 {
+                                        ProgressView()
+                                            .onAppear {
+                                                viewModel.loadMoreContent()
+                                            }
+                                    }
                                 }
                             }
-                            .padding(.horizontal, 25)
-                            .padding(.vertical, 4)
-                            .padding(.top, 107)
+                            .padding(.top, 80)
+                            .padding(.horizontal, 16)
                         }
+                    } else {
+                        PermissionAlert()
                     }
-                    
-                    VStack {
-                        EmptyView()
-                    }
+
+                    // 상단 네비게이션 바
+                    GalleryNavigationBar()
                 }
-                .toolbar(.hidden, for: .tabBar)
                 .onAppear {
-                    itemWidth = calculateItemWidth(for: geometry.size.width)
-                    requestPhotoLibraryPermission()
+                    viewModel.requestPhotoLibraryPermission()
                 }
-                .alert(isPresented: $showPermissionAlert) {
+                .alert(isPresented: $viewModel.showPermissionAlert) {
                     Alert(
                         title: Text("권한 필요"),
                         message: Text("사진 라이브러리에 접근하려면 권한이 필요합니다."),
@@ -68,91 +84,54 @@ struct GalleryProfileView: View {
                 }
             }
         }
-        .edgesIgnoringSafeArea(.all)
-        .navigationBarBackButtonHidden()
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Text("갤러리에서 선택")
-                    .frame(height: 20)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.black)
-            }
-            // 뒤로가기 버튼
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    viewModel.resetUserData()
+        .toolbar(.hidden, for: .tabBar)
+        .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
+        .navigationDestination(for: UIImage.self) { image in
+            EditImageView(selectedImage: image, navigationPath: $navigationPath, profileViewModel: profileViewModel)
+        }
+    }
+}
+
+// MARK: - Private Extensions
+private extension GalleryProfileView {
+
+    // 네비게이션 바
+    private func GalleryNavigationBar() -> some View {
+        VStack {
+            HStack {
+                Button(action: {
+                    profileViewModel.resetUserData()
                     navigationPath.removeLast(1)
-                } label: {
-                    Image("close")
-                        .resizable()
-                        .frame(width: 20, height: 20)
-                        .tint(.black)
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                        .font(.title2)
                 }
-                .padding(.leading, 15)
+                .frame(width: 44, height: 44)
+
+                Text("갤러리에서 선택")
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity, alignment: .center)
+
+                Spacer()
             }
+            .padding(.horizontal, 16)
+            .frame(height: 60)
+            .background(Color.white)
+
+            Spacer()
         }
     }
-    
-    private func calculateItemWidth(for width: CGFloat) -> CGFloat {
-        let totalSpacing = 4 * CGFloat(3 - 1) + 50
-        return (width - totalSpacing) / CGFloat(3)
-    }
-    
-    private func handleImageSelection(_ image: UIImage) {
-        viewModel.convertPreviewImage(from: image)
-    }
-    
-    private func requestPhotoLibraryPermission() {
-        PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
-            DispatchQueue.main.async {
-                switch status {
-                case .authorized, .limited:
-                    isPermissionGranted = true
-                    fetchPhotos()
-                case .denied, .restricted:
-                    isPermissionGranted = false
-                    showPermissionAlert = true
-                default:
-                    break
-                }
-            }
-        }
-    }
-    
-    private func fetchPhotos() {
-        guard isPermissionGranted else { return }
-        
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-        let imageManager = PHImageManager.default()
-        let options = PHImageRequestOptions()
-        options.isSynchronous = false
-        options.deliveryMode = .highQualityFormat
-        
-        Task {
-            for index in 0..<fetchResult.count {
-                let asset = fetchResult.object(at: index)
-                let image = await fetchImage(for: asset, with: imageManager, options: options)
-                if let image = image {
-                    DispatchQueue.main.async {
-                        selectedImages.append(image)
-                    }
-                }
-            }
-        }
-    }
-    
-    private func fetchImage(for asset: PHAsset, with manager: PHImageManager, options: PHImageRequestOptions) async -> UIImage? {
-        return await withCheckedContinuation { continuation in
-            manager.requestImage(
-                for: asset,
-                targetSize: CGSize(width: 200, height: 200),
-                contentMode: .aspectFill,
-                options: options
-            ) { image, _ in
-                continuation.resume(returning: image)
-            }
+
+    // 사진 권한 필요 시 알림 메시지
+    private func PermissionAlert() -> some View {
+        VStack {
+            Text("사진 권한이 필요합니다. 설정에서 권한을 허용해주세요.")
+                .multilineTextAlignment(.center)
+                .padding()
         }
     }
 }

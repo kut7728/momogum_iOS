@@ -40,7 +40,7 @@ struct MainTabView: View {
                             .fill(Color(UIColor.systemGray6))
                             .frame(height: 90)
                             .frame(maxWidth: .infinity)
-                            .shadow(radius: 5)
+                            .shadow(color: Color.black.opacity(0.3), radius: 2)
 
                         // 탭 아이콘 및 텍스트 (배경 기준으로 위치 조정)
                         HStack {
