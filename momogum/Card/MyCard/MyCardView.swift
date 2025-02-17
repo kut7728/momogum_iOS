@@ -182,14 +182,18 @@ struct MyCardView: View {
             }
 
             if viewModel.showDeleted {
-                Text("삭제됨")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.red)
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
-                    .transition(.opacity)
+                DeletedPopupView(
+                    showDeletedPopup: $viewModel.showDeleted,
+                    showPopup: $viewModel.showPopup
+                ) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        let isTabBarHiddenBinding = Binding<Bool>(
+                            get: { isTabBarHidden },
+                            set: { isTabBarHidden = $0 }
+                        )
+                        changeRootView(to: MyProfileView(isTabBarHidden: isTabBarHiddenBinding))
+                    }
+                }
             }
         }
         .navigationBarHidden(true)
@@ -200,17 +204,6 @@ struct MyCardView: View {
         }
         .onAppear {
             viewModel.fetchMealDiary(mealDiaryId: mealDiaryId, userId: 1)
-        }
-        .onChange(of: viewModel.showDeleted) {
-            if viewModel.showDeleted {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    let isTabBarHiddenBinding = Binding<Bool>(
-                        get: { isTabBarHidden },
-                        set: { isTabBarHidden = $0 }
-                    )
-                    changeRootView(to: MyProfileView(isTabBarHidden: isTabBarHiddenBinding))
-                }
-            }
         }
     }
 
