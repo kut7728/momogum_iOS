@@ -32,11 +32,31 @@ struct UserInfoView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(viewModel.myCard.nickname)
                     .font(.system(size: 16, weight: .bold))
-                Text(viewModel.myCard.mealDiaryCreatedAt)
+
+                Text(convertToFormattedDate(viewModel.myCard.mealDiaryCreatedAt))
                     .font(.system(size: 13))
                     .foregroundColor(.gray)
             }
             Spacer()
+        }
+    }
+
+    private func convertToFormattedDate(_ dateString: String) -> String {
+        let inputFormatter = DateFormatter()
+        inputFormatter.locale = Locale(identifier: "ko_KR")
+        inputFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        inputFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+
+        let outputFormatter = DateFormatter()
+        outputFormatter.locale = Locale(identifier: "ko_KR")
+        outputFormatter.timeZone = TimeZone(abbreviation: "KST")
+        outputFormatter.dateFormat = "yyyy-MM-dd HH:mm"
+
+        if let date = inputFormatter.date(from: dateString) {
+            let kstDate = date.addingTimeInterval(9 * 3600)
+            return outputFormatter.string(from: kstDate)
+        } else {
+            return "날짜 없음"
         }
     }
 }
