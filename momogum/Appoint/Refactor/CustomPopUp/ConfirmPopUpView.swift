@@ -1,9 +1,11 @@
 import SwiftUI
 
+/// 약속 확정 팝업
 struct ConfirmPopUpView: View {
     // MARK: - properites
     // 해당 프로퍼티로 팝업을 띄울지 말지를 부모뷰의 state 값으로 전달 받을 예정
     @Binding var showPopUp: Bool
+    @Binding var showAlarm: Bool
     
     let title: String = "약속을 확정해요" // 공지 이름
     let message: String = "지금까지 초대를 수락한 참가자와 약속을 확정합니다. 더 이상 다른 참가자가 초대를 수락할 수 없습니다." // 공지 내용
@@ -23,7 +25,7 @@ struct ConfirmPopUpView: View {
             VStack(spacing: 12) {
                 
                 Text(title)
-                    .foregroundStyle( (title == "약속을 취소해요") ? .Red_2 : .black_1)
+                    .foregroundStyle(.black_1)
                     .frame(maxWidth: .infinity)
                     .frame(height: 30)
                     .fontWeight(.bold)
@@ -41,7 +43,7 @@ struct ConfirmPopUpView: View {
                 /// 버튼 뭉치
                 HStack(spacing: 8) {
                     
-                    /// 왼쪽 버튼
+                    /// 왼쪽 버튼 - 돌아가기
                     Button(action: {
                         showPopUp = false
                     }, label: {
@@ -55,10 +57,12 @@ struct ConfirmPopUpView: View {
                     
                     Divider()
                     
-                    /// 오른쪽 버튼
+                    /// 오른쪽 버튼 - 약속 확정
                     Button(action: {
-                        print("취소 누름")
                         showPopUp = false
+                        withAnimation {
+                            showAlarm = true
+                        }
                     }, label: {
                         Text(btn2)
                             .font(.mmg(.subheader3))
@@ -89,6 +93,8 @@ struct ConfirmPopUpView: View {
 
 #Preview {
     ConfirmPopUpView(
-        showPopUp: .constant(false)
+        showPopUp: .constant(false),
+        showAlarm: .constant(false)
+
     )
 }

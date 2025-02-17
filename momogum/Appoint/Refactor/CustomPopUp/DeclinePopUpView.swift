@@ -1,18 +1,21 @@
 import SwiftUI
 
+/// 약속 거절 팝업
 struct DeclinePopUpView: View {
     // MARK: - properites
     // 해당 프로퍼티로 팝업을 띄울지 말지를 부모뷰의 state 값으로 전달 받을 예정
     @Binding var showPopUp: Bool
+    @Binding var showAlarm: Bool
     private var name: String
     
     let title: String = "약속을 거절해요" // 공지 이름
-    var message: String {"'\(name)' 약속 정보를 다시 확인하거나 초대받을 수 없습니다." }// 공지 내용
+    var message: String {"'\(name)' 약속 정보를 다시 \n확인하거나 초대받을 수 없습니다." }// 공지 내용
     let btn1: String = "돌아가기" // 왼쪽 버튼 text
     let btn2: String = "거절하기" // 오른쪽 버튼 text
     
-    init(showPopUp: Binding<Bool>, name: String) {
+    init(showPopUp: Binding<Bool>, showAlarm: Binding<Bool>, name: String) {
         self._showPopUp = showPopUp
+        self._showAlarm = showAlarm
         self.name = name
     }
     
@@ -29,7 +32,7 @@ struct DeclinePopUpView: View {
             VStack(spacing: 12) {
                 
                 Text(title)
-                    .foregroundStyle( (title == "약속을 취소해요") ? .Red_2 : .black_1)
+                    .foregroundStyle(.Red_2)
                     .frame(maxWidth: .infinity)
                     .frame(height: 30)
                     .fontWeight(.bold)
@@ -96,6 +99,7 @@ struct DeclinePopUpView: View {
 #Preview {
     DeclinePopUpView(
         showPopUp: .constant(false),
+        showAlarm: .constant(false),
         name: "test"
     )
 }

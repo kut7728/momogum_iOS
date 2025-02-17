@@ -13,12 +13,17 @@ import SwiftUI
 struct AppointCheckingView: View {
     @Environment(\.dismiss) var dismiss
     
-    @State var showConfirmPopUp: Bool = false
-    @State var showCanclePopUp: Bool = false
+    @State var showConfirmPopUp: Bool = false // 약속 확정
+    @State var showCanclePopUp: Bool = false // 약속 취소
     
     private var isOther: Bool { appoint.senderId != AuthManager.shared.UUID }
-    @State var showDeclinePopUp: Bool = false
-    @State var showApprovePopUp: Bool = false
+    @State var showDeclinePopUp: Bool = false  // 약속 거절
+    @State var showApprovePopUp: Bool = false  // 약속 수락
+    
+    @State var showConfirmAlarm: Bool = false  // 약속 확정 알람
+    @State var showCancleAlarm: Bool = false  // 약속 취소 알람
+    @State var showDeclineAlarm: Bool = false  // 약속 거절 알람
+    @State var showApproveAlarm: Bool = false  // 약속 수락 알람
     
     let appoint: Appoint
     
@@ -173,14 +178,25 @@ struct AppointCheckingView: View {
                 }
                 
                 
+                
                 if showConfirmPopUp {
-                    ConfirmPopUpView(showPopUp: $showConfirmPopUp)
+                    ConfirmPopUpView(showPopUp: $showConfirmPopUp, showAlarm: $showConfirmAlarm)
                 } else if showCanclePopUp {
-                    CanclePopUpView(showPopUp: $showCanclePopUp)
+                    CanclePopUpView(showPopUp: $showCanclePopUp, showAlarm: $showCancleAlarm)
                 } else if showDeclinePopUp {
-                    DeclinePopUpView(showPopUp: $showDeclinePopUp, name: appoint.appointName)
+                    DeclinePopUpView(showPopUp: $showDeclinePopUp, showAlarm: $showDeclineAlarm, name: appoint.appointName)
                 } else if showApprovePopUp {
-                    ApprovePopUpView(showPopUp: $showApprovePopUp)
+                    ApprovePopUpView(showPopUp: $showApprovePopUp, showAlarm: $showApproveAlarm)
+                }
+                
+                if showCancleAlarm {
+                    CancleAlarmView(showAlarm: $showCancleAlarm)
+                } else if showDeclineAlarm {
+                    DeclineAlarmView(showAlarm: $showDeclineAlarm)
+                } else if showApproveAlarm {
+                    ApproveAlarmView(showAlarm: $showApproveAlarm)
+                } else if showConfirmAlarm {
+                    ConfirmAlarmView(showAlarm: $showConfirmAlarm)
                 }
             }
         }
