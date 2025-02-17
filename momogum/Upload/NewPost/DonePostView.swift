@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DonePostView: View {
     @Environment(\.dismiss) var dismiss
+    var mealDiaryId: Int
 
     var body: some View {
         VStack {
@@ -54,7 +55,7 @@ struct DonePostView: View {
 
             Spacer().frame(height: 90)
 
-            NavigationLink(destination: MyCardView(isTabBarHidden: .constant(true))) {
+            NavigationLink(destination: MyCardView(isTabBarHidden: .constant(true), mealDiaryId: mealDiaryId)) {
                     Text("바로 확인하기")
                     .font(.system(size: 20, weight: .bold))
                     .frame(width: 340, height: 58)
@@ -71,8 +72,4 @@ struct DonePostView: View {
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
     }
-}
-
-#Preview {
-    DonePostView()
 }

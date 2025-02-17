@@ -12,14 +12,15 @@ struct NewPostView: View {
     @Binding var isTabBarHidden: Bool
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel = NewPostViewModel()
-    
+
     let editedImage: UIImage
     let onReset: () -> Void
 
-    var body: some View {
-        ZStack {
-            Color.white.ignoresSafeArea()
+    @State private var isUploading = false
+    @State private var isNavigateToDonePost = false
 
+    var body: some View {
+        NavigationStack {
             VStack(spacing: 0) {
                 VStack {
                     HStack {
@@ -91,7 +92,7 @@ struct NewPostView: View {
                             .id("category")
                             .onChange(of: viewModel.newPost.selectedCategory) { _, _ in
                                 withAnimation {
-                                    scrollViewProxy.scrollTo("input", anchor: .top)
+                                    scrollViewProxy.scrollTo("input", anchor: .center)
                                 }
                             }
 
@@ -152,33 +153,41 @@ struct NewPostView: View {
 
                             if viewModel.newPost.selectedIcon != nil {
                                 Button(action: {
-                                    viewModel.setSelectedImage(editedImage) // 이미지 설정
+                                    guard !isUploading else { return }
+                                    isUploading = true  // ✅ 중복 업로드 방지
+
+                                    viewModel.setSelectedImage(editedImage)
                                     viewModel.uploadMealDiarySingleRequest(image: editedImage) { success in
-                                        if success {
-                                            DispatchQueue.main.async {
-                                                isTabBarHidden = false
-                                                dismiss()
+                                        DispatchQueue.main.async {
+                                            isUploading = false
+                                            if success {
+                                                isNavigateToDonePost = true  // ✅ 업로드 성공 시 DonePostView로 이동
+                                            } else {
+                                                print("🚨 업로드 실패")
                                             }
-                                        } else {
-                                            print("🚨 업로드 실패")
                                         }
                                     }
                                 }) {
-                                    Text(viewModel.isUploading ? "업로드 중..." : "밥일기 업로드 하기")
+                                    Text(isUploading ? "업로드 중..." : "밥일기 업로드 하기")
                                         .font(.system(size: 17, weight: .bold))
                                         .frame(width: 340, height: 58)
                                         .foregroundColor(.white)
-                                        .background(viewModel.isUploading ? Color.gray : Color(hex: 0xE05A55))
+                                        .background(isUploading ? Color.gray : Color(hex: 0xE05A55))
                                         .cornerRadius(16)
                                         .padding(.top, 44)
                                         .frame(maxWidth: .infinity, alignment: .center)
                                 }
-                                .disabled(viewModel.isUploading)
+                                .disabled(isUploading)
                                 .id("uploadButton")
                             }
                         }
                         .padding(.bottom, 100)
                     }
+                }
+            }
+            .navigationDestination(isPresented: $isNavigateToDonePost) {
+                if let mealDiaryId = viewModel.mealDiaryId {
+                    DonePostView(mealDiaryId: mealDiaryId)  
                 }
             }
         }
@@ -190,16 +199,5 @@ struct NewPostView: View {
         .onDisappear {
             UITabBar.appearance().isHidden = false
         }
-    }
-}
-
-#Preview {
-    NavigationView {
-        NewPostView(
-            tabIndex: .constant(0),
-            isTabBarHidden: .constant(false),
-            editedImage: UIImage(systemName: "photo") ?? UIImage(),
-            onReset: {}
-        )
     }
 }
