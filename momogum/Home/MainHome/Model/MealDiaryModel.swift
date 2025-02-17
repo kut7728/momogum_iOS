@@ -12,21 +12,16 @@ struct MealDiaryResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: MealDiaryData
-}
-
-// API 응답 결과
-struct MealDiaryData: Decodable {
-    let viewMealDiaryResponseList: [MealDiary]
+    let result: [MealDiary] // 배열 형태로 변경
 }
 
 // meal diary 모델
-struct MealDiary: Decodable, Identifiable {
+struct MealDiary: Decodable, Identifiable, Equatable {
     let id: Int
     let foodImageURLs: [String]
     let userImageURL: String
     let foodCategory: FoodCategory
-    let keyWord: [String]
+    let keyWord: String // String으로 변경
     let isRevisit: RevisitStatus
 
     enum CodingKeys: String, CodingKey {
@@ -44,5 +39,3 @@ enum RevisitStatus: String, Decodable {
     case good = "GOOD"
     case notGood = "NOT_GOOD"
 }
-
-
