@@ -161,14 +161,21 @@ final class AuthViewModel: ObservableObject {
         }
     }
 
-//    func fetchMyUUID(){
-//        AuthService.shared.fetchUUID(token: AuthManager.shared.momogumAccessToken{ [weak self] result in
-//            switch result {
-//            case .success(let response):
-//                if response.result.isSuccess
-//            }
-//        }
-//    }
+    func fetchUserUUID() {
+        AuthService.shared.fetchUUID(token: AuthManager.shared.momogumAccessToken ?? "") { [weak self] result in
+               DispatchQueue.main.async {
+                   switch result {
+                   case .success(let response):
+                       print(" UUID 조회 성공: \(response)")
+                    AuthManager.shared.UUID = response.result.id
+
+                   case .failure(let error):
+                       print(" UUID 조회 실패: \(error.localizedDescription)")
+                       self?.errorMessage = error.localizedDescription
+                   }
+               }
+           }
+       }
     
     
 //     토큰 저장: AuthManager.shared.kakaoAccessToken = oauthToken.accessToken

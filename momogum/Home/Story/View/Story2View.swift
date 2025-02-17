@@ -12,7 +12,6 @@ struct Story2View: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var storyViewModel = StoryViewModel()
     @StateObject private var viewModel = Story2ViewModel()
-    @State private var dragOffset: CGFloat = 0
     let nickname: String
     let storyIDList: [Int]
     @State private var currentIndex: Int = 0

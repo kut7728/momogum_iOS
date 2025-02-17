@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SignupEndView: View {
     @Binding var path: [Route]
-
+    @ObservedObject var authViewModel: AuthViewModel
     
     var body: some View {
         VStack{
@@ -32,12 +32,26 @@ struct SignupEndView: View {
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 path = []
-                AuthManager.shared.isLoggedIn = true
+//                AuthManager.shared.isLoggedIn = true
+                authViewModel.checkIsNewUser { isSuccess, isNew in
+                    if isSuccess { //로그인 성공 true
+                        if isNew { 
+                            path = []
+                            print("newUser값이 false란 소리")
+                        } else { // true false  기존유저
+                            AuthManager.shared.isLoggedIn = true
+                            authViewModel.fetchUserUUID()
+                            print("신규 회원의 로그인 완료!")
+                        }
+                    } else {
+                        print(" 유저 확인 실패")
+                    }
+                }
             }
         }
     }
 }
 
-#Preview {
-    SignupEndView(path: .constant([]))
-}
+//#Preview {
+//    SignupEndView(path: .constant([]))
+//}
