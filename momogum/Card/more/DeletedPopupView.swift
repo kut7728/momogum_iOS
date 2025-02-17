@@ -9,7 +9,8 @@ import SwiftUI
 
 struct DeletedPopupView: View {
     @Binding var showDeletedPopup: Bool
-    @Binding var showPopup: Bool 
+    @Binding var showPopup: Bool
+    var onDismiss: () -> Void
     
     var body: some View {
         Text("삭제됨")
@@ -25,6 +26,7 @@ struct DeletedPopupView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     showDeletedPopup = false
                     showPopup = false
+                    onDismiss()
                 }
             }
     }

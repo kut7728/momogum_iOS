@@ -89,7 +89,25 @@ final class AuthService {
                }
        }
     
-    
+//    func fetchUUID(token : String, completion: @escaping(Result<GetUUIDResponseModel, APIError>)-> Void){
+//        let url = "\(BaseAPI)/auth/me)"
+//        let token = AuthManager.shared.momogumAccessToken ?? ""
+//        let headers: HTTPHeaders = [
+//                "Authorization": "Bearer \(token)",
+//                "Content-Type": "application/json"
+//            ]
+//        
+//        AF.request(url, method: .get, headers: headers)
+//            .validate()
+//            .responseDecodable(of: IsNewUserResponseModel.self) { response in
+//                switch response.result {
+//                case .success(let MyPK):
+//                    print("PK값 통신 성공")
+//                case .failure(let error):
+//                    print("PK값 통신실패")
+//                }
+//            }
+//    }
     
     
     ///  에러 핸들링 로직
