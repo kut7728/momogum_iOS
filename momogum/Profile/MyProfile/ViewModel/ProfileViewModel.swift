@@ -130,7 +130,8 @@ class ProfileViewModel {
                         }
                     }
                 case .failure(let error):
-                    print("프로필 이미지 로드 실패: \(error.localizedDescription)") // 백에서 해결중
+                    print("")
+//                    print("프로필 이미지 로드 실패: \(error.localizedDescription)") // 백에서 해결중
                 }
             }
     }

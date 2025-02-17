@@ -11,11 +11,13 @@ struct StoryModel: Codable {
 struct StoryResult: Codable, Identifiable {
     let id: Int  //
     let nickname: String
+    let profileImageLink: String
     let mealDiaryImageLinks: String
+    let createdAt: String
     let viewed: Bool
 
     enum CodingKeys: String, CodingKey {
         case id = "mealDiaryStoryId"  //
-        case nickname, mealDiaryImageLinks, viewed
+        case nickname, mealDiaryImageLinks, profileImageLink, createdAt ,viewed
     }
 }

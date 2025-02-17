@@ -105,11 +105,12 @@ extension HomeView {
                 storyItem(title: "내 스토리", hasStory: false, destination: StoryView(userID: "", tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden))
 //                storyItem(title: "momogum._.", hasStory: true, destination: Story2View(userID: "", isTabBarHidden: .constant(false)))
                 
-                let sortedStories = Array(storyViewModel.groupedStories).sorted(by: { $0.key < $1.key })
+                let sortedStories = storyViewModel.sortedGroupedStories //정렬이 끝난 스토리값
 
                 ForEach(sortedStories, id:\.key){ (nickname , stories) in
+                    
                     if !stories.isEmpty {
-
+                        
                         let StoryIDList = storyViewModel.getStoryIDs(for: nickname)
                         let firstUnviewedStory = stories.first{ !$0.viewed}
                         let storyToShow = firstUnviewedStory ?? stories.first
@@ -123,6 +124,7 @@ extension HomeView {
                                 storyViewModel: storyViewModel,
                                 destination: AnyView(Story2View(isTabBarHidden: $isTabBarHidden, nickname: nickname, storyIDList: StoryIDList)),
                                 hasUnViewedStory: hasUnviewedStory,
+                                profileImageLink: story.profileImageLink,
                                 isTabBarHidden: $isTabBarHidden
                                
                             )
@@ -130,6 +132,7 @@ extension HomeView {
                                 print(story.viewed)
                                 print("StoryIDs : \(StoryIDList)")
                                 print(firstUnviewedStory)
+                                print("📌 \(nickname) - \(stories.map { $0.viewed })")
                             }
                           
                             

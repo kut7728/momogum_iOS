@@ -16,6 +16,7 @@ struct StoryItemCell: View {
     let storyViewModel: StoryViewModel
     let destination: AnyView
     let hasUnViewedStory: Bool
+    let profileImageLink: String
     @Binding var isTabBarHidden: Bool
     var body: some View {
         VStack{
@@ -43,13 +44,21 @@ struct StoryItemCell: View {
                                 .frame(width: 90, height: 90)
                         }
                         
-                        Image("pixelsImage")  //  스토리 이미지 (추후 API 연결 가능)
-                            .resizable()
-                            .frame(width: 76, height: 76)
-                            .clipShape(Circle())
+                        AsyncImage(url: URL(string: profileImageLink)) { image in
+                                                image.resizable()
+                                                    .scaledToFill()
+                                            } placeholder: {
+                                                Image(systemName: "person.circle.fill")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .foregroundColor(.gray)
+                                            }
+                                            .frame(width: 76, height: 76)
+                                            .clipShape(Circle())
                     }
                     Text(nickname)
                         .bold()
+                        .foregroundColor(.black)
                         .font(.mmg(.Caption2))
                 }
                 .padding(.leading, 24)
