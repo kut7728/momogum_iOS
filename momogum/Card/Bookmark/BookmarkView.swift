@@ -10,7 +10,10 @@ import SwiftUI
 struct BookmarkView: View {
     @Binding var showBookmark: Bool
     @State private var isBookmarked = false
-    
+    var viewModel: MyCardViewModel
+    var mealDiaryId: Int
+    var userId: Int
+
     var body: some View {
         Button(action: {
             if !isBookmarked {
@@ -20,14 +23,11 @@ struct BookmarkView: View {
                 }
             }
             isBookmarked.toggle()
+            viewModel.toggleBookmarkAPI(mealDiaryId: mealDiaryId)
         }) {
             Image(isBookmarked ? "bookmark_fill" : "bookmark")
                 .resizable()
                 .frame(width: 24, height: 24)
         }
     }
-}
-
-#Preview {
-    BookmarkView(showBookmark: .constant(false))
 }

@@ -40,7 +40,7 @@ class MyCardViewModel: ObservableObject {
         let isSuccess: Bool
         let code: String
         let message: String
-        let result: ResultData?
+        let result: String?
     }
 
     struct ResultData: Codable {
@@ -158,6 +158,37 @@ class MyCardViewModel: ObservableObject {
         withAnimation {
             showPopup.toggle()
         }
+    }
+    
+    func toggleBookmarkAPI(mealDiaryId: Int) {
+        let url = "\(BaseAPI)/meal-diaries/bookmarks/userId/1/mealDiaryId/\(mealDiaryId)"
+        
+        let newBookmarkState = !myCard.showBookmark
+
+        AF.request(url, method: .post, encoding: JSONEncoding.default)
+            .validate()
+            .responseData { response in
+                switch response.result {
+                case .success(let data):
+                    if let jsonString = String(data: data, encoding: .utf8) {
+                        print("✅ 북마크 API 응답: \(jsonString)")
+                    }
+                    do {
+                        let decodedResponse = try JSONDecoder().decode(ResponseData.self, from: data)
+                        DispatchQueue.main.async {
+                            if decodedResponse.isSuccess {
+                                self.myCard.showBookmark = newBookmarkState
+                            } else {
+                                print("❌ 북마크 실패: \(decodedResponse.message)")
+                            }
+                        }
+                    } catch {
+                        print("❌ JSON 디코딩 오류: \(error.localizedDescription)")
+                    }
+                case .failure(let error):
+                    print("❌ 북마크 API 호출 실패: \(error.localizedDescription)")
+                }
+            }
     }
     
     func toggleBookmark() {

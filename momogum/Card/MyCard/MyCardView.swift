@@ -102,7 +102,7 @@ struct MyCardView: View {
                         Spacer().frame(width: 20)
                         CommentView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                         Spacer()
-                        BookmarkView(showBookmark: $viewModel.myCard.showBookmark)
+                        BookmarkView(showBookmark: $viewModel.myCard.showBookmark, viewModel: viewModel, mealDiaryId: mealDiaryId, userId: 1)
                         Spacer().frame(width: 10)
                     }
                     .padding(.horizontal, 16)
