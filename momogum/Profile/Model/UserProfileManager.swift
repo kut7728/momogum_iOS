@@ -5,7 +5,7 @@
 //  Created by 류한비 on 2/9/25.
 //
 
-import Foundation
+import SwiftUI
 import Alamofire
 
 @Observable
@@ -102,7 +102,35 @@ class UserProfileManager {
             }
     }
     
-    // 유저 프로필 이미지 업로드
+    // 유저 프로필 이미지 편집
+    func uploadProfileImage(userId: Int, image: UIImage, completion: @escaping (Result<String, Error>) -> Void) {
+        let url = "\(BaseAPI)/userProfiles/\(userId)/uploadCustomProfileImage"
+        
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            completion(.failure(UserProfileError.noData))
+            return
+        }
+
+        AF.upload(multipartFormData: { multipartFormData in
+            multipartFormData.append(imageData, withName: "file", fileName: "profile.jpg", mimeType: "image/jpeg")
+        }, to: url, method: .put, headers: ["Content-Type": "multipart/form-data"])
+        .validate(statusCode: 200..<300)
+        .responseDecodable(of: ProfileImageResponse.self) { response in
+            switch response.result {
+            case .success(let decodedResponse):
+                completion(.success(decodedResponse.imageUrl)) // 서버에서 반환한 이미지 URL
+            case .failure(let error):
+                print("❌ 프로필 이미지 업로드 실패: \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+    }
+
+    // 프로필 이미지 업로드 응답 모델
+    struct ProfileImageResponse: Decodable {
+        let imageUrl: String
+    }
+
 }
 
 // 유저 프로필 에러
