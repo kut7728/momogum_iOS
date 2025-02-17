@@ -12,21 +12,22 @@ struct MealDiaryResponse: Decodable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let result: ResultData
-    
-    struct ResultData: Decodable {  // 중첩 구조체로 변경하여 중복 선언 문제 해결
-        let viewMealDiaryResponseList: [MealDiary]
-    }
+    let result: MealDiaryData
 }
 
-// 식사 일기 모델
+// API 응답 결과
+struct MealDiaryData: Decodable {
+    let viewMealDiaryResponseList: [MealDiary]
+}
+
+// meal diary 모델
 struct MealDiary: Decodable, Identifiable {
     let id: Int
     let foodImageURLs: [String]
     let userImageURL: String
-    let foodCategory: String
+    let foodCategory: FoodCategory
     let keyWord: [String]
-    let isRevisit: String
+    let isRevisit: RevisitStatus
 
     enum CodingKeys: String, CodingKey {
         case id = "mealDiaryId"
@@ -36,6 +37,12 @@ struct MealDiary: Decodable, Identifiable {
         case keyWord
         case isRevisit
     }
+}
+
+// 재방문 여부 Enum
+enum RevisitStatus: String, Decodable {
+    case good = "GOOD"
+    case notGood = "NOT_GOOD"
 }
 
 
