@@ -26,7 +26,7 @@ class CommentViewModel: ObservableObject {
     }
 
     struct ResultData: Codable {
-        let commentId: Int? // "밥일기 댓글 식별자"를 직접 사용하지 않고 대응
+        let commentId: Int?
     }
     
     func addComment(mealDiaryId: Int, comment: String) {

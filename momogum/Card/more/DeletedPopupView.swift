@@ -26,7 +26,7 @@ struct DeletedPopupView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     showDeletedPopup = false
                     showPopup = false
-                    onDismiss() 
+                    onDismiss()
                 }
             }
     }

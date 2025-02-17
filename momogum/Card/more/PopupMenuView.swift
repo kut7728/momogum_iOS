@@ -35,12 +35,8 @@ struct PopupMenuView: View {
                     showDeletedPopup: $showDeletedPopup,
                     showPopup: $showPopup
                 ) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        let isTabBarHiddenBinding = Binding<Bool>(
-                            get: { isTabBarHidden },
-                            set: { isTabBarHidden = $0 }
-                        )
-                        changeRootView(to: MyProfileView(isTabBarHidden: isTabBarHiddenBinding))
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        changeRootView(to: MyProfileView(isTabBarHidden: .constant(false)))
                     }
                 }
                 .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
