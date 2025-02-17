@@ -195,11 +195,8 @@ struct MyCardView: View {
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $viewModel.showHeartBottomSheet) {
-            HeartBottomSheetView()
+            HeartBottomSheetView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                 .presentationDetents([.fraction(2/3)])
-        }
-        .onAppear {
-            viewModel.fetchMealDiary(mealDiaryId: mealDiaryId, userId: 1)
         }
     }
     

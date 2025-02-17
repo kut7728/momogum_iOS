@@ -10,15 +10,19 @@ import SwiftUI
 struct HeartView: View {
     @ObservedObject var viewModel: MyCardViewModel
     var mealDiaryId: Int
+    @State private var showHeartBottomSheet = false
 
     var body: some View {
         HStack {
             Button(action: {
-                viewModel.toggleLikeAPI(mealDiaryId: mealDiaryId) // API 호출
+                viewModel.toggleLikeAPI(mealDiaryId: mealDiaryId)
             }) {
                 Image(viewModel.myCard.isLiked ? "heart_fill" : "heart")
                     .resizable()
                     .frame(width: 24, height: 24)
+            }
+            .onTapGesture {
+                showHeartBottomSheet = true
             }
 
             Spacer().frame(width: 12)
@@ -26,6 +30,13 @@ struct HeartView: View {
             Text(viewModel.myCard.likeCount >= 99 ? "99+" : "\(viewModel.myCard.likeCount)")
                 .font(.system(size: 16))
                 .opacity(viewModel.myCard.likeCount > 0 ? 1 : 0)
+        }
+        .sheet(isPresented: $viewModel.showHeartBottomSheet) {
+            HeartBottomSheetView(viewModel: viewModel, mealDiaryId: mealDiaryId)
+                .presentationDetents([.fraction(2/3)])
+                .onAppear {
+                    viewModel.fetchLikedUsers(mealDiaryId: mealDiaryId) 
+                }
         }
         .frame(minWidth: 50)
     }
