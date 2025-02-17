@@ -10,6 +10,8 @@ import SwiftUI
 struct CommentView: View {
     @State private var showCommentBottomSheet = false
     @ObservedObject var viewModel: MyCardViewModel
+    
+    var mealDiaryId: Int
 
     var body: some View {
         HStack {
@@ -27,8 +29,8 @@ struct CommentView: View {
                 .font(.system(size: 16))
         }
         .sheet(isPresented: $showCommentBottomSheet) {
-            CommentBottomSheetView()
-                .presentationDetents([.fraction(2/3)]) 
+            CommentBottomSheetView(mealDiaryId: mealDiaryId) 
+                .presentationDetents([.fraction(2/3)])
         }
     }
 }

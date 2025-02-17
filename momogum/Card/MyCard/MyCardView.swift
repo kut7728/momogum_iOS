@@ -100,7 +100,7 @@ struct MyCardView: View {
                         HeartView(viewModel: viewModel)
                             .fixedSize()
                         Spacer().frame(width: 20)
-                        CommentView(viewModel: viewModel)
+                        CommentView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                         Spacer()
                         BookmarkView(showBookmark: $viewModel.myCard.showBookmark)
                         Spacer().frame(width: 10)
