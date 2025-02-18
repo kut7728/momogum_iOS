@@ -40,7 +40,7 @@ struct MyFollowing: View {
             .navigationDestination(item: $selectedUserID) { userID in
                 OtherProfileView(userID: userID,
                        isFollowing: followViewModel.isFollowing(userID),
-                                 viewModel: ProfileViewModel(), followViewModel: followViewModel
+                                 viewModel: ProfileViewModel(userId: 1), followViewModel: followViewModel
                    )
             }
         }

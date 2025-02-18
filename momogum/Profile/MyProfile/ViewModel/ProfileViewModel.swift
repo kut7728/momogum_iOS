@@ -25,11 +25,12 @@ class ProfileViewModel: ObservableObject {
         return currentPreviewImage?.pngData() == UIImage(named: "defaultProfile")?.pngData()
     }
     
-    var uuid: Int? {
-        return AuthManager.shared.UUID
-    }
-    
-    init() {
+//    var uuid: Int? {
+//        return AuthManager.shared.UUID
+//    }
+//    
+//    init() {
+    init(userId: Int) {
         self.userName = ""
         self.userID = ""
         self.userBio = ""
@@ -37,14 +38,17 @@ class ProfileViewModel: ObservableObject {
         self.profileImage = UIImage(named: "defaultProfile")
         self.currentPreviewImage = self.profileImage
         
-        guard let uuid = self.uuid else {
-            print("⚠️ UUID가 없습니다. ProfileViewModel 초기화 중단")
-            return
-        }
+//        guard let uuid = self.uuid else {
+//            print("⚠️ UUID가 없습니다. ProfileViewModel 초기화 중단")
+//            return
+//        }
         
-        fetchUserProfile(userId: uuid)
-        fetchMealDiaries(userId: uuid)
-        fetchBookmarkedMealDiaries(userId: uuid)
+//        fetchUserProfile(userId: uuid)
+//        fetchMealDiaries(userId: uuid)
+//        fetchBookmarkedMealDiaries(userId: uuid)
+        fetchUserProfile(userId: userId)
+        fetchMealDiaries(userId: userId)
+        fetchBookmarkedMealDiaries(userId: userId)
     }
     
     // 유저 프로필 로드
@@ -71,7 +75,6 @@ class ProfileViewModel: ObservableObject {
     // 밥일기 로드
     func fetchMealDiaries(userId: Int) {
         guard !isFetchingMealDiaries && !isLoaded else {
-            print("⚠️ 이미 밥일기 데이터를 불러왔거나 요청 중입니다.")
             return
         }
         
@@ -106,6 +109,50 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
+    // 밥일기 새로고침
+    func refreshMealDiaries() {
+//        guard let userId = AuthManager.shared.UUID, !isFetchingMealDiaries else { return } //중복 실행 방지
+        
+        let userId = AuthManager.shared.UUID ?? 1
+        guard !isFetchingMealDiaries else { return }
+        isFetchingMealDiaries = true
+        
+        let group = DispatchGroup()
+
+        // 작성한 밥일기 새로고침
+        group.enter()
+        UserProfileManager.shared.fetchMealDiaries(userId: userId) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let newMealDiaries):
+                    self.mealDiaries = newMealDiaries
+                case .failure(let error):
+                    print("❌ 밥일기 새로고침 실패: \(error.localizedDescription)")
+                }
+                group.leave()
+            }
+        }
+
+        // 저장한 밥일기 새로고침
+        group.enter()
+        UserProfileManager.shared.fetchBookmarkedMealDiaries(userId: userId) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let newBookmarkedMealDiaries):
+                    self.bookmarkedMealDiaries = newBookmarkedMealDiaries
+                case .failure(let error):
+                    print("❌ 북마크된 밥일기 새로고침 실패: \(error.localizedDescription)")
+                }
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) {
+            self.isFetchingMealDiaries = false // 요청 완료 표시
+        }
+    }
+
+    
     // 프로필 이미지 로드
     private func loadImageAsync(from urlString: String) {
         AF.request(urlString)
@@ -118,7 +165,6 @@ class ProfileViewModel: ObservableObject {
                             self.profileImage = image
                             self.currentPreviewImage = image
                         }
-                        print("✅ 프로필 이미지 로드 성공!")
                     }
                 case .failure(let error):
                     print("❌ 프로필 이미지 로드 실패: \(error.localizedDescription)")
@@ -142,7 +188,6 @@ class ProfileViewModel: ObservableObject {
                     
                     switch result {
                     case .success(let uploadedImageUrl):
-                        print("✅ 프로필 이미지 업로드 성공: \(uploadedImageUrl)")
                         self.updateProfileInfo(userId: userId, imageUrl: uploadedImageUrl)
 
                     case .failure(let error):
@@ -155,6 +200,7 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
+    // 프로필 편집 (이름,아이디,한줄소개)
     private func updateProfileInfo(userId: Int, imageUrl: String?) {
         let updatedProfile = UserProfile(
             id: Int64(userId),
