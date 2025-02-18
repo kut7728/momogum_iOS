@@ -97,7 +97,7 @@ struct OtherCardView: View {
                         Spacer().frame(width: 20)
 //                        CommentView(viewModel: viewModel)
                         Spacer()
-                        BookmarkView(showBookmark: $viewModel.otherCard.showBookmark)
+//                        BookmarkView(showBookmark: $viewModel.otherCard.showBookmark)
                         Spacer().frame(width: 10)
                     }
                     .padding(.horizontal, 16)
@@ -176,11 +176,11 @@ struct OtherCardView: View {
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
         
-        .sheet(isPresented: $viewModel.showHeartBottomSheet) {
-            HeartBottomSheetView()
-                .presentationDetents([.fraction(2/3)])
-        }
-        
+//        .sheet(isPresented: $viewModel.showHeartBottomSheet) {
+//            HeartBottomSheetView()
+//                .presentationDetents([.fraction(2/3)])
+//        }
+//        
         .sheet(isPresented: $viewModel.showReportSheet) {
             ReportBottomSheet(isPresented: $viewModel.showReportSheet, showCompletedModal: $viewModel.showCompletedAlert)
                 .presentationDetents([.fraction(2/3)])
