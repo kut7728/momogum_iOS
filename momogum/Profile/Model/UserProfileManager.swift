@@ -113,22 +113,23 @@ class UserProfileManager {
 
         AF.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(imageData, withName: "file", fileName: "profile.jpg", mimeType: "image/jpeg")
-        }, to: url, method: .put, headers: ["Content-Type": "multipart/form-data"])
+        }, to: url, method: .put)
         .validate(statusCode: 200..<300)
         .responseDecodable(of: ProfileImageResponse.self) { response in
             switch response.result {
             case .success(let decodedResponse):
-                completion(.success(decodedResponse.imageUrl)) // 서버에서 반환한 이미지 URL
+                if decodedResponse.isSuccess, let imageUrl = decodedResponse.result {
+                    print("✅ 프로필 이미지 업로드 성공: \(imageUrl)")
+                    completion(.success(imageUrl))
+                } else {
+                    print("❌ 프로필 이미지 업로드 실패: \(decodedResponse.message)")
+                    completion(.failure(UserProfileError.noData))
+                }
             case .failure(let error):
                 print("❌ 프로필 이미지 업로드 실패: \(error.localizedDescription)")
                 completion(.failure(error))
             }
         }
-    }
-
-    // 프로필 이미지 업로드 응답 모델
-    struct ProfileImageResponse: Decodable {
-        let imageUrl: String
     }
 
 }

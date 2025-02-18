@@ -25,9 +25,9 @@ struct UserProfile: Codable {
 }
 
 // 프로필 이미지 업로드 응답 모델
-struct UploadProfileImageResponse: Codable {
+struct ProfileImageResponse: Codable {
     let isSuccess: Bool
     let code: String
     let message: String
-    let imageUrl: String?
+    let result: String? // 이미지 URL
 }
