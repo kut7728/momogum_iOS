@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FollowView: View {
     @Environment(\.dismiss) var dismiss
-    @Bindable var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: ProfileViewModel
     @Bindable var followViewModel: FollowViewModel
     
     @Binding var selectedSegment: Int
@@ -19,17 +19,19 @@ struct FollowView: View {
     @State private var popupUserID: String? // 팔로워 목록에서 삭제할 유저 ID
     
     var body: some View {
-        ZStack{
+        ZStack {
             VStack {
                 HStack(alignment: .center, spacing: 0) {
                     // back 버튼
-                    Button{
-                        followViewModel.refreshFollowingList()
-                        dismiss()
+                    Button {
+                        DispatchQueue.main.async {
+                            followViewModel.refreshFollowingList()
+                            dismiss()
+                        }
                     } label: {
                         Image("back")
                             .resizable()
-                            .frame(width: 20,height: 20)
+                            .frame(width: 20, height: 20)
                     }
                     .padding(.leading, 32)
                     
@@ -103,8 +105,10 @@ struct FollowView: View {
                     showPopup: $showPopup, showCompletedPopup: $showCompletedPopup,
                     onRemove: {
                         if let userID = popupUserID {
-                            followViewModel.removeFollower(userID)
-                            popupUserID = nil // 초기화
+                            DispatchQueue.main.async {
+                                followViewModel.removeFollower(userID)
+                                popupUserID = nil // 초기화
+                            }
                         }
                     }
                 )
@@ -120,7 +124,6 @@ struct FollowView: View {
                         }
                     }
             }
-            
         }
     }
 }
