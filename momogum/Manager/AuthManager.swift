@@ -10,6 +10,8 @@ import Foundation
 final class AuthManager : ObservableObject {
     static let shared = AuthManager()
     @Published var isLoggedIn: Bool = false
+    @Published var currentUser: UserProfile? // 유저 정보
+    
     private init() {}
     
     private let defaults = UserDefaults.standard
@@ -30,7 +32,7 @@ final class AuthManager : ObservableObject {
         }
     }
     
-//    
+//
 //    var UUID: Int? {
 //        get {
 //            return 1
@@ -67,18 +69,23 @@ final class AuthManager : ObservableObject {
           defaults.removeObject(forKey: "UUID")
       }
     
-    func handleLoginSuccess() {
+    func handleLoginSuccess(userProfile: UserProfile) {
         UserDefaults.standard.setValue(true, forKey: "isLoggedIn")
+        self.currentUser = userProfile
+        self.UUID = userProfile.id // 현재 유저의 UUID 저장
     }
     
     
-    // 오토로그인 추후 구현예정    
+    // 오토로그인 추후 구현예정
     func checkAutoLogin() {
-            if let token = momogumAccessToken, !token.isEmpty {
+        if let token = momogumAccessToken, !token.isEmpty, let userId = UUID {
                 isLoggedIn = true
+            // 기존에 저장된 UUID를 이용해 currentUser 설정
+            self.currentUser = UserProfile(id: userId, name: "이름", nickname: "닉네임", about: nil, profileImage: nil, newUser: false)
                 print("✅ 자동 로그인 성공: \(token)")
             } else {
                 isLoggedIn = false
+                currentUser = nil
                 print("❌ 저장된 토큰 없음, 로그인 필요")
             }
         }

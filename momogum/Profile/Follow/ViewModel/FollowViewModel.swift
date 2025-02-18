@@ -6,20 +6,27 @@
 //
 
 import SwiftUI
+import Combine
 
-@Observable
-class FollowViewModel {
-    var followerCount: Int
-    var followingCount: Int
+class FollowViewModel: ObservableObject {
+    @Published var followingStatus: [String: Bool] = [:] // 유저 ID별 팔로우 여부
     
-    var search: String = ""
-    var loadedFollowers = 20 // 초기 로딩 개수
-    var allFollowers: [String] = [] // 전체 팔로워 리스트
-    var followingUsers: [String] = [] // 팔로우한 유저 목록
+    @Published var followerCount: Int
+    @Published var followingCount: Int
+    
+    @Published var search: String = ""
+    @Published var loadedFollowers = 20 // 초기 로딩 개수
+    @Published var allFollowers: [String] = [] // 전체 팔로워 리스트
+    @Published var followingUsers: [String] = [] // 팔로우한 유저 목록
     private var pendingUnfollow: [String] = [] // 언팔로우 예약된 유저 목록
     
+    init(followerCount: Int = 1325, followingCount: Int = 0) {
+        self.followerCount = followerCount
+        self.followingCount = followingCount
+        generateFollowers() // 팔로워 목록 초기화
+    }
     
-// MARK: - 검색
+    // MARK: - 검색
     
     // 검색된 팔로워 목록
     var filteredFollowers: [String] {
@@ -37,12 +44,6 @@ class FollowViewModel {
         } else {
             return followingUsers.filter { $0.localizedCaseInsensitiveContains(search) }
         }
-    }
-    
-    init(followerCount: Int = 1325, followingCount: Int = 0) {
-        self.followerCount = followerCount
-        self.followingCount = followingCount
-        generateFollowers() // 팔로워 목록 초기화
     }
     
     // 더미 데이터 생성 (테스트용)
@@ -68,7 +69,7 @@ class FollowViewModel {
             followingCount += 1
         }
     }
-
+    
     
     // 즉시 반영되는 언팔로우 (Follower)
     func unfollow(_ userID: String) {
@@ -109,4 +110,59 @@ class FollowViewModel {
             }
         }
     }
+    
+    // 팔로우 토글
+    func toggleFollow(userId: Int, targetUserId: String) {
+        guard let userIntId = Int(targetUserId) else {
+            print("❌ 잘못된 userId 형식")
+            return
+        }
+        
+        UserProfileManager.shared.toggleFollow(userId: userId, targetUserId: userIntId) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    // 기존 팔로우 상태를 반전
+                    let followingStatus = !(self.followingStatus[targetUserId] ?? false)
+                    self.followingStatus[targetUserId] = followingStatus
+                    
+                    // followingUsers 리스트에도 반영
+                    if followingStatus {
+                        if !self.followingUsers.contains(targetUserId) {
+                            self.followingUsers.append(targetUserId)
+                        }
+                        self.followingCount += 1
+                    } else {
+                        self.followingUsers.removeAll { $0 == targetUserId }
+                        self.followingCount -= 1
+                    }
+                    
+                    print("✅ 팔로우 상태 변경됨: \(targetUserId) - \(followingStatus ? "팔로우 중" : "언팔로우됨")")
+                    
+                case .failure(let error):
+                    print("❌ 팔로우 토글 실패: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    // 유저 ID별 팔로우 여부 로드
+    func fetchFollowStatus(userId: Int, targetUserIds: [String]) {
+        for targetUserId in targetUserIds {
+            guard let targetIntId = Int(targetUserId) else { continue }
+            
+            UserProfileManager.shared.toggleFollow(userId: userId, targetUserId: targetIntId) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success:
+                        self.followingStatus[targetUserId] = true // 현재 팔로우 상태를 저장
+                    case .failure:
+                        self.followingStatus[targetUserId] = false // 실패하면 기본적으로 false 처리
+                    }
+                }
+            }
+        }
+    }
+    
+    
 }

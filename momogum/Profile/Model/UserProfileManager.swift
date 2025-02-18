@@ -131,6 +131,25 @@ class UserProfileManager {
             }
         }
     }
+    
+    // 팔로우 토글
+    func toggleFollow(userId: Int, targetUserId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        let url = "\(BaseAPI)/follows/\(userId)/follow/\(targetUserId)/toggle"
+
+        AF.request(url, method: .post)
+            .validate(statusCode: 200..<300)
+            .responseDecodable(of: FollowResponse.self) { response in
+                switch response.result {
+                case .success(let followResponse):
+                    completion(.success(())) // 성공 시 아무 값도 반환하지 않음
+
+                case .failure(let error):
+                    print("❌ 팔로우 토글 실패: \(error.localizedDescription)")
+                    completion(.failure(error))
+                }
+            }
+    }
+
 
 }
 

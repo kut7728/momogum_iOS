@@ -176,7 +176,7 @@ extension ProfileViewModel {
     // 프로필 편집 (이름,아이디,한줄소개)
     private func updateProfileInfo(userId: Int, imageUrl: String?) {
         let updatedProfile = UserProfile(
-            id: Int64(userId),
+            id: Int(userId),
             name: self.userName,
             nickname: self.userID,
             about: self.userBio,

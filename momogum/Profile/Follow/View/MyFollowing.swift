@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MyFollowing: View {
-    @Bindable var followViewModel: FollowViewModel
+    @ObservedObject var followViewModel: FollowViewModel
     
     @State private var showCloseButton = false
     @State private var isEditing = false // 텍스트필드 활성화 여부
