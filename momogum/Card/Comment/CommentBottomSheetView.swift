@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CommentBottomSheetView: View {
-    @Environment(\ .dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     @State private var newComment = ""
     @FocusState private var isFocused: Bool
     @ObservedObject var viewModel: MyCardViewModel
@@ -42,6 +42,7 @@ struct CommentBottomSheetView: View {
                                 } placeholder: {
                                     Image(systemName: "person.crop.circle.fill")
                                         .resizable()
+                                        .frame(width: 52, height: 52)
                                         .foregroundColor(.gray)
                                 }
                                 .frame(width: 52, height: 52)
