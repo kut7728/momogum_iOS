@@ -21,6 +21,7 @@ struct AppointView: View {
             ScrollView {
                 VStack (alignment: .leading) {
                     Button {
+                        newAppointViewModel.getAppointId() // 약속 id 할당
                         path.append("create1")
                         isTabBarHidden = true
                     } label: {
@@ -96,7 +97,7 @@ struct AppointView: View {
                                         .frame(width: 30)
                                     
                                     ForEach(viewModel.appoints) { appoint in
-                                        NearAppointCellView(isPresented: $isPresented, appoint: appoint)
+                                        WaitingConfirmCellView(isPresented: $isPresented, appoint: appoint)
                                     }
                                 }
                             }
@@ -127,7 +128,7 @@ struct AppointView: View {
                                         .frame(width: 30)
                                     
                                     ForEach(viewModel.appoints) { appoint in
-                                        WaitingConfirmCellView(isPresented: $isPresented, appoint: appoint)
+                                        NearAppointCellView(isPresented: $isPresented, appoint: appoint)
                                     }
                                 }
                             }

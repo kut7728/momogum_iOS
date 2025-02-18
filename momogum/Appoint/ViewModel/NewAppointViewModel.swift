@@ -35,6 +35,7 @@ struct ApmResult: Codable {
 // MARK: - class
 @Observable
 class NewAppointViewModel {
+    var appointId: Int = 0
     /// 약속 7요소
     var appointName: String = ""
     var menuName: String = ""
@@ -49,6 +50,26 @@ class NewAppointViewModel {
     var friends: [String] = ["친구1", "친구2", "친구3", "친구4", "친구5", "친구6", "친구7", "친구8", "친구9", "친구10"]
     
    
+    
+    // MARK: - 약속 고유 id 획득
+    func getAppointId() {
+        let url = "\(BaseAPI)/appointment/init"
+
+        AF.request(url, method: .post)
+            .validate(statusCode: 200..<300)
+            .responseDecodable(of: ApiResponse.self) { [self] response in
+                
+                switch response.result {
+                case .success(let data):
+                    self.appointId = data.result.appointmentID
+                case .failure(let error):
+                    print("오류 발생: \(error.localizedDescription)")
+                }
+            }
+    }
+    
+    
+    
     
     // MARK: - 초대장 발송 및 저장소 초기화
     func createAppoint() {
