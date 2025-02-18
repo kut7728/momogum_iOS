@@ -17,7 +17,7 @@ struct OtherProfileView: View {
     @State private var selectedSegment = 0
     @State private var navigateToMyCardView = false
     
-    @State var viewModel: ProfileViewModel
+    @StateObject var viewModel = ProfileViewModel()
     @State var followViewModel: FollowViewModel = FollowViewModel()
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
@@ -268,5 +268,5 @@ struct OtherProfileView: View {
 }
 
 #Preview {
-    OtherProfileView(userID: "", isFollowing: false, viewModel: ProfileViewModel(userId: 1))
+    OtherProfileView(userID: "", isFollowing: false, viewModel: ProfileViewModel())
 }

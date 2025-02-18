@@ -46,7 +46,7 @@ struct MyFollower: View {
                 OtherProfileView(
                     userID: userID,
                     isFollowing: followViewModel.isFollowing(userID),
-                    viewModel: ProfileViewModel(userId: 1), followViewModel: followViewModel
+                    viewModel: ProfileViewModel(), followViewModel: followViewModel
                 )
             }
         }
