@@ -184,10 +184,12 @@ struct MyCardView: View {
             if viewModel.showDeleted {
                 DeletedPopupView(
                     showDeletedPopup: $viewModel.showDeleted,
+                    isTabBarHidden: $isTabBarHidden,
                     showPopup: $viewModel.showPopup
                 ) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        changeRootView(to: MyProfileView(isTabBarHidden: .constant(false)))
+                        isTabBarHidden = false
+                        dismiss()
                     }
                 }
             }
@@ -197,14 +199,6 @@ struct MyCardView: View {
         .sheet(isPresented: $viewModel.showHeartBottomSheet) {
             HeartBottomSheetView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                 .presentationDetents([.fraction(2/3)])
-        }
-    }
-    
-    private func changeRootView<Content: View>(to view: Content) {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-            let window = windowScene.windows.first {
-            window.rootViewController = UIHostingController(rootView: view)
-            window.makeKeyAndVisible()
         }
     }
 }
