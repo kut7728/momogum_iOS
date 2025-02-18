@@ -45,6 +45,7 @@ struct LoginView: View {
                                         print("신규 유저입니다. 회원가입이 필요합니다.")
                                     } else { // true false  기존유저
                                         AuthManager.shared.isLoggedIn = true
+                                        authViewModel.fetchUserUUID()
                                         print("기존 유저 로그인 완료")
                                     }
                                 } else {
@@ -71,7 +72,7 @@ struct LoginView: View {
                     case.SignupStep2View:
                         SignupStep2View(authViewModel: authViewModel, path: $path)
                     case.SignupEndView:
-                        SignupEndView(path: $path)
+                        SignupEndView(path: $path, authViewModel: authViewModel)
                     }
                     
                 }

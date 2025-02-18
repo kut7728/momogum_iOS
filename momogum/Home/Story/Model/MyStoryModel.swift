@@ -11,7 +11,7 @@ import Foundation
 struct MyStoryModel: Codable {
     let isSuccess: Bool
     let code, message: String
-    let result: MyStoryResult
+    let result: [MyStoryResult]
 }
 
 // MARK: - Result

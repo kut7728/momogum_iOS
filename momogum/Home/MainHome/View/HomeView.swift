@@ -48,6 +48,7 @@ struct HomeView: View {
             }
             .onAppear{
                 storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
+                storyViewModel.fetchMyStory(for: AuthManager.shared.UUID ?? 1)
             }
             .onDisappear {
                 storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
@@ -102,8 +103,8 @@ extension HomeView {
     private func storyScrollView() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                storyItem(title: "내 스토리", hasStory: false, destination: StoryView(userID: "", tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden))
-                //                storyItem(title: "momogum._.", hasStory: true, destination: Story2View(userID: "", isTabBarHidden: .constant(false)))
+                storyItem(title: "내 스토리", viewed: false, destination: MyStoryView( isTabBarHidden: $isTabBarHidden, storyViewModel: storyViewModel))
+
                 
                 let sortedStories = storyViewModel.sortedGroupedStories //정렬이 끝난 스토리값
 
@@ -126,7 +127,6 @@ extension HomeView {
                                 hasUnViewedStory: hasUnviewedStory,
                                 profileImageLink: story.profileImageLink,
                                 isTabBarHidden: $isTabBarHidden
-                               
                             )
                             .onAppear(){
                                 print(story.viewed)
@@ -151,14 +151,13 @@ extension HomeView {
     
     
     //홈뷰에 나타나는 스토리리스트
-    private func storyItem(title: String, hasStory: Bool, destination: some View) -> some View {
+    private func storyItem(title: String, viewed: Bool, destination: some View) -> some View {
         VStack {
-            Button(action: {
-                isTabBarHidden = true
-                path.append(title) // path에 추가해서 이동
-            }) {
+            NavigationLink(
+                destination: destination
+                                    .onAppear { isTabBarHidden = true }) {
                 ZStack {
-                    if hasStory {
+                    if viewed { // 연동아직안되엇음
                         Circle()
                             .strokeBorder(
                                 LinearGradient(gradient: Gradient(colors: [

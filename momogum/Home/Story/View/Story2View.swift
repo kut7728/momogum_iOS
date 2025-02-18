@@ -12,7 +12,6 @@ struct Story2View: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var storyViewModel = StoryViewModel()
     @StateObject private var viewModel = Story2ViewModel()
-    @State private var dragOffset: CGFloat = 0
     let nickname: String
     let storyIDList: [Int]
     @State private var currentIndex: Int = 0
@@ -25,11 +24,9 @@ struct Story2View: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
-                Rectangle()
-                    .frame(width:352, height:6)
-                    .cornerRadius(10)
-                    .foregroundStyle(.black_3)
+                storyProgressBar()
                     .padding(.top, 8)
+
                 
                 headerView()  // 상단 유저 정보 및 신고 버튼
                 postContentView()  // 게시글 내용
@@ -52,7 +49,6 @@ struct Story2View: View {
             print(nickname)
             print("storyIDList: \(storyIDList)")
             print("currentIndex: \(storyIDList[currentIndex])")
-            
         }
         .sheet(isPresented: $viewModel.showReportSheet) {
             ReportView(showReportSheet: $viewModel.showReportSheet, showPopup: $viewModel.showPopup)
@@ -66,6 +62,20 @@ struct Story2View: View {
 // MARK: - UI 컴포넌트 분리
 extension Story2View {
     // 상단 헤더 (유저 정보, 신고 버튼, 닫기 버튼)
+    private func storyProgressBar() -> some View {
+        HStack(spacing: 4) {
+            ForEach(0..<storyIDList.count, id: \.self) { index in
+                Rectangle()
+                    .fill(index <= currentIndex ? Color.red : Color.gray.opacity(0.3))
+                    .frame(height: 6)
+                    .cornerRadius(10)
+                    .animation(.easeInOut, value: currentIndex)
+            }
+        }
+        .frame(width: 352)
+    }
+    
+    
     private func headerView() -> some View {
         HStack {
             Circle()
@@ -120,6 +130,8 @@ extension Story2View {
     // 게시글 내용
     private func postContentView() -> some View {
         ZStack {
+            
+            
             Rectangle()
                 .frame(width:360, height: 534)
                 .foregroundColor(.white)

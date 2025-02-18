@@ -5,8 +5,9 @@ class StoryViewModel: ObservableObject {
     @Published var rawStories: [StoryResult] = []  //  여러 개의 친구들의 스토리를 저장
     @Published var selectedStory: StoryDetailResult?
     @Published var groupedStories : [String:[StoryResult]] = [:]
-    @Published var sortedGroupedStories: [(key: String, value: [StoryResult])] = []  // ✅ 정렬된 데이터를 배열로 저장
-    @Published var Mystories : MyStoryResult?
+    @Published var sortedGroupedStories: [(key: String, value: [StoryResult])] = []  // 정렬된 데이터를 배열로 저장
+    @Published var Mystories : [MyStoryResult] = []
+    
     // 회원 친구들의 스토리 전체 조회
     func fetchStory(for memberId: Int) {
         let url = "\(BaseAPI)/meal-stories/memberId/\(memberId)" // API 요청 URL
@@ -63,15 +64,15 @@ class StoryViewModel: ObservableObject {
                            let rhsHasUnviewed = rhs.value.contains { !$0.viewed }
 
                            if lhsHasUnviewed == rhsHasUnviewed {
-                               return lhs.key < rhs.key  // ✅ 같은 viewed 상태라면 닉네임 기준으로 정렬
+                               return lhs.key < rhs.key  //같은 viewed 상태라면 닉네임 기준으로 정렬
                            }
-                           return lhsHasUnviewed && !rhsHasUnviewed  // ✅ viewed == false가 포함된 닉네임이 먼저 오게 정렬
+                           return lhsHasUnviewed && !rhsHasUnviewed  //  viewed == false가 포함된 닉네임이 먼저 오게 정렬
                        }
             DispatchQueue.main.async {
                        self.groupedStories = grouped
-                    self.sortedGroupedStories = sortedGroupedStories  // ✅ 정렬된 데이터를 배열로 저장
+                    self.sortedGroupedStories = sortedGroupedStories  //  정렬된 데이터를 배열로 저장
 
-                print("✅ 닉네임 정렬 완료! \(sortedGroupedStories.map { "\($0.key): \($0.value.map { $0.viewed })" })")
+                print(" 닉네임 정렬 완료! \(sortedGroupedStories.map { "\($0.key): \($0.value.map { $0.viewed })" })")
 
                    }
         }
@@ -88,12 +89,12 @@ class StoryViewModel: ObservableObject {
         let url = "\(BaseAPI)/meal-stories/myStories/memberId/\(memberId)"
         AF.request(url, method: .get)
             .validate()
-            .responseDecodable(of: StoryDetailModel.self) { response in
+            .responseDecodable(of: MyStoryModel.self) { response in
                 switch response.result {
                 case .success(let data):
                     DispatchQueue.main.async {
-//                        self.Mystories = data.result
-                        print("내 스토리 가져오기 성공: \(data.result.name)의 스토리")
+                        self.Mystories = data.result
+                        print("내 스토리 가져오기 성공: \(data.result)의 스토리")
                     }
                 case .failure(let error):
                     print(error)

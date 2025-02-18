@@ -15,30 +15,30 @@ final class AuthManager : ObservableObject {
     private let defaults = UserDefaults.standard
     private let accessTokenKey = "momogumAccessToken"
 
-//    var UUID: Int? {
-//        get {
-//            let value = defaults.integer(forKey: "UUID")
-//            return value == 0 ? nil : value
-//        }
-//        
-//        set {
-//            if let newValue = newValue {
-//                defaults.set(newValue , forKey: "UUID")
-//            } else{
-//                defaults.removeObject(forKey: "UUID")
-//            }
-//        }
-//    }
-    
-    
     var UUID: Int? {
         get {
-            return 1
+            let value = defaults.integer(forKey: "UUID")
+            return value == 0 ? nil : value
         }
+        
         set {
-            defaults.set(1, forKey: "UUID")
+            if let newValue = newValue {
+                defaults.set(newValue , forKey: "UUID")
+            } else{
+                defaults.removeObject(forKey: "UUID")
+            }
         }
     }
+    
+//    
+//    var UUID: Int? {
+//        get {
+//            return 1
+//        }
+//        set {
+//            defaults.set(1, forKey: "UUID")
+//        }
+//    }
 
     //토큰 저장 키체인
     // 카카오소셜토큰값이 들어왔다가 기존 유저의 경우 isNewUser함수 실행하게 되면 해당 토큰값이 서버쪽 토큰값으로 바뀌게 된다.
