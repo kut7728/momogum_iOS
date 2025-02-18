@@ -123,7 +123,7 @@ class MyCardViewModel: ObservableObject {
     func addComment(mealDiaryId: Int, comment: String) {
         let url = "\(BaseAPI)/meal-diaries/comments"
         let parameters: [String: Any] = [
-            "userId": 1,
+            "memberId": 1,
             "mealDiaryId": mealDiaryId,
             "comment": comment
         ]
