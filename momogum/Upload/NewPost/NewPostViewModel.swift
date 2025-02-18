@@ -72,7 +72,7 @@ class NewPostViewModel: ObservableObject {
         let foodCategory = categoryMapping[newPost.selectedCategory ?? "기타"] ?? "ETC"
         
         let revisitMapping: [String: String] = [
-            "bad": "BAD", "soso": "NOT_GOOD", "good": "GOOD"
+            "bad": "NOT_GOOD", "soso": "SO_SO", "good": "GOOD"
         ]
         let revisit = revisitMapping[newPost.selectedIcon ?? "soso"] ?? "NOT_GOOD"
         
