@@ -25,12 +25,12 @@ class ProfileViewModel: ObservableObject {
         return currentPreviewImage?.pngData() == UIImage(named: "defaultProfile")?.pngData()
     }
     
-    //    var uuid: Int? {
-    //        return AuthManager.shared.UUID
-    //    }
-    //
-    //    init() {
-    init(userId: Int) {
+    var uuid: Int? {
+        return AuthManager.shared.UUID
+    }
+    
+    init() {
+//    init(userId: Int) {
         self.userName = ""
         self.userID = ""
         self.userBio = ""
@@ -38,17 +38,17 @@ class ProfileViewModel: ObservableObject {
         self.profileImage = UIImage(named: "defaultProfile")
         self.currentPreviewImage = self.profileImage
         
-        //        guard let uuid = self.uuid else {
-        //            print("⚠️ UUID가 없습니다. ProfileViewModel 초기화 중단")
-        //            return
-        //        }
+        guard let uuid = self.uuid else {
+            print("⚠️ UUID가 없습니다. ProfileViewModel 초기화 중단")
+            return
+        }
         
-        //        fetchUserProfile(userId: uuid)
-        //        fetchMealDiaries(userId: uuid)
-        //        fetchBookmarkedMealDiaries(userId: uuid)
-        fetchUserProfile(userId: userId)
-        fetchMealDiaries(userId: userId)
-        fetchBookmarkedMealDiaries(userId: userId)
+        fetchUserProfile(userId: uuid)
+        fetchMealDiaries(userId: uuid)
+        fetchBookmarkedMealDiaries(userId: uuid)
+//        fetchUserProfile(userId: userId)
+//        fetchMealDiaries(userId: userId)
+//        fetchBookmarkedMealDiaries(userId: userId)
     }
 }
 
