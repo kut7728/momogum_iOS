@@ -20,7 +20,7 @@ struct MyProfileView: View {
     
     var mealDiary: ProfileMealDiary? = nil
     
-    @StateObject var viewModel = ProfileViewModel()
+    @StateObject var viewModel = ProfileViewModel(userId: AuthManager.shared.UUID ?? 0) // ✅ UUID 값 사용
     @State var followViewModel: FollowViewModel = FollowViewModel()
     
     @Binding var isTabBarHidden: Bool

@@ -34,7 +34,7 @@ class ProfileViewModel: ObservableObject {
         return AuthManager.shared.UUID
     }
     
-    init() {
+    init(userId: Int) {
         self.userName = ""
         self.userID = ""
         self.userBio = ""
