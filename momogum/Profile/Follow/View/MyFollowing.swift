@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MyFollowing: View {
-    @Bindable var followViewModel: FollowViewModel
+    @ObservedObject var followViewModel: FollowViewModel
     
     @State private var showCloseButton = false
     @State private var isEditing = false // 텍스트필드 활성화 여부
@@ -40,7 +40,7 @@ struct MyFollowing: View {
             .navigationDestination(item: $selectedUserID) { userID in
                 OtherProfileView(userID: userID,
                        isFollowing: followViewModel.isFollowing(userID),
-                                 userName: "", about: "", viewModel: ProfileViewModel(userId: 1), followViewModel: followViewModel
+                                 viewModel: ProfileViewModel(), followViewModel: followViewModel
                    )
             }
         }

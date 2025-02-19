@@ -20,7 +20,7 @@ struct MyProfileView: View {
     
     var mealDiary: ProfileMealDiary? = nil
     
-    @StateObject var viewModel = ProfileViewModel(userId: 1)
+    @StateObject var viewModel = ProfileViewModel()
     @State var followViewModel: FollowViewModel = FollowViewModel()
     
     @Binding var isTabBarHidden: Bool
@@ -53,6 +53,9 @@ struct MyProfileView: View {
                     if isTabBarHidden {
                         isTabBarHidden = false
                     }
+                }
+                .onAppear { // 밥일기 새로고침
+                    viewModel.refreshMealDiaries()
                 }
             }
             .disabled(showPopup) // 팝업이 보일 때 메인 화면 비활성화
