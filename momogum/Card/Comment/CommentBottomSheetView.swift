@@ -60,9 +60,9 @@ struct CommentBottomSheetView: View {
                                     Text(comment.nickname)
                                         .font(.system(size: 16, weight: .bold))
                                     
-                                    Text("방금")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.gray)
+//                                    Text("방금")
+//                                        .font(.system(size: 14))
+//                                        .foregroundColor(.gray)
                                 }
                                 Text(comment.content)
                                     .font(.system(size: 14))
