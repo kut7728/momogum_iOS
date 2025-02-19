@@ -31,9 +31,9 @@ struct HeartBottomSheetView: View {
             List {
                 ForEach(viewModel.likedUsers, id: \.nickname) { user in
                     HStack {
-                        if let imageUrl = URL(string: "\(BaseAPI)/\(user.userProfileImage ?? "")") {
-                            AsyncImage(url: imageUrl) { image in
-                                image.resizable()
+                        if let imagePath = user.userProfileImage, let url = URL(string: imagePath) {
+                            AsyncImage(url: url) { image in
+                                image.resizable().aspectRatio(contentMode: .fill)
                             } placeholder: {
                                 Image(systemName: "person.crop.circle.fill")
                                     .resizable()
