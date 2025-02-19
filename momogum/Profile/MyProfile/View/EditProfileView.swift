@@ -109,6 +109,9 @@ private extension EditProfileView {
                 showPopup = true
             }
         }
+        .onAppear {
+            KeyboardHider.hideKeyboard()
+        }
     }
 
     // 유저 정보 편집

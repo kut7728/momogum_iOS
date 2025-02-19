@@ -10,7 +10,7 @@ import SwiftUI
 struct EditNameView: View {
     @Binding var navigationPath: NavigationPath
     @ObservedObject var viewModel: ProfileViewModel
-    @StateObject private var keyboardObservers = KeyboardObservers(offset: 90)
+    @StateObject private var keyboardObservers = KeyboardObservers(offset: UIScreen.main.bounds.height <= 896 ? 100 : 90)
 
     @State private var showCloseButton = false
     @State private var underBarColor: Color = Color.black_4
@@ -163,7 +163,7 @@ private extension EditNameView {
             .disabled(showErrorMessage || draftName.isEmpty)
         }
         .padding(.trailing, 62.5)
-        .padding(.bottom, keyboardObservers.keyboardHeight > 0 ? keyboardObservers.keyboardHeight : 116)
+        .padding(.bottom, keyboardObservers.keyboardHeight > 0 ? keyboardObservers.keyboardHeight - 20 : 116)
         .animation(.easeInOut(duration: 0.3), value: keyboardObservers.keyboardHeight)
     }
 
