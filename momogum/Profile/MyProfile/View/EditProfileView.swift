@@ -171,7 +171,7 @@ private extension EditProfileView {
                 Spacer()
                 Button {
                     if let userId = viewModel.uuid {
-                        viewModel.saveUserData(userId: userId) // 동적으로 현재 사용자 ID를 사용
+                        viewModel.saveUserData(userId: userId)
                         navigationPath.removeLast(1)
                     }
                 } label: {

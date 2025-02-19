@@ -35,7 +35,6 @@ class ProfileViewModel: ObservableObject {
     }
     
     init() {
-//    init(userId: Int) {
         self.userName = ""
         self.userID = ""
         self.userBio = ""
@@ -51,9 +50,6 @@ class ProfileViewModel: ObservableObject {
         fetchUserProfile(userId: uuid)
         fetchMealDiaries(userId: uuid)
         fetchBookmarkedMealDiaries(userId: uuid)
-//        fetchUserProfile(userId: userId)
-//        fetchMealDiaries(userId: userId)
-//        fetchBookmarkedMealDiaries(userId: userId)
     }
 }
 
@@ -163,19 +159,19 @@ extension ProfileViewModel {
     // 프로필 편집 확정 (완료 버튼 클릭 시 호출)
     func saveUserData(userId: Int) {
         DispatchQueue.main.async {
-            // ✅ 기존 값과 비교하여 변경 여부 확인
+            // 기존 값과 비교하여 변경 여부 확인
             let isNameChanged = self.userName != self.originalUserName
             let isNicknameChanged = self.userID != self.originalUserID
             let isBioChanged = self.userBio != self.originalUserBio
             let isImageChanged = self.currentPreviewImage != self.profileImage
 
-            // ✅ 변경된 값이 없으면 서버 요청을 생략
+            // 변경된 값이 없으면 서버 요청을 생략
             if !isNameChanged && !isNicknameChanged && !isBioChanged && !isImageChanged {
                 print("⚠️ 변경된 정보가 없으므로 서버 요청을 생략합니다.")
                 return
             }
 
-            // ✅ 변경된 값이 있을 경우 서버로 전송
+            // 변경된 값이 있을 경우 서버로 전송
             if isImageChanged {
                 UserProfileManager.shared.uploadProfileImage(userId: userId, image: self.currentPreviewImage!) { [weak self] result in
                     guard let self = self else { return }
@@ -203,10 +199,8 @@ extension ProfileViewModel {
         ]
 
         if let imageUrl = imageUrl {
-            updatedParameters["profileImage"] = imageUrl  // 서버에서 허용하는지 확인 필요
+            updatedParameters["profileImage"] = imageUrl
         }
-
-        print("🔍 서버로 보낼 최종 데이터: \(updatedParameters)")
 
         UserProfileManager.shared.updateUserProfile(userId: userId, parameters: updatedParameters) { result in
             switch result {
@@ -225,10 +219,10 @@ extension ProfileViewModel {
 extension ProfileViewModel {
     // 밥일기 새로고침
     func refreshMealDiaries() {
-        //        guard let userId = AuthManager.shared.UUID, !isFetchingMealDiaries else { return } //중복 실행 방지
+        guard let userId = AuthManager.shared.UUID, !isFetchingMealDiaries else { return } //중복 실행 방지
         
-        let userId = AuthManager.shared.UUID ?? 1
-        guard !isFetchingMealDiaries else { return }
+//        let userId = AuthManager.shared.UUID ?? 1
+//        guard !isFetchingMealDiaries else { return }
         isFetchingMealDiaries = true
         
         let group = DispatchGroup()
