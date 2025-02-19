@@ -20,7 +20,7 @@ class FollowViewModel: ObservableObject {
     @Published var followingUsers: [String] = [] // 팔로우한 유저 목록
     private var pendingUnfollow: [String] = [] // 언팔로우 예약된 유저 목록
     
-    init(followerCount: Int = 1325, followingCount: Int = 0) {
+    init(followerCount: Int = 10, followingCount: Int = 0) {
         self.followerCount = followerCount
         self.followingCount = followingCount
         generateFollowers() // 팔로워 목록 초기화
