@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FollowerCell: View {
-    @Bindable var followViewModel: FollowViewModel
+    @ObservedObject var followViewModel: FollowViewModel
     @State private var isFollowing: Bool = false
     @Binding var showPopup: Bool
     @Binding var popupUserID: String?

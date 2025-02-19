@@ -20,24 +20,42 @@ class ProfileViewModel: ObservableObject {
     @Published var mealDiaries: [ProfileMealDiary] = []
     @Published var bookmarkedMealDiaries: [ProfileMealDiary] = []
     
+    // 기존 값 저장 (서버에서 받아온 초기 값)
+    private var originalUserName: String = ""
+    private var originalUserID: String = ""
+    private var originalUserBio: String = ""
+    
     // 기본 프로필 여부 체크
     var isDefaultProfileImage: Bool {
         return currentPreviewImage?.pngData() == UIImage(named: "defaultProfile")?.pngData()
     }
     
-    init(userId: Int) {
+    var uuid: Int? {
+        return AuthManager.shared.UUID
+    }
+    
+    init() {
         self.userName = ""
         self.userID = ""
         self.userBio = ""
-
+        
         self.profileImage = UIImage(named: "defaultProfile")
         self.currentPreviewImage = self.profileImage
         
-        fetchUserProfile(userId: userId)
-        fetchMealDiaries(userId: userId)
-        fetchBookmarkedMealDiaries(userId: userId)
+        guard let uuid = self.uuid else {
+            print("⚠️ UUID가 없습니다. ProfileViewModel 초기화 중단")
+            return
+        }
+        
+        fetchUserProfile(userId: uuid)
+        fetchMealDiaries(userId: uuid)
+        fetchBookmarkedMealDiaries(userId: uuid)
     }
-    
+}
+
+// MARK: - API 요청
+
+extension ProfileViewModel {
     // 유저 프로필 로드
     func fetchUserProfile(userId: Int) {
         UserProfileManager.shared.fetchUserProfile(userId: userId) { result in
@@ -48,7 +66,10 @@ class ProfileViewModel: ObservableObject {
                     self.userID = userProfile.nickname
                     self.userBio = userProfile.about ?? ""
 
-                    // 프로필 이미지 로드
+                    self.originalUserName = userProfile.name
+                    self.originalUserID = userProfile.nickname
+                    self.originalUserBio = userProfile.about ?? ""
+
                     if let profileImageURL = userProfile.profileImage, !profileImageURL.isEmpty {
                         self.loadImageAsync(from: profileImageURL)
                     }
@@ -62,7 +83,6 @@ class ProfileViewModel: ObservableObject {
     // 밥일기 로드
     func fetchMealDiaries(userId: Int) {
         guard !isFetchingMealDiaries && !isLoaded else {
-            print("⚠️ 이미 밥일기 데이터를 불러왔거나 요청 중입니다.")
             return
         }
         
@@ -96,7 +116,11 @@ class ProfileViewModel: ObservableObject {
             }
         }
     }
-    
+}
+
+// MARK: - 프로필 이미지 관리
+
+extension ProfileViewModel {
     // 프로필 이미지 로드
     private func loadImageAsync(from urlString: String) {
         AF.request(urlString)
@@ -109,7 +133,6 @@ class ProfileViewModel: ObservableObject {
                             self.profileImage = image
                             self.currentPreviewImage = image
                         }
-                        print("✅ 프로필 이미지 로드 성공!")
                     }
                 case .failure(let error):
                     print("❌ 프로필 이미지 로드 실패: \(error.localizedDescription)")
@@ -124,18 +147,38 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
+    // 기본 이미지로 임시 설정
+    func setDefaultImage() {
+        currentPreviewImage = UIImage(named: "defaultProfile")
+    }
+}
+
+// MARK: - 프로필 편집 및 저장
+
+extension ProfileViewModel {
     // 프로필 편집 확정 (완료 버튼 클릭 시 호출)
     func saveUserData(userId: Int) {
         DispatchQueue.main.async {
-            if let newImage = self.currentPreviewImage, newImage != self.profileImage {
-                UserProfileManager.shared.uploadProfileImage(userId: userId, image: newImage) { [weak self] result in
+            // 기존 값과 비교하여 변경 여부 확인
+            let isNameChanged = self.userName != self.originalUserName
+            let isNicknameChanged = self.userID != self.originalUserID
+            let isBioChanged = self.userBio != self.originalUserBio
+            let isImageChanged = self.currentPreviewImage != self.profileImage
+
+            // 변경된 값이 없으면 서버 요청을 생략
+            if !isNameChanged && !isNicknameChanged && !isBioChanged && !isImageChanged {
+                print("⚠️ 변경된 정보가 없으므로 서버 요청을 생략합니다.")
+                return
+            }
+
+            // 변경된 값이 있을 경우 서버로 전송
+            if isImageChanged {
+                UserProfileManager.shared.uploadProfileImage(userId: userId, image: self.currentPreviewImage!) { [weak self] result in
                     guard let self = self else { return }
-                    
+
                     switch result {
                     case .success(let uploadedImageUrl):
-                        print("✅ 프로필 이미지 업로드 성공: \(uploadedImageUrl)")
                         self.updateProfileInfo(userId: userId, imageUrl: uploadedImageUrl)
-
                     case .failure(let error):
                         print("❌ 프로필 이미지 업로드 실패: \(error.localizedDescription)")
                     }
@@ -145,18 +188,21 @@ class ProfileViewModel: ObservableObject {
             }
         }
     }
+
     
+    // 프로필 편집 (이름,아이디,한줄소개)
     private func updateProfileInfo(userId: Int, imageUrl: String?) {
-        let updatedProfile = UserProfile(
-            id: Int64(userId),
-            name: self.userName,
-            nickname: self.userID,
-            about: self.userBio,
-            profileImage: imageUrl,
-            newUser: false
-        )
-        
-        UserProfileManager.shared.updateUserProfile(userId: userId, updatedProfile: updatedProfile) { result in
+        var updatedParameters: [String: Any] = [
+            "name": self.userName.isEmpty ? originalUserName : self.userName,
+            "nickname": self.userID.isEmpty ? originalUserID : self.userID,
+            "about": self.userBio.isEmpty ? originalUserBio : self.userBio
+        ]
+
+        if let imageUrl = imageUrl {
+            updatedParameters["profileImage"] = imageUrl
+        }
+
+        UserProfileManager.shared.updateUserProfile(userId: userId, parameters: updatedParameters) { result in
             switch result {
             case .success:
                 print("✅ 프로필 업데이트 성공")
@@ -166,6 +212,54 @@ class ProfileViewModel: ObservableObject {
             }
         }
     }
+}
+
+// MARK: - 데이터 초기화
+
+extension ProfileViewModel {
+    // 밥일기 새로고침
+    func refreshMealDiaries() {
+        guard let userId = AuthManager.shared.UUID, !isFetchingMealDiaries else { return } //중복 실행 방지
+        
+//        let userId = AuthManager.shared.UUID ?? 1
+//        guard !isFetchingMealDiaries else { return }
+        isFetchingMealDiaries = true
+        
+        let group = DispatchGroup()
+        
+        // 작성한 밥일기 새로고침
+        group.enter()
+        UserProfileManager.shared.fetchMealDiaries(userId: userId) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let newMealDiaries):
+                    self.mealDiaries = newMealDiaries
+                case .failure(let error):
+                    print("❌ 밥일기 새로고침 실패: \(error.localizedDescription)")
+                }
+                group.leave()
+            }
+        }
+        
+        // 저장한 밥일기 새로고침
+        group.enter()
+        UserProfileManager.shared.fetchBookmarkedMealDiaries(userId: userId) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let newBookmarkedMealDiaries):
+                    self.bookmarkedMealDiaries = newBookmarkedMealDiaries
+                case .failure(let error):
+                    print("❌ 북마크된 밥일기 새로고침 실패: \(error.localizedDescription)")
+                }
+                group.leave()
+            }
+        }
+        
+        group.notify(queue: .main) {
+            self.isFetchingMealDiaries = false // 요청 완료 표시
+        }
+    }
+    
     
     // 편집 취소 시 초기화
     func resetUserData() {
@@ -186,8 +280,4 @@ class ProfileViewModel: ObservableObject {
         userBio = userBio
     }
     
-    // 기본 이미지로 임시 설정
-    func setDefaultImage() {
-        currentPreviewImage = UIImage(named: "defaultProfile")
-    }
 }

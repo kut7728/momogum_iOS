@@ -10,7 +10,7 @@ import SwiftUI
 struct EditBioView: View {
     @Binding var navigationPath: NavigationPath
     @ObservedObject var viewModel: ProfileViewModel
-    @StateObject private var keyboardObservers = KeyboardObservers(offset: 110)
+    @StateObject private var keyboardObservers = KeyboardObservers(offset: UIScreen.main.bounds.height <= 896 ? 110 : 90)
 
     private let maxLength = 40
 
@@ -20,7 +20,7 @@ struct EditBioView: View {
     init(navigationPath: Binding<NavigationPath>, viewModel: ProfileViewModel) {
         self._navigationPath = navigationPath
         self._viewModel = ObservedObject(initialValue: viewModel)
-        self._draftBio = State(initialValue: viewModel.userBio) // ✅ 기존 값 유지
+        self._draftBio = State(initialValue: viewModel.userBio)
     }
 
     var body: some View {
