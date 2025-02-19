@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AppointFriendListCellView: View {
-    let friend: String
+    let profile: Friend
     
     var body: some View {
         HStack {
@@ -19,10 +19,10 @@ struct AppointFriendListCellView: View {
                 .padding(.trailing)
             
             VStack (alignment: .leading) {
-                Text("유저 아이디")
+                Text(profile.nickname)
                     .font(.mmg(.subheader4))
                 
-                Text(friend)
+                Text(profile.name)
                     .font(.mmg(.Caption3))
             }
             Spacer()
@@ -31,5 +31,5 @@ struct AppointFriendListCellView: View {
 }
 
 #Preview {
-    AppointFriendListCellView(friend: "친구")
+    AppointFriendListCellView(profile: Friend.demoFriends)
 }

@@ -21,7 +21,10 @@ struct AppointView: View {
             ScrollView {
                 VStack (alignment: .leading) {
                     Button {
-                        newAppointViewModel.getAppointId() // 약속 id 할당
+                        Task {
+                            await newAppointViewModel.getAppointId() // 약속 id 할당 POST
+//                            await newAppointViewModel.getAvailableFriends() // 초대 가능 친구 GET
+                        }
                         path.append("create1")
                         isTabBarHidden = true
                     } label: {
@@ -52,15 +55,15 @@ struct AppointView: View {
                                 .environment(newAppointViewModel)
                         } else if (value == "create2") {
                             AppointCreate2View(path: $path)
-                                .environment(newAppointViewModel)
+//                                .environment(newAppointViewModel)
                         } else if (value == "create3") {
                             AppointCreate3View(path: $path)
-                                .environment(newAppointViewModel)
+//                                .environment(newAppointViewModel)
                         } else if (value == "create4") {
-                            AppointCreate4View(path: $path)
-                                .environment(newAppointViewModel)
+                            AppointCreate4View(path: $path, appointViewModel: $viewModel)
+//                                .environment(newAppointViewModel)
                         } else {
-                            AppointSentView(path: $path)
+                            AppointSentView(path: $path, appoint: newAppointViewModel.newAppoint!)
                         }
                         
                     }
@@ -73,7 +76,7 @@ struct AppointView: View {
                             .padding(.leading, 30)
                         
                         
-                        if (viewModel.appoints.isEmpty) {
+                        if (viewModel.pendingAppoints.isEmpty) {
                             Rectangle()
                                 .foregroundStyle(.black_5)
                                 .frame(width: 336, height: 156)
@@ -96,7 +99,7 @@ struct AppointView: View {
                                     Spacer()
                                         .frame(width: 30)
                                     
-                                    ForEach(viewModel.appoints) { appoint in
+                                    ForEach(viewModel.pendingAppoints) { appoint in
                                         WaitingConfirmCellView(isPresented: $isPresented, appoint: appoint)
                                     }
                                 }
@@ -109,7 +112,7 @@ struct AppointView: View {
                             .font(.mmg(.subheader3))
                             .padding(.leading, 30)
                         
-                        if (viewModel.appoints.isEmpty) {
+                        if (viewModel.confirmedAppoints.isEmpty) {
                             Rectangle()
                                 .foregroundStyle(.black_5)
                                 .frame(width: 336, height: 156)
@@ -127,7 +130,7 @@ struct AppointView: View {
                                     Spacer()
                                         .frame(width: 30)
                                     
-                                    ForEach(viewModel.appoints) { appoint in
+                                    ForEach(viewModel.confirmedAppoints) { appoint in
                                         NearAppointCellView(isPresented: $isPresented, appoint: appoint)
                                     }
                                 }
@@ -143,10 +146,10 @@ struct AppointView: View {
                 }
             }
             .refreshable {
-                await viewModel.loadAllAppoints()
+                viewModel.loadMyAppoints()
             }
             .task {
-                await viewModel.loadAllAppoints()
+                viewModel.loadMyAppoints()
                 isTabBarHidden = false
             }
             .fullScreenCover(isPresented: $isPresented) {

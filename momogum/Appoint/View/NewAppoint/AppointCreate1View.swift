@@ -19,12 +19,12 @@ struct AppointCreate1View: View {
     private var isEditingBeforeEnd: Bool { path.dropLast().last == "create4"}
 
     
-    var filteredFriends: [String] {
+    var filteredFriends: [Friend] {
         if searchText.isEmpty {
             return appointViewModel.friends
         } else {
             return appointViewModel.friends.filter { friend in
-                return friend.lowercased().contains(searchText.lowercased())
+                return friend.nickname.lowercased().contains(searchText.lowercased())
             }
         }
     }
@@ -42,7 +42,7 @@ struct AppointCreate1View: View {
                 /// 선택된 친구들 가로 스크롤 표시
                 ScrollView (.horizontal) {
                     HStack {
-                        ForEach(viewModel.pickedFriends, id: \.self) { friend in
+                        ForEach(viewModel.pickedFriends, id: \.name) { friend in
                             AppointPickedFriendCellView(friend: friend)
                                 .environment(viewModel)
                         }
@@ -95,10 +95,11 @@ struct AppointCreate1View: View {
                             .padding(.vertical, 15)
                         
                         /// 선택된 친구 상단 표시
-                        ForEach(filteredFriends.filter { viewModel.pickedFriends.contains($0) },
-                                id: \.self) { friend in
+                        ForEach(filteredFriends.filter { friend in
+                            viewModel.pickedFriends.contains(where: { $0.nickname == friend.nickname })
+                        }, id: \.nickname) { friend in
                             HStack {
-                                AppointFriendListCellView(friend: friend)
+                                AppointFriendListCellView(profile: friend)
                                 Image("selected")
                                     .resizable()
                                     .frame(width: 24, height: 24)
@@ -110,10 +111,11 @@ struct AppointCreate1View: View {
                         }
                         
                         // 전체 친구 표시
-                        ForEach(filteredFriends.filter { !viewModel.pickedFriends.contains($0) },
-                                id: \.self) { friend in
+                        ForEach(filteredFriends.filter { friend in
+                            viewModel.pickedFriends.contains(where: { $0.nickname != friend.nickname }) },
+                                id: \.nickname) { friend in
                             HStack {
-                                AppointFriendListCellView(friend: friend)
+                                AppointFriendListCellView(profile: friend)
                                 Image("unselected")
                                     .resizable()
                                     .frame(width: 24, height: 24)
@@ -139,10 +141,10 @@ struct AppointCreate1View: View {
         }
     }
     
-    private func toggleSelection(for friend: String) {
-        if appointViewModel.pickedFriends.contains(friend) {
+    private func toggleSelection(for friend: Friend) {
+        if appointViewModel.pickedFriends.contains(where: { $0.nickname == friend.nickname }) {
             // 이미 선택된 친구라면 리스트에서 제거
-            appointViewModel.pickedFriends.removeAll { $0 == friend }
+            appointViewModel.pickedFriends.removeAll { $0.nickname == friend.nickname }
             
             if (appointViewModel.pickedFriends.isEmpty) {
                 withAnimation {

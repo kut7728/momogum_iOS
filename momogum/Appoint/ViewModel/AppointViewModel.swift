@@ -9,27 +9,66 @@ import Foundation
 import Alamofire
 
 class AppointViewModel {
+    let userId: Int = AuthManager.shared.UUID ?? 9
     
-    var appoints: [Appoint] = [Appoint.DUMMY_APM, Appoint.DUMMY_APM, Appoint.DUMMY_APM, Appoint.DUMMY_APM]
+    var pendingAppoints: [Appoint] = []
+    var confirmedAppoints: [Appoint] = []
     
     init() {
-        Task {
-            await loadAllAppoints()
+        loadMyAppoints()
+    }
+    
+    // MARK: - 약속잡기 메인페이지 확정 약속 로드
+    func loadConfirmedAppoints() {
+        
+        let url = "\(BaseAPI)/appointment/\(userId)/confirmed"
+        
+        AF.request(url, method: .get)
+        .responseDecodable(of: [ApmResponse].self) { [self] response in
+            
+            switch response.result {
+            case .success(let responseBody):
+                print("Response received successfully: \(responseBody)")
+                self.confirmedAppoints = responseBody.map{Appoint(from: $0)}
+
+                
+            case .failure(let error):
+                print("확정된 약속 로드 Error: \(error.localizedDescription)")
+                return
+            }
+        }
+    }
+    
+    // MARK: - 약속잡기 메인페이지 대기 중 약속 로드
+    func loadPendingAppoints() {
+        
+        let url = "\(BaseAPI)/appointment/\(userId)accept"
+        
+        AF.request(url, method: .get)
+        .responseDecodable(of: [ApmResponse].self) { [self] response in
+            
+            switch response.result {
+            case .success(let responseBody):
+                print("Response received successfully: \(responseBody)")
+                self.pendingAppoints = responseBody.map{Appoint(from: $0)}
+
+                
+            case .failure(let error):
+                print("확정 안된 약속 로드 Error: \(error.localizedDescription)")
+                return
+            }
         }
     }
     
     
-    func loadAllAppoints() async {
-        //        do {
-        //            let documents = try await Firestore.firestore().collection("posts").order(by: "date", descending: true).getDocuments().documents
-        //
-        //            let appoints = try documents.map({ document in
-        //                return try document.data(as: Appoint.self)
-        //            })
-        //            self.appoints = appoints
-        //
-        //        } catch {
-        //            print("DEBUG : Failed to load appoints with error \(error.localizedDescription)")
-        //        }
+    
+    
+    
+    
+    
+    func loadMyAppoints() {
+        loadConfirmedAppoints()
+        loadPendingAppoints()
     }
+    
 }
