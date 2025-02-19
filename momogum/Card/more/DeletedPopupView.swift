@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DeletedPopupView: View {
     @Binding var showDeletedPopup: Bool
+    @Binding var isTabBarHidden: Bool
     @Binding var showPopup: Bool
     var onDismiss: () -> Void
     
@@ -27,6 +28,7 @@ struct DeletedPopupView: View {
                     showDeletedPopup = false
                     showPopup = false
                     onDismiss()
+                    isTabBarHidden = false
                 }
             }
     }

@@ -97,12 +97,12 @@ struct MyCardView: View {
                     
                     HStack {
                         Spacer().frame(width: 10)
-                        HeartView(viewModel: viewModel)
+                        HeartView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                             .fixedSize()
                         Spacer().frame(width: 20)
                         CommentView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                         Spacer()
-                        BookmarkView(showBookmark: $viewModel.myCard.showBookmark)
+                        BookmarkView(showBookmark: $viewModel.myCard.showBookmark, viewModel: viewModel, mealDiaryId: mealDiaryId)
                         Spacer().frame(width: 10)
                     }
                     .padding(.horizontal, 16)
@@ -184,10 +184,12 @@ struct MyCardView: View {
             if viewModel.showDeleted {
                 DeletedPopupView(
                     showDeletedPopup: $viewModel.showDeleted,
+                    isTabBarHidden: $isTabBarHidden,
                     showPopup: $viewModel.showPopup
                 ) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        changeRootView(to: MyProfileView(isTabBarHidden: .constant(false)))
+                        isTabBarHidden = false
+                        dismiss()
                     }
                 }
             }
@@ -195,19 +197,8 @@ struct MyCardView: View {
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $viewModel.showHeartBottomSheet) {
-            HeartBottomSheetView()
+            HeartBottomSheetView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                 .presentationDetents([.fraction(2/3)])
-        }
-        .onAppear {
-            viewModel.fetchMealDiary(mealDiaryId: mealDiaryId, userId: 1)
-        }
-    }
-    
-    private func changeRootView<Content: View>(to view: Content) {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-            let window = windowScene.windows.first {
-            window.rootViewController = UIHostingController(rootView: view)
-            window.makeKeyAndVisible()
         }
     }
 }

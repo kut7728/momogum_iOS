@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PopupMenuView: View {
+    @Environment(\.dismiss) var dismiss
     @Binding var showPopup: Bool
     @Binding var isTabBarHidden: Bool
     @Binding var showSavedPopup: Bool
@@ -33,10 +34,12 @@ struct PopupMenuView: View {
             if showDeletedPopup {
                 DeletedPopupView(
                     showDeletedPopup: $showDeletedPopup,
+                    isTabBarHidden: $isTabBarHidden,
                     showPopup: $showPopup
                 ) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        changeRootView(to: MyProfileView(isTabBarHidden: .constant(false)))
+                        isTabBarHidden = false
+                        dismiss()
                     }
                 }
                 .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
@@ -80,14 +83,6 @@ struct PopupMenuView: View {
         }
         .navigationDestination(isPresented: $navigateToFixPostView) {
             FixPostView(isTabBarHidden: $isTabBarHidden, showSavedPopup: $showSavedPopup)
-        }
-    }
-
-    private func changeRootView<Content: View>(to view: Content) {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            window.rootViewController = UIHostingController(rootView: view)
-            window.makeKeyAndVisible()
         }
     }
 }
