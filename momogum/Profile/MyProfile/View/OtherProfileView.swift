@@ -74,7 +74,7 @@ struct OtherProfileView: View {
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 78, height: 78)
                             .clipShape(Circle())
-                            .padding(3)
+                            .padding(4)
                             .overlay(
                                 Circle()
                                     .stroke(lineWidth: 4)
@@ -87,7 +87,7 @@ struct OtherProfileView: View {
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 78, height: 78)
                                 .clipShape(Circle())
-                                .padding(3)
+                                .padding(4)
                                 .overlay(
                                     Circle()
                                         .stroke(lineWidth: 4)
@@ -138,7 +138,7 @@ struct OtherProfileView: View {
                                     .foregroundStyle(Color.black_1)
                                     .padding(.bottom, 16)
                                 
-                                Text("\(followViewModel.followerCount.formattedFollowerCount())")
+                                Text("0")
                                     .font(.mmg(.subheader4))
                                     .foregroundStyle(Color.black_1)
                             }
@@ -154,7 +154,7 @@ struct OtherProfileView: View {
                                     .foregroundStyle(Color.black_1)
                                     .padding(.bottom, 16)
                                 
-                                Text("\(followViewModel.followingCount.formattedFollowerCount())")
+                                Text("0")
                                     .font(.mmg(.subheader4))
                                     .foregroundStyle(Color.black_1)
                             }

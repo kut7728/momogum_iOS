@@ -15,18 +15,25 @@ struct MyFollowing: View {
     @State private var selectedUserID: String? = nil
     
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             VStack {
                 List {
                     searchBar
-                    // 팔로워 목록
+                    
                     ForEach(followViewModel.filteredFollowing, id: \.self) { userID in
-                        FollowingCell(followViewModel: followViewModel, userID: userID)
+                        FollowCell(
+                            followViewModel: followViewModel,
+                            showPopup: .constant(false),
+                            popupUserID: .constant(nil),
+                            userID: userID,
+                            isFollowerList: false
+                        )
                         .onTapGesture {
                             selectedUserID = userID
                         }
                         .onAppear {
-                            if userID == followViewModel.filteredFollowers.last {
+                            // ✅ 무한 스크롤
+                            if userID == followViewModel.filteredFollowing.last {
                                 followViewModel.loadMoreFollowers()
                             }
                         }
@@ -36,12 +43,21 @@ struct MyFollowing: View {
                     }
                 }
                 .listStyle(PlainListStyle())
+                .onAppear {
+                    if let currentUserId = AuthManager.shared.UUID {
+                        followViewModel.fetchFollowingList(userId: currentUserId)
+                    }
+                }
             }
             .navigationDestination(item: $selectedUserID) { userID in
-                OtherProfileView(userID: userID,
-                       isFollowing: followViewModel.isFollowing(userID),
-                                 userName: "", about: "", viewModel: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1), followViewModel: followViewModel
-                   )
+                OtherProfileView(
+                    userID: userID,
+                    isFollowing: followViewModel.isFollowing(userID),
+                    userName: "",
+                    about: "",
+                    viewModel: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1),
+                    followViewModel: followViewModel
+                )
             }
         }
     }

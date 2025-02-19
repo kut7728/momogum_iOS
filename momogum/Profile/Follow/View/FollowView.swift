@@ -94,6 +94,12 @@ struct FollowView: View {
             .edgesIgnoringSafeArea(.all)
             .toolbar(.hidden, for: .tabBar)
             .navigationBarBackButtonHidden()
+            .onAppear {
+                if let currentUserId = AuthManager.shared.UUID {
+                    followViewModel.fetchFollowerList(userId: currentUserId) // 팔로워 목록 불러오기
+                    followViewModel.fetchFollowingList(userId: currentUserId) // 팔로잉 목록 불러오기
+                }
+            }
             
             if showPopup {
                 Color.black.opacity(0.001)

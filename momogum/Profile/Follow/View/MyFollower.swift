@@ -21,12 +21,14 @@ struct MyFollower: View {
             VStack {
                 List {
                     searchBar
-                    // 팔로워 목록
                     ForEach(followViewModel.filteredFollowers, id: \.self) { userID in
-                        FollowerCell(followViewModel: followViewModel, showPopup: $showPopup, popupUserID: $popupUserID, userID: userID)
-                        {
-                            followViewModel.removeFollower(userID)
-                        }
+                        FollowCell(
+                            followViewModel: followViewModel,
+                            showPopup: $showPopup,
+                            popupUserID: $popupUserID,
+                            userID: userID,
+                            isFollowerList: true
+                        )
                         .onTapGesture {
                             profileUserID = userID
                         }

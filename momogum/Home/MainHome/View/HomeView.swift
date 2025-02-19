@@ -189,12 +189,12 @@ extension HomeView {
                                     Color(.Red_3),
                                     Color(.momogumRed)
                                 ]), startPoint: .topLeading, endPoint: .bottomTrailing),
-                                lineWidth: 6
+                                lineWidth: 4
                             )
                             .frame(width: 90, height: 90)
                     } else {
                         Circle()
-                            .strokeBorder(Color.gray.opacity(0.5), lineWidth: 6)
+                            .strokeBorder(Color.gray.opacity(0.5), lineWidth: 4)
                             .frame(width: 90, height: 90)
                     }
 
@@ -252,6 +252,7 @@ extension HomeView {
             }
             .padding(.top, 24)
             .padding(.leading, 12)
+            .padding(.bottom, 10)
         }
     }
     
@@ -265,6 +266,7 @@ extension HomeView {
             }
             .padding(.horizontal, 16)
         }
+        .padding(.bottom, 48)
     }
     
     // 그리드 따로 빼기

@@ -35,13 +35,15 @@ struct StoryItemCell: View {
                                         Color(.Red_3),
                                         Color(.momogumRed)
                                     ]), startPoint: .topLeading, endPoint: .bottomTrailing),
-                                    lineWidth: 6
+                                    lineWidth: 4
                                 )
                                 .frame(width: 90, height: 90)
+                                .padding(3)
                         } else {
                             Circle()
-                                .strokeBorder(Color.gray.opacity(0.5), lineWidth: 6)
+                                .strokeBorder(Color.gray.opacity(0.5), lineWidth: 4)
                                 .frame(width: 90, height: 90)
+                                .padding(3)
                         }
                         
                         AsyncImage(url: URL(string: profileImageLink)) { image in

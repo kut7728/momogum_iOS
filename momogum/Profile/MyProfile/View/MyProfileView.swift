@@ -106,7 +106,7 @@ private extension MyProfileView {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 78, height: 78)
                     .clipShape(Circle())
-                    .padding(3)
+                    .padding(4)
                     .overlay(
                         Circle()
                             .stroke(lineWidth: 4)
@@ -119,7 +119,7 @@ private extension MyProfileView {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 78, height: 78)
                     .clipShape(Circle())
-                    .padding(3)
+                    .padding(4)
                     .overlay(
                         Circle()
                             .stroke(lineWidth: 4)
@@ -170,6 +170,11 @@ private extension MyProfileView {
                     Text("\(followViewModel.followerCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
+                        .onAppear {
+                            if let currentUserId = AuthManager.shared.UUID {
+                                followViewModel.fetchFollowerList(userId: currentUserId) // 팔로워 목록 가져오기
+                            }
+                        }
                 }
             }
             .padding(.trailing, 67)
@@ -191,6 +196,11 @@ private extension MyProfileView {
                     Text("\(followViewModel.followingCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
+                        .onAppear {
+                            if let currentUserId = AuthManager.shared.UUID {
+                                followViewModel.fetchFollowingList(userId: currentUserId)
+                            }
+                        }
                 }
             }
             .padding(.trailing, 67)

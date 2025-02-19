@@ -73,26 +73,16 @@ private extension EditProfileView {
                 Image(uiImage: profileImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 88, height: 88)
+                    .frame(width: 90, height: 88)
                     .clipShape(Circle())
                     .padding(3)
-                    .overlay(
-                        Circle()
-                            .stroke(lineWidth: 4)
-                            .foregroundStyle(Color.black_4)
-                    )
             } else {
                 Image("defaultProfile")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 88, height: 88)
+                    .frame(width: 90, height: 88)
                     .clipShape(Circle())
                     .padding(3)
-                    .overlay(
-                        Circle()
-                            .stroke(lineWidth: 4)
-                            .foregroundStyle(Color.black_4)
-                    )
             }
 
             // 수정 버튼

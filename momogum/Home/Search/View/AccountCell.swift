@@ -42,6 +42,7 @@ struct AccountCell: View {
                         Circle()
                             .fill(Color.gray.opacity(0.3))
                             .frame(width: 64, height: 64)
+                            .padding(2)
                     }
                 } else {
                     Circle()
@@ -57,7 +58,7 @@ struct AccountCell: View {
                             Color(.momogumRed)
                         ]), startPoint: .topLeading, endPoint: .bottomTrailing) :
                         LinearGradient(gradient: Gradient(colors: [Color.gray.opacity(0.5), Color.gray.opacity(0.5)]), startPoint: .topLeading, endPoint: .bottomTrailing),
-                        lineWidth: 3
+                        lineWidth: 4
                     )
                     .frame(width: 70, height: 70)
             }
