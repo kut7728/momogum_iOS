@@ -21,19 +21,20 @@ struct MyFollower: View {
             VStack {
                 List {
                     searchBar
-                    ForEach(followViewModel.filteredFollowers, id: \.self) { userID in
+                    ForEach(followViewModel.filteredFollowers, id: \.userId) { follower in
                         FollowCell(
                             followViewModel: followViewModel,
                             showPopup: $showPopup,
                             popupUserID: $popupUserID,
-                            userID: userID,
+                            follower: follower,
+                            followingUser: nil, 
                             isFollowerList: true
                         )
                         .onTapGesture {
-                            profileUserID = userID
+                            profileUserID = "\(follower.userId)"
                         }
                         .onAppear {
-                            if userID == followViewModel.filteredFollowers.last {
+                            if follower.userId == followViewModel.filteredFollowers.last?.userId {
                                 followViewModel.loadMoreFollowers()
                             }
                         }
@@ -42,7 +43,14 @@ struct MyFollower: View {
                         .padding(.horizontal, 5)
                     }
                 }
+                .padding(.bottom, 10)
                 .listStyle(PlainListStyle())
+                .onAppear {
+                    if let currentUserId = AuthManager.shared.UUID {
+                        followViewModel.fetchFollowerList(userId: currentUserId)
+                    }
+                }
+                
             }
             .navigationDestination(item: $profileUserID) { userID in
                 OtherProfileView(

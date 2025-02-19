@@ -63,7 +63,7 @@ struct OtherProfileView: View {
                     .padding(.bottom, 20)
                     
                     HStack(alignment: .center, spacing: 0) {
-                        // ✅ 서버에서 받은 프로필 이미지 표시
+                        // 서버에서 받은 프로필 이미지 표시
                         if let imageUrl = profileImageURL, let url = URL(string: imageUrl) {
                             AsyncImage(url: url) { image in
                                 image.resizable()

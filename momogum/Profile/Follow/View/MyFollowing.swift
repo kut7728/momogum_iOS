@@ -13,6 +13,9 @@ struct MyFollowing: View {
     @State private var showCloseButton = false
     @State private var isEditing = false // 텍스트필드 활성화 여부
     @State private var selectedUserID: String? = nil
+    @State private var showPopup: Bool = false
+    @State private var popupUserID: String? = nil
+
     
     var body: some View {
         NavigationStack {
@@ -20,20 +23,21 @@ struct MyFollowing: View {
                 List {
                     searchBar
                     
-                    ForEach(followViewModel.filteredFollowing, id: \.self) { userID in
+                    ForEach(followViewModel.filteredFollowing, id: \.userId) { followingUser in
                         FollowCell(
                             followViewModel: followViewModel,
-                            showPopup: .constant(false),
-                            popupUserID: .constant(nil),
-                            userID: userID,
+                            showPopup: $showPopup,
+                            popupUserID: $popupUserID,
+                            follower: nil,
+                            followingUser: followingUser,
                             isFollowerList: false
                         )
+                        
                         .onTapGesture {
-                            selectedUserID = userID
+                            selectedUserID = "\(followingUser.userId)"
                         }
                         .onAppear {
-                            // ✅ 무한 스크롤
-                            if userID == followViewModel.filteredFollowing.last {
+                            if followingUser.userId == followViewModel.followingUsers.last?.userId {
                                 followViewModel.loadMoreFollowers()
                             }
                         }
@@ -42,6 +46,7 @@ struct MyFollowing: View {
                         .padding(.horizontal, 5)
                     }
                 }
+                .padding(.bottom, 10)
                 .listStyle(PlainListStyle())
                 .onAppear {
                     if let currentUserId = AuthManager.shared.UUID {

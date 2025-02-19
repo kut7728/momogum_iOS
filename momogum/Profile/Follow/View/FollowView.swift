@@ -110,9 +110,9 @@ struct FollowView: View {
                 UnfollowPopup(
                     showPopup: $showPopup, showCompletedPopup: $showCompletedPopup,
                     onRemove: {
-                        if let userID = popupUserID {
+                        if let userID = popupUserID, let userIdInt = Int(userID) {
                             DispatchQueue.main.async {
-                                followViewModel.removeFollower(userID)
+                                followViewModel.removeFollower(userIdInt)
                                 popupUserID = nil // 초기화
                             }
                         }

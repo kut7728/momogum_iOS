@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 class FollowViewModel: ObservableObject {
-    @Published var followingUsers: [String] = []  // 팔로우한 유저 리스트
+    @Published var followingUsers: [FollowingUser] = []  // ✅ 팔로우한 유저 리스트 (모델 배열로 변경)
     @Published var followingStatus: [String: Bool] = [:] // 유저 ID별 팔로우 여부
     
     @Published var followerCount: Int
@@ -17,7 +17,7 @@ class FollowViewModel: ObservableObject {
     
     @Published var search: String = ""
     @Published var loadedFollowers = 20 // 초기 로딩 개수
-    @Published var allFollowers: [String] = [] // 전체 팔로워 리스트
+    @Published var allFollowers: [Follower] = [] // ✅ 팔로워 목록도 모델 배열로 변경
     @Published var followUsers: [String] = [] // 팔로우한 유저 목록
     private var pendingUnfollow: [String] = [] // 언팔로우 예약된 유저 목록
     
@@ -29,20 +29,20 @@ class FollowViewModel: ObservableObject {
     // MARK: - 검색
     
     // 검색된 팔로워 목록
-    var filteredFollowers: [String] {
+    var filteredFollowers: [Follower] {
         if search.isEmpty {
             return Array(allFollowers.prefix(loadedFollowers)) // 검색어가 없으면 현재 로드된 만큼만 반환
         } else {
-            return allFollowers.filter { $0.localizedCaseInsensitiveContains(search) } // 검색어가 포함된 데이터만 반환
+            return allFollowers.filter { $0.nickname.localizedCaseInsensitiveContains(search) } // 닉네임 기준으로 검색
         }
     }
     
     // 검색된 팔로잉 목록
-    var filteredFollowing: [String] {
+    var filteredFollowing: [FollowingUser] {
         if search.isEmpty {
-            return followingUsers
+            return followingUsers // 검색어가 없으면 전체 반환
         } else {
-            return followingUsers.filter { $0.localizedCaseInsensitiveContains(search) }
+            return followingUsers.filter { $0.nickname.localizedCaseInsensitiveContains(search) } // 닉네임 기준으로 검색
         }
     }
     
@@ -90,10 +90,10 @@ class FollowViewModel: ObservableObject {
         pendingUnfollow.removeAll() // 초기화
     }
     
-    // 팔로워 삭제
-    func removeFollower(_ userID: String) {
-        allFollowers.removeAll { $0 == userID }
-        followerCount -= 1
+//    // 팔로워 삭제
+    func removeFollower(_ userID: Int) {
+        allFollowers.removeAll { $0.userId == userID } // userId 기준으로 삭제
+        followerCount = allFollowers.count // 팔로워 수 업데이트
     }
     
     // 더 많은 팔로워 로드
@@ -183,27 +183,27 @@ class FollowViewModel: ObservableObject {
             print("❌ 유효하지 않은 URL")
             return
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ 팔로잉 목록 요청 실패: \(error.localizedDescription)")
                 return
             }
-            
+
             guard let data = data else {
                 print("❌ 응답 데이터 없음")
                 return
             }
-            
+
             do {
                 let decodedResponse = try JSONDecoder().decode(FollowingListResponse.self, from: data)
                 DispatchQueue.main.async {
                     if decodedResponse.isSuccess {
-                        self.followingUsers = decodedResponse.result.map { "\($0.userId)" }
+                        self.followingUsers = decodedResponse.result
                         self.followingCount = self.followingUsers.count
                     } else {
                         print("❌ API 요청 실패: \(decodedResponse.message)")
@@ -214,6 +214,7 @@ class FollowViewModel: ObservableObject {
             }
         }.resume()
     }
+
     
     
     
@@ -243,7 +244,7 @@ class FollowViewModel: ObservableObject {
                 let decodedResponse = try JSONDecoder().decode(FollowerListResponse.self, from: data)
                 DispatchQueue.main.async {
                     if decodedResponse.isSuccess {
-                        self.allFollowers = decodedResponse.result.map { "\($0.nickname)" } // 닉네임 리스트 저장
+                        self.allFollowers = decodedResponse.result // 닉네임 리스트 저장
                         self.followerCount = self.allFollowers.count // 팔로워 수 업데이트
                     } else {
                         print("❌ API 요청 실패: \(decodedResponse.message)")
