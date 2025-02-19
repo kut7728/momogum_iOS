@@ -16,7 +16,8 @@ final class AuthManager : ObservableObject {
     
     private let defaults = UserDefaults.standard
     private let accessTokenKey = "momogumAccessToken"
-
+    private let KakaoAccessTokenKey = "kakaoAccessToken"
+    private let KakaoRefreshTokenKey = "kakaoRefreshToken"
 //    var UUID: Int? {
 //        get {
 //            let value = defaults.integer(forKey: "UUID")
@@ -57,7 +58,31 @@ final class AuthManager : ObservableObject {
                 }
             }
         }
+    var KakaoAccessToken: String? {
+            get {
+                return KeychainHelper.shared.get(forKey: accessTokenKey)
+            }
+            set {
+                if let token = newValue {
+                    KeychainHelper.shared.save(token, forKey: accessTokenKey)
+                } else {
+                    KeychainHelper.shared.delete(forKey: accessTokenKey)
+                }
+            }
+        }
     
+    var KakaoRefreshToken: String? {
+            get {
+                return KeychainHelper.shared.get(forKey: accessTokenKey)
+            }
+            set {
+                if let token = newValue {
+                    KeychainHelper.shared.save(token, forKey: accessTokenKey)
+                } else {
+                    KeychainHelper.shared.delete(forKey: accessTokenKey)
+                }
+            }
+        }
     func updateLoginState(isLoggedIn: Bool) {
             DispatchQueue.main.async {
                 self.isLoggedIn = isLoggedIn
