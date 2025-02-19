@@ -1,23 +1,16 @@
-//
-//  Story2View.swift
-//  momogum
-//
-//  Created by 김윤진 on 1/31/25.
-//
-
 import SwiftUI
 
 struct Story2View: View {
     @Binding var isTabBarHidden: Bool
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var storyViewModel = StoryViewModel()
     @StateObject private var viewModel = Story2ViewModel()
+    @StateObject private var storyViewModel = StoryViewModel()
+
     let nickname: String
     let storyIDList: [Int]
     @State private var currentIndex: Int = 0
-    let profileImageLink: String  
-    @State private var selectedStory : StoryDetailResult?
-//    @Binding var path: String
+    let profileImageLink: String
+
     var body: some View {
         ZStack {
             Color(.black_5)
@@ -27,10 +20,9 @@ struct Story2View: View {
                 storyProgressBar()
                     .padding(.top, 8)
 
-                
                 headerView()  // 상단 유저 정보 및 신고 버튼
                 postContentView()  // 게시글 내용
-
+                
                 Spacer()
             }
 
@@ -39,13 +31,12 @@ struct Story2View: View {
             }
         }
         .onAppear {
-            if let firstStoryID = storyIDList.first, let memberId = AuthManager.shared.UUID {
-                storyViewModel.fetchStoryDetail(for: memberId, storyId: firstStoryID)
-            } else {
-                print("Error: storyIDList is empty or memberId is nil")
-            }
+            fetchCurrentStory()
         }
-        .onAppear(){
+        .onChange(of: currentIndex) { _ in
+            fetchCurrentStory()
+        }
+        .onAppear {
             print(nickname)
             print("storyIDList: \(storyIDList)")
             print("currentIndex: \(storyIDList[currentIndex])")
@@ -61,7 +52,13 @@ struct Story2View: View {
 
 // MARK: - UI 컴포넌트 분리
 extension Story2View {
-    // 상단 헤더 (유저 정보, 신고 버튼, 닫기 버튼)
+    
+    private func fetchCurrentStory() {
+        let storyId = storyIDList[currentIndex]
+        print("📌 Fetching story for ID: \(storyId)")
+        storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyId)
+    }
+
     private func storyProgressBar() -> some View {
         HStack(spacing: 4) {
             ForEach(0..<storyIDList.count, id: \.self) { index in
@@ -74,15 +71,26 @@ extension Story2View {
         }
         .frame(width: 352)
     }
-    
-    
+
     private func headerView() -> some View {
         HStack {
-            Circle()
-                .frame(width:64, height:64)
-                .padding(.leading, 24)
-                .padding(.top, 22)
-                .foregroundColor(Color(.black_3))
+            AsyncImage(url: URL(string: profileImageLink)) { image in
+                                    image.resizable()
+                                        .scaledToFill()
+                                } placeholder: {
+                                    Image(systemName: "person.circle.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundColor(.gray)
+                                }
+                                .frame(width: 64, height: 64)
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle().stroke(Color.gray, lineWidth: 1)
+                                )
+                                .padding(.leading, 24)
+                                .padding(.top, 22)
+
 
             VStack {
                 HStack {
@@ -91,11 +99,16 @@ extension Story2View {
                         .bold()
                         .padding(.top, 22)
                         .padding(.leading, 12)
-
-                    Text("n분")
-                        .foregroundColor(.black_3)
-                        .padding(.top, 22)
-                        .padding(.leading, 12)
+                    
+                    if let createdAt = storyViewModel.selectedStory?.createdAt,  // Optional 안전하게 언랩핑
+                    let date = Date.fromStringWithKST(createdAt) {
+                        Text("\(date.relativeDateString())")
+                            .foregroundColor(.black_3)
+                            .padding(.top, 22)
+                            .padding(.leading, 12)
+                    } else {
+                        Text("날짜 변환 실패")
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -108,7 +121,7 @@ extension Story2View {
 
             Image("exclamation")
                 .resizable()
-                .frame(width:30, height:30)
+                .frame(width: 30, height: 30)
                 .padding(.top, 22)
                 .padding(.leading, 8)
                 .onTapGesture {
@@ -120,27 +133,26 @@ extension Story2View {
             }) {
                 Image("close_s")
                     .resizable()
-                    .frame(width:38, height:38)
+                    .frame(width: 38, height: 38)
                     .padding(.top, 22)
             }
             Spacer()
         }
     }
 
-    // 게시글 내용
     private func postContentView() -> some View {
         ZStack {
-            
-            
             Rectangle()
-                .frame(width:360, height: 534)
+                .frame(width: 360, height: 534)
                 .foregroundColor(.white)
                 .padding(.top, 44)
 
             VStack(alignment: .leading) {
-                if let imageUrl = storyViewModel.selectedStory?.mealDiaryImageLinks.first, let url = URL(string: imageUrl) {
+                if let imageUrl = storyViewModel.selectedStory?.mealDiaryImageLinks.first,
+                   let url = URL(string: imageUrl) {
                     AsyncImage(url: url) { image in
                         image.resizable()
+                            .scaledToFit()
                     } placeholder: {
                         ProgressView()
                     }
@@ -180,47 +192,28 @@ extension Story2View {
                                 }
                         )
                 }
-            } // 탭 범위 지정
+            }
         }
-//        .background(
-//            GeometryReader { geometry in
-//                Color.clear.contentShape(Rectangle())
-//                    .gesture(
-//                        DragGesture(minimumDistance: 0)
-//                            .onEnded { gesture in
-//                                let screenWidth = geometry.size.width
-//                                let tapX = gesture.location.x
-//
-//                                if tapX < screenWidth / 2 {
-//                                    previousStory()
-//                                } else {
-//                                    nextStory()
-//                                }
-//                            }
-//                    )
-//            }
-//        )
     }
 
-    // 신고 접수 팝업
     private func popupView() -> some View {
         VStack {
             Text("신고가 접수되었습니다.")
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(Color.black_2)
+                .foregroundColor(Color.black_2)
                 .padding(.top, 31)
 
             Text("검토는 최대 24시간 소요됩니다.")
                 .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(Color.black_2)
+                .foregroundColor(Color.black_2)
 
             Divider()
                 .frame(width: 300, height: 1)
-                .foregroundStyle(Color.black_4)
+                .foregroundColor(Color.black_4)
                 .padding(.top, 28)
 
             Button(action: {
-                viewModel.closePopup()  
+                viewModel.closePopup()
             }) {
                 Text("확인")
                     .font(.mmg(.subheader4))
@@ -236,32 +229,24 @@ extension Story2View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.black_5, lineWidth: 1)
         )
-        .onDisappear { // 뒤로 갈 때 탭 바 다시 보이게
+        .onDisappear {
             isTabBarHidden = false
         }
     }
     
-    
-    
     private func previousStory() {
-           if currentIndex > 0 {
-               withAnimation {
-                   currentIndex -= 1
-                   storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex])
-               }
-           }
-       }
-
-    private func nextStory() {
-            if currentIndex < storyIDList.count - 1 {
-                withAnimation {
-                    currentIndex += 1
-                    storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyIDList[currentIndex])
-                }
+        if currentIndex > 0 {
+            withAnimation {
+                currentIndex -= 1
             }
         }
-}
+    }
 
-//#Preview {
-//    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
-//}
+    private func nextStory() {
+        if currentIndex < storyIDList.count - 1 {
+            withAnimation {
+                currentIndex += 1
+            }
+        }
+    }
+}

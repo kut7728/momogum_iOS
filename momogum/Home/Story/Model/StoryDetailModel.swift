@@ -18,4 +18,5 @@ struct StoryDetailResult: Codable {
     let name: String
     let mealDiaryImageLinks: [String]
     let location, description: String
+    let createdAt: String
 }

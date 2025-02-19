@@ -13,7 +13,7 @@ struct HomeView: View {
     @StateObject private var homeviewModel = HomeViewModel()
     @StateObject private var mealDiaryViewModel = MealDiaryViewModel()
     @State private var path = NavigationPath() // 네비게이션 경로 추가
-    @StateObject var storyViewModel : StoryViewModel
+    @StateObject var storyViewModel = StoryViewModel()
     let columns = [GridItem(.flexible()), GridItem(.flexible())]
     let normalButtonColor = Color(.black_5)
     let selectedButtonColor = Color(.Red_2)
@@ -49,6 +49,7 @@ struct HomeView: View {
             .onAppear{
                 storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
                 storyViewModel.fetchMyStory(for: AuthManager.shared.UUID ?? 1)
+                
             }
             .onDisappear {
                 storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
@@ -103,8 +104,21 @@ extension HomeView {
     private func storyScrollView() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-                storyItem(title: "내 스토리", viewed: false, destination: MyStoryView( isTabBarHidden: $isTabBarHidden, storyViewModel: storyViewModel))
 
+
+                if let firstStory = storyViewModel.Mystories.first {
+                    
+                    let sortedStoryIDList = storyViewModel.MyStoryIDList()
+                    storyItem(
+                        title: firstStory.nickname,
+                        viewed: firstStory.viewed,
+                        nickname: firstStory.nickname,
+                        profileImage: firstStory.profileImageLink,
+                        storyIDList: sortedStoryIDList // 전체 스토리 ID 리스트 전달
+                    )
+                }else{
+                    
+                }
                 
                 let sortedStories = storyViewModel.sortedGroupedStories //정렬이 끝난 스토리값
 
@@ -129,6 +143,7 @@ extension HomeView {
                                 isTabBarHidden: $isTabBarHidden
                             )
                             .onAppear(){
+                                print("스토리디테일:\(storyViewModel.selectedStory)")
                                 print(story.viewed)
                                 print("StoryIDs : \(StoryIDList)")
                                 print(firstUnviewedStory)
@@ -151,13 +166,23 @@ extension HomeView {
     
     
     //홈뷰에 나타나는 스토리리스트
-    private func storyItem(title: String, viewed: Bool, destination: some View) -> some View {
+    private func storyItem(title: String,
+                           viewed: Bool,
+                           nickname: String,
+                           profileImage: String,
+                           storyIDList: [Int]) -> some View {
         VStack {
             NavigationLink(
-                destination: destination
-                                    .onAppear { isTabBarHidden = true }) {
+                destination: MyStoryView(
+                    isTabBarHidden: $isTabBarHidden,
+                    nickname: nickname,
+                    storyIDList: storyIDList,
+                    profileImageLink: profileImage
+                )
+                .onAppear { isTabBarHidden = true }
+            ) {
                 ZStack {
-                    if viewed { // 연동아직안되엇음
+                    if viewed {
                         Circle()
                             .strokeBorder(
                                 LinearGradient(gradient: Gradient(colors: [
@@ -172,10 +197,22 @@ extension HomeView {
                             .strokeBorder(Color.gray.opacity(0.5), lineWidth: 6)
                             .frame(width: 90, height: 90)
                     }
-                    
-                    Image("pixelsImage")
-                        .resizable()
+
+                    if let url = URL(string: profileImage) {
+                        AsyncImage(url: url) { image in
+                            image.resizable()
+                        } placeholder: {
+                            Image("pixelsImage")
+                                .resizable()
+                        }
                         .frame(width: 76, height: 76)
+                        .clipShape(Circle())
+                    } else {
+                        Image("pixelsImage")
+                            .resizable()
+                            .frame(width: 76, height: 76)
+                            .clipShape(Circle())
+                    }
                 }
             }
             Text(title)
@@ -184,6 +221,7 @@ extension HomeView {
         }
         .padding(.leading, 24)
     }
+
     
     
     private func categoryTitle() -> some View {
