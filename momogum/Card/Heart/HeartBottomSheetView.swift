@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HeartBottomSheetView: View {
     @Environment(\.dismiss) var dismiss
-    @ObservedObject var viewModel: MyCardViewModel
+    @ObservedObject var viewModel: CardViewModel
     var mealDiaryId: Int
 
     var body: some View {

@@ -11,7 +11,7 @@ struct CommentBottomSheetView: View {
     @Environment(\.dismiss) var dismiss
     @State private var newComment = ""
     @FocusState private var isFocused: Bool
-    @ObservedObject var viewModel: MyCardViewModel
+    @ObservedObject var viewModel: CardViewModel
     
     var mealDiaryId: Int
     
