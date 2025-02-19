@@ -1,3 +1,10 @@
+//
+//  MealCategoryView.swift
+//  momogum
+//
+//  Created by 조승연 on 1/30/25.
+//
+
 import SwiftUI
 
 struct MealCategoryView: View {
@@ -18,7 +25,9 @@ struct MealCategoryView: View {
                         Text(category)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(selectedCategory == category ? .white : .black)
-                            .frame(width: 60, height: 32)
+                            .padding(.horizontal, 12)
+                            .frame(height: 32)
+                            .fixedSize(horizontal: true, vertical: false)
                             .background(selectedCategory == category ? Color.momogumRed : Color.placeholderGray3)
                             .cornerRadius(8)
                             .overlay(
