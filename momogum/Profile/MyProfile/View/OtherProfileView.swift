@@ -11,6 +11,10 @@ struct OtherProfileView: View {
     @Environment(\.dismiss) var dismiss
     var userID: String
     var isFollowing: Bool
+    var userName: String //검색뷰에서 이름 받기
+    var profileImageURL: String? //검색뷰에서 이미지 받기
+    let about: String? // 한줄소개 넘겨받기
+    var followersText: String? // 검색부에서 맞팔중인사람
     @State private var showReportPopup = false
     @State private var showReportDetailPopup = false
     
@@ -58,21 +62,25 @@ struct OtherProfileView: View {
                     .padding(.top, 23)
                     .padding(.bottom, 20)
                     
-                    HStack(alignment: .center, spacing: 0){
-                        // 프로필 이미지
-                        if let profileImage = viewModel.profileImage {
-                            Image(uiImage: profileImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 78, height: 78)
-                                .clipShape(Circle())
-                                .padding(3)
-                                .overlay(
-                                    Circle()
-                                        .stroke(lineWidth: 4)
-                                        .foregroundStyle(Color.black_4)
-                                )
-                                .padding(.trailing, 38)
+                    HStack(alignment: .center, spacing: 0) {
+                        // ✅ 서버에서 받은 프로필 이미지 표시
+                        if let imageUrl = profileImageURL, let url = URL(string: imageUrl) {
+                            AsyncImage(url: url) { image in
+                                image.resizable()
+                            } placeholder: {
+                                Image("defaultProfile") // 로딩 중 기본 이미지
+                                    .resizable()
+                            }
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 78, height: 78)
+                            .clipShape(Circle())
+                            .padding(3)
+                            .overlay(
+                                Circle()
+                                    .stroke(lineWidth: 4)
+                                    .foregroundStyle(Color.black_4)
+                            )
+                            .padding(.trailing, 38)
                         } else {
                             Image("defaultProfile")
                                 .resizable()
@@ -87,18 +95,22 @@ struct OtherProfileView: View {
                                 )
                                 .padding(.trailing, 38)
                         }
+                    
+
                         
                         // 이름 / 한 줄 소개
                         VStack(alignment: .leading){
                             VStack(alignment: .leading){
                                 // 이름
-                                Text("이름")
+                                Text(userName)
                                     .font(.mmg(.subheader4))
                                     .padding(.bottom, 13)
                                 
-                                Text("한 줄 소개")
-                                    .font(.mmg(.Caption2))
-                                    .foregroundStyle(Color.black_2)
+                                if let about = about, !about.isEmpty {
+                                    Text(about)
+                                        .font(.mmg(.Caption2))
+                                        .foregroundStyle(Color.black_2)
+                                }
                             }
                         }
                         
@@ -109,10 +121,12 @@ struct OtherProfileView: View {
                     .padding(.horizontal, 32)
                     .padding(.bottom, 24)
                     
-                    Text("@@@님, ###님 외 n명이 팔로우 합니다.")
-                        .font(.mmg(.Caption2))
-                        .padding(.bottom, 24)
-                        .padding(.leading, 33)
+                    if let followersText = followersText {
+                        Text(followersText) // 실제 followersText 표시
+                            .font(.mmg(.Caption2))
+                            .padding(.bottom, 24)
+                            .padding(.leading, 33)
+                    }
                     
                     HStack(alignment: .center, spacing: 0){
                         // 팔로워
@@ -267,6 +281,6 @@ struct OtherProfileView: View {
     }
 }
 
-#Preview {
-    OtherProfileView(userID: "", isFollowing: false, viewModel: ProfileViewModel(userId: 1))
-}
+//#Preview {
+//    OtherProfileView(userID: "", isFollowing: false, userName: "", viewModel: ProfileViewModel(userId: 1))
+//}
