@@ -111,8 +111,7 @@ struct AppointCreate1View: View {
                         }
                         
                         // 전체 친구 표시
-                        ForEach(filteredFriends.filter { friend in
-                            viewModel.pickedFriends.contains(where: { $0.nickname != friend.nickname }) },
+                        ForEach(filteredFriends.filter { viewModel.pickedFriends.map(\.nickname).contains($0.nickname) == false },
                                 id: \.nickname) { friend in
                             HStack {
                                 AppointFriendListCellView(profile: friend)
@@ -125,6 +124,19 @@ struct AppointCreate1View: View {
                                 toggleSelection(for: friend)
                             }
                         }
+                        
+//                        ForEach(filteredFriends, id: \.nickname) { friend in
+//                            HStack {
+//                                AppointFriendListCellView(profile: friend)
+//                                Image("unselected")
+//                                    .resizable()
+//                                    .frame(width: 24, height: 24)
+//                            }
+//                            .contentShape(Rectangle())
+//                            .onTapGesture {
+//                                toggleSelection(for: friend)
+//                            }
+//                        }
                         
                     }
                     .padding(.bottom, 100)

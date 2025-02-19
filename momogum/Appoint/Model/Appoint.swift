@@ -39,17 +39,38 @@ struct Appoint: Codable, Identifiable {
             self.isConfirmed = isConfirmed
         }
     
-    init(from response: ApmResponse) {
+    init(from response: ApmResponseResult) {
+        self.id = response.appointmentId
+        self.senderId = response.senderId ?? 0
+        self.senderName = response.senderName ?? "temp"
+        
+        self.appointName = response.name
+        self.menuName = response.menu
+        self.placeName = response.location
+        self.note = response.notes
+        
+        // 🔥 날짜 변환: "2025-02-19T10:30:00" 형태일 경우 Date 타입으로 변환 필요
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        self.pickedDate = dateFormatter.date(from: response.date) ?? Date()
+        
+        self.pickedFriends = response.invitedFriends
+        self.pickedCard = response.selectedCards.imageUrl
+        
+        self.isConfirmed = response.fixed?.lowercased() == "true"
+    }
+    
+    init(from response: AppointCreateResponse) {
         let result = response.result
         
         self.id = result.appointmentId
-        self.senderId = result.senderId
-        self.senderName = result.senderName
+        self.senderId = 0
+        self.senderName = "temp"
         
         self.appointName = result.name
         self.menuName = result.menu
         self.placeName = result.location
-        self.note = result.notes!
+        self.note = result.notes
         
         // 🔥 날짜 변환: "2025-02-19T10:30:00" 형태일 경우 Date 타입으로 변환 필요
         let dateFormatter = ISO8601DateFormatter()
@@ -57,9 +78,9 @@ struct Appoint: Codable, Identifiable {
         self.pickedDate = dateFormatter.date(from: result.date) ?? Date()
         
         self.pickedFriends = result.invitedFriends
-        self.pickedCard = result.selectedCards.imageUrl
+        self.pickedCard = result.selectedCards.first?.imageUrl ?? ""
         
-        self.isConfirmed = result.fixed.lowercased() == "true"  // ✅ "true"/"false" 문자열을 Bool로 변환
+        self.isConfirmed = false
     }
     
     

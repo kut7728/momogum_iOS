@@ -24,16 +24,19 @@ class AppointViewModel {
         let url = "\(BaseAPI)/appointment/\(userId)/confirmed"
         
         AF.request(url, method: .get)
-        .responseDecodable(of: [ApmResponse].self) { [self] response in
+        .responseDecodable(of: ApmResponse.self) { [self] response in
             
             switch response.result {
             case .success(let responseBody):
                 print("Response received successfully: \(responseBody)")
-                self.confirmedAppoints = responseBody.map{Appoint(from: $0)}
+                self.confirmedAppoints = responseBody.result.map{Appoint(from: $0)}
+                print("⚠️ 확정 약속 응답: \(response)")
+
 
                 
             case .failure(let error):
                 print("확정된 약속 로드 Error: \(error.localizedDescription)")
+                print("⚠️ 확정 약속 응답: \(response)")
                 return
             }
         }
@@ -45,16 +48,20 @@ class AppointViewModel {
         let url = "\(BaseAPI)/appointment/\(userId)accept"
         
         AF.request(url, method: .get)
-        .responseDecodable(of: [ApmResponse].self) { [self] response in
+        .responseDecodable(of: ApmResponse.self) { [self] response in
             
             switch response.result {
             case .success(let responseBody):
                 print("Response received successfully: \(responseBody)")
-                self.pendingAppoints = responseBody.map{Appoint(from: $0)}
+                self.pendingAppoints = responseBody.result.map{Appoint(from: $0)}
+                print("⚠️ 확정 안된 약속 응답: \(response)")
+
 
                 
             case .failure(let error):
                 print("확정 안된 약속 로드 Error: \(error.localizedDescription)")
+                print("⚠️ 확정 안된 약속 응답: \(response)")
+
                 return
             }
         }

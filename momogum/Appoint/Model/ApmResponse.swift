@@ -9,19 +9,19 @@ import Foundation
 struct ApmResponse: Codable {
     let isSuccess: Bool
     let code, message: String
-    let result: ApmResponseResult
+    let result: [ApmResponseResult]
 }
 
 // MARK: - Result
 struct ApmResponseResult: Codable {
     let appointmentId: Int
-    let senderId: Int
-    let senderName: String
-    let fixed: String
+    let senderId: Int?
+    let senderName: String?
+    let fixed: String?
     
     let name, menu, date: String
     let location : String
-    let notes: String?
+    let notes: String
     let createdAt: String?
     
     let selectedCards: SelectedCard

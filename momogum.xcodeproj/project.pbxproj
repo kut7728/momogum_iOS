@@ -12,9 +12,6 @@
 		68CCB1832D365F58006D55E6 /* KakaoSDKCert in Frameworks */ = {isa = PBXBuildFile; productRef = 68CCB1822D365F58006D55E6 /* KakaoSDKCert */; };
 		68CCB1852D365F58006D55E6 /* KakaoSDKCertCore in Frameworks */ = {isa = PBXBuildFile; productRef = 68CCB1842D365F58006D55E6 /* KakaoSDKCertCore */; };
 		68CCB1872D365F58006D55E6 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 68CCB1862D365F58006D55E6 /* KakaoSDKCommon */; };
-		6D59B0B82D65DBFA00ACCB37 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6D59B0B72D65DBFA00ACCB37 /* FirebaseAnalytics */; };
-		6D59B0BA2D65DBFA00ACCB37 /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = 6D59B0B92D65DBFA00ACCB37 /* FirebaseInAppMessaging-Beta */; };
-		6D59B0BC2D65DBFA00ACCB37 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 6D59B0BB2D65DBFA00ACCB37 /* FirebaseMessaging */; };
 		6D82DEAB2D2C1273008386FE /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6D82DEAA2D2C1273008386FE /* .gitignore */; };
 		B32186392D65CF30002E408C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B32186382D65CF30002E408C /* FirebaseAnalytics */; };
 		B321863B2D65CF30002E408C /* FirebaseInAppMessaging-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = B321863A2D65CF30002E408C /* FirebaseInAppMessaging-Beta */; };

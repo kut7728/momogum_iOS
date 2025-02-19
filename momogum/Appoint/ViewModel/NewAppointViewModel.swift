@@ -79,16 +79,18 @@ class NewAppointViewModel {
             self.friends = try await withCheckedThrowingContinuation {continuation in
                 AF.request(url, method: .get)
                     .validate(statusCode: 200..<300)
-                    .responseDecodable(of: ApiResponse<[Friend]>.self) { response in
+                    .responseDecodable(of: [Friend].self) { response in
                         
                         switch response.result {
                         case .success(let data):
-                            continuation.resume(returning: data.result)
+                            continuation.resume(returning: data)
+
                         case .failure(let error):
                             print("초대 가능한 친구 목록 반환 오류")
                             continuation.resume(throwing: error)
                         }
                     }
+                   
             }
         } catch {
             print("초대 가능 친구 GET 오류: \(error.localizedDescription)")
@@ -125,21 +127,21 @@ class NewAppointViewModel {
                    parameters: parm,
                    encoder: JSONParameterEncoder.default,
                    headers: ["Content-Type": "application/json", "Accept": "application/json"])
-        .responseDecodable(of: ApmResponse.self) { [self] response in
+        .responseDecodable(of: AppointCreateResponse.self) { [self] response in
             
             switch response.result {
             case .success(let responseBody):
                 print("Response received successfully: \(responseBody)")
-                print(responseBody.result.appointmentId)
                 let responseData = responseBody
                 self.newAppoint = Appoint(from: responseData)
-
-                
-//                self.printingForDebug()
                 self.resetAppoint()
                 
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
+                
+                if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
+                                print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
+                            }
                 return
             }
         }

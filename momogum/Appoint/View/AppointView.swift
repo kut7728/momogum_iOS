@@ -23,7 +23,7 @@ struct AppointView: View {
                     Button {
                         Task {
                             await newAppointViewModel.getAppointId() // 약속 id 할당 POST
-//                            await newAppointViewModel.getAvailableFriends() // 초대 가능 친구 GET
+                            await newAppointViewModel.getAvailableFriends() // 초대 가능 친구 GET
                         }
                         path.append("create1")
                         isTabBarHidden = true
@@ -55,15 +55,15 @@ struct AppointView: View {
                                 .environment(newAppointViewModel)
                         } else if (value == "create2") {
                             AppointCreate2View(path: $path)
-//                                .environment(newAppointViewModel)
+                                .environment(newAppointViewModel)
                         } else if (value == "create3") {
                             AppointCreate3View(path: $path)
-//                                .environment(newAppointViewModel)
+                                .environment(newAppointViewModel)
                         } else if (value == "create4") {
                             AppointCreate4View(path: $path, appointViewModel: $viewModel)
-//                                .environment(newAppointViewModel)
+                                .environment(newAppointViewModel)
                         } else {
-                            AppointSentView(path: $path, appoint: newAppointViewModel.newAppoint!)
+                            AppointSentView(path: $path, appoint: newAppointViewModel.newAppoint ?? Appoint.DUMMY_APM)
                         }
                         
                     }
