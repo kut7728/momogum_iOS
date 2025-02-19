@@ -1,6 +1,6 @@
 import Foundation
 import Alamofire
-
+import FirebaseMessaging
 
 final class AuthService {
     static let shared = AuthService()
@@ -33,12 +33,30 @@ final class AuthService {
 
     
     func signup(signupModel: SignupModel, completion: @escaping (Result<SignupResponseModel, APIError>) -> Void) {
+        Messaging.messaging().token { fcmToken, error in
+            if let error = error {
+                print("❌ FCM 토큰 가져오기 실패: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let fcmToken = fcmToken else {
+                print("❌ FCM 토큰이 없음")
+                return
+            }
+        
+        var parameters = [
+                  "accessToken": signupModel.accessToken,
+                  "name": signupModel.name,
+                  "nickname": signupModel.nickname
+              ]
+              
+              parameters["fcmToken"] = fcmToken
             let url = "\(BaseAPI)/auth/signup/kakao" // 백엔드에서 정의한 회원가입 엔드포인트
             let headers: HTTPHeaders = [
                 "Content-Type": "application/json"
             ]
 
-            AF.request(url, method: .post, parameters: signupModel, encoder: JSONParameterEncoder.default, headers: headers)
+            AF.request(url, method: .post, parameters: parameters, encoder: JSONParameterEncoder.default, headers: headers)
                 .validate()
                 .responseDecodable(of: SignupResponseModel.self) { response in
                     switch response.result {
@@ -56,6 +74,7 @@ final class AuthService {
                             print(" 응답 바디: \(String(describing: responseString))")
                         }
                         completion(.failure(self.handleError(error: error, response: response)))
+                    }
                     }
                 }
         }
@@ -89,25 +108,30 @@ final class AuthService {
                }
        }
     
-//    func fetchUUID(token : String, completion: @escaping(Result<GetUUIDResponseModel, APIError>)-> Void){
-//        let url = "\(BaseAPI)/auth/me)"
-//        let token = AuthManager.shared.momogumAccessToken ?? ""
-//        let headers: HTTPHeaders = [
-//                "Authorization": "Bearer \(token)",
-//                "Content-Type": "application/json"
-//            ]
-//        
-//        AF.request(url, method: .get, headers: headers)
-//            .validate()
-//            .responseDecodable(of: IsNewUserResponseModel.self) { response in
-//                switch response.result {
-//                case .success(let MyPK):
-//                    print("PK값 통신 성공")
-//                case .failure(let error):
-//                    print("PK값 통신실패")
-//                }
-//            }
-//    }
+    func fetchUUID(token : String, completion: @escaping(Result<GetUUIDResponseModel, APIError>)-> Void){
+        let url = "\(BaseAPI)/auth/me"
+        let token = AuthManager.shared.KakaoAccessToken ?? ""
+        let headers: HTTPHeaders = [
+                "Authorization": "Bearer \(token)",
+                "Content-Type": "application/json"
+            ]
+        print("url : \(url)")
+        
+        AF.request(url, method: .get, headers: headers)
+            .validate()
+            .responseDecodable(of: GetUUIDResponseModel.self) { response in
+                switch response.result {
+                case .success(let data):
+                    print("PK값 통신 성공")
+                    completion(.success(data))
+                case .failure(let error):
+                    print("PK값 통신실패")
+                    print(error)
+                    completion(.failure(self.handleError(error: error, response: response)))
+
+                }
+            }
+    }
     
     
     ///  에러 핸들링 로직

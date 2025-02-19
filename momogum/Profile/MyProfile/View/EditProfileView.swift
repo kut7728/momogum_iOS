@@ -109,6 +109,9 @@ private extension EditProfileView {
                 showPopup = true
             }
         }
+        .onAppear {
+            KeyboardHider.hideKeyboard()
+        }
     }
 
     // 유저 정보 편집
@@ -167,8 +170,10 @@ private extension EditProfileView {
             HStack {
                 Spacer()
                 Button {
-                    viewModel.saveUserData(userId: 1)
-                    navigationPath.removeLast(1)
+                    if let userId = viewModel.uuid {
+                        viewModel.saveUserData(userId: userId)
+                        navigationPath.removeLast(1)
+                    }
                 } label: {
                     Rectangle()
                         .frame(width: 105, height: 52)

@@ -59,14 +59,20 @@ class NewPostViewModel: ObservableObject {
         ]
         
         let categoryMapping: [String: String] = [
-            "한식": "KOREAN", "중식": "CHINESE", "일식": "JAPANESE", "양식": "WESTERN",
-            "패스트푸드": "FAST_FOOD", "카페": "CAFE", "기타": "ETC"
+            "한식": "KOREAN",
+            "중식": "CHINESE",
+            "일식": "JAPANESE",
+            "양식": "WESTERN",
+            "아시안": "ASIAN",
+            "패스트푸드": "FAST_FOOD",
+            "카페": "CAFE",
+            "기타": "ETC"
         ]
         
         let foodCategory = categoryMapping[newPost.selectedCategory ?? "기타"] ?? "ETC"
         
         let revisitMapping: [String: String] = [
-            "bad": "BAD", "soso": "NOT_GOOD", "good": "GOOD"
+            "bad": "NOT_GOOD", "soso": "SO_SO", "good": "GOOD"
         ]
         let revisit = revisitMapping[newPost.selectedIcon ?? "soso"] ?? "NOT_GOOD"
         
@@ -74,7 +80,7 @@ class NewPostViewModel: ObservableObject {
 
         
         let jsonRequest: [String: Any] = [
-            "memberId": 1,  // 백엔드에서 자동 설정?
+            "memberId": 9,  // 백엔드에서 자동 설정?
             "foodCategory": foodCategory,
             "keyword": keywords,
             "location": newPost.mealPlace,
@@ -84,12 +90,14 @@ class NewPostViewModel: ObservableObject {
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: jsonRequest, options: []) else {
             print("🚨 JSON 변환 오류")
+            print("✅ 선택된 카테고리: \(newPost.selectedCategory ?? "선택 안 됨")")
             completion(false)
             return
         }
         
         guard let jsonString = String(data: jsonData, encoding: .utf8) else {
             print("🚨 JSON 문자열 변환 오류")
+            print("✅ 선택된 카테고리: \(newPost.selectedCategory ?? "선택 안 됨")")
             completion(false)
             return
         }
@@ -117,6 +125,7 @@ class NewPostViewModel: ObservableObject {
                 if let data = response.data, let errorString = String(data: data, encoding: .utf8) {
                     print("🚨 업로드 실패: \(error.localizedDescription)")
                     print("🚨 서버 응답: \(errorString)")
+                    print("✅ 변환된 foodCategory: \(foodCategory)")
                 } else {
                     print("🚨 업로드 실패: \(error.localizedDescription)")
                 }

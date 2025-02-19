@@ -55,6 +55,7 @@ struct StoryItemCell: View {
                                             }
                                             .frame(width: 76, height: 76)
                                             .clipShape(Circle())
+                        
                     }
                     Text(nickname)
                         .bold()

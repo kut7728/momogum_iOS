@@ -16,11 +16,12 @@ struct KeywordCell: View {
             AsyncImage(url: URL(string: keyword.foodImageURL)) { image in
                 image.resizable()
                     .scaledToFit()
+                    .aspectRatio(contentMode: .fill)
                     .frame(width: 166, height: 166)
                     .clipped()
             } placeholder: {
                 Rectangle()
-                    .fill(Color.gray.opacity(0.3))
+                    .fill(Color.black_4)
                     .frame(width: 166, height: 166)
             }
 
@@ -32,7 +33,8 @@ struct KeywordCell: View {
                 HStack(spacing: 8) {
                     AsyncImage(url: URL(string: keyword.userImageURL)) { image in
                         image.resizable()
-                            .scaledToFit()
+                            .scaledToFill()
+                            .aspectRatio(contentMode: .fill)
                             .frame(width: 36, height: 36)
                             .clipShape(Circle())
                     } placeholder: {
@@ -43,7 +45,7 @@ struct KeywordCell: View {
 
                     Text(keyword.foodName)
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.black)
+                        .foregroundColor(.black_1)
 
                     Spacer()
                 }
@@ -54,34 +56,34 @@ struct KeywordCell: View {
         .cornerRadius(10)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.gray, lineWidth: 1)
+                .stroke(Color.black_4, lineWidth: 1)
         )
     }
 }
 
 
 
-//#Preview {
-//    ScrollView(.horizontal, showsIndicators: false) {
-//        HStack(spacing: 20) {
-//            KeywordCell(keyword: KeywordSearchResult(
-//                id: 0,
-//                foodImageURL: "https://via.placeholder.com/166",
-//                userImageURL: "https://via.placeholder.com/36",
-//                foodName: "김치찌개",
-//                isRevisit: "yes"
-//            ))
-//            
-//            KeywordCell(keyword: KeywordSearchResult(
-//                id: 0,
-//                foodImageURL: "https://via.placeholder.com/166",
-//                userImageURL: "https://via.placeholder.com/36",
-//                foodName: "된장찌개",
-//                isRevisit: "yes"
-//            ))
-//            
-//
-//        }
-//        .padding(.leading, 24)
-//    }
-//}
+#Preview {
+    ScrollView(.horizontal, showsIndicators: false) {
+        HStack(spacing: 20) {
+            KeywordCell(keyword: KeywordSearchResult(
+                id: 0,
+                foodImageURL: "https://via.placeholder.com/166",
+                userImageURL: "https://via.placeholder.com/36",
+                foodName: "김치찌개",
+                isRevisit: "yes"
+            ))
+            
+            KeywordCell(keyword: KeywordSearchResult(
+                id: 0,
+                foodImageURL: "https://via.placeholder.com/166",
+                userImageURL: "https://via.placeholder.com/36",
+                foodName: "된장찌개",
+                isRevisit: "yes"
+            ))
+            
+
+        }
+        .padding(.leading, 24)
+    }
+}

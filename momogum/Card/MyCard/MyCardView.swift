@@ -12,6 +12,8 @@ struct MyCardView: View {
     @Binding var isTabBarHidden: Bool
     @StateObject private var viewModel = MyCardViewModel()
     
+    @State private var showBookmarkText = false
+
     var mealDiaryId: Int
 
     var body: some View {
@@ -76,33 +78,27 @@ struct MyCardView: View {
                                     .padding(20)
                             }
                         }
-
-                        if viewModel.myCard.showBookmark {
-                            Text("저장됨")
-                                .font(.system(size: 16))
-                                .foregroundColor(.red)
-                                .frame(width: 134, height: 46)
-                                .background(Color.white)
-                                .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.red, lineWidth: 2)
-                                )
-                                .transition(.opacity)
-                                .position(x: UIScreen.main.bounds.width / 2, y: 200)
-                        }
                     }
 
                     Spacer().frame(height: 5)
                     
                     HStack {
                         Spacer().frame(width: 10)
-                        HeartView(viewModel: viewModel)
+                        HeartView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                             .fixedSize()
                         Spacer().frame(width: 20)
                         CommentView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                         Spacer()
-                        BookmarkView(showBookmark: $viewModel.myCard.showBookmark)
+                        BookmarkView(
+                            viewModel: viewModel,
+                            mealDiaryId: mealDiaryId,
+                            onBookmarkToggled: {
+                                showBookmarkText = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                    showBookmarkText = false
+                                }
+                            }
+                        )
                         Spacer().frame(width: 10)
                     }
                     .padding(.horizontal, 16)
@@ -184,30 +180,23 @@ struct MyCardView: View {
             if viewModel.showDeleted {
                 DeletedPopupView(
                     showDeletedPopup: $viewModel.showDeleted,
+                    isTabBarHidden: $isTabBarHidden,
                     showPopup: $viewModel.showPopup
                 ) {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        changeRootView(to: MyProfileView(isTabBarHidden: .constant(false)))
+                        isTabBarHidden = false
+                        dismiss()
                     }
                 }
             }
+
+            BookmarkPopupView(showBookmarkText: $showBookmarkText)
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
         .sheet(isPresented: $viewModel.showHeartBottomSheet) {
-            HeartBottomSheetView()
+            HeartBottomSheetView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                 .presentationDetents([.fraction(2/3)])
-        }
-        .onAppear {
-            viewModel.fetchMealDiary(mealDiaryId: mealDiaryId, userId: 1)
-        }
-    }
-    
-    private func changeRootView<Content: View>(to view: Content) {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-            let window = windowScene.windows.first {
-            window.rootViewController = UIHostingController(rootView: view)
-            window.makeKeyAndVisible()
         }
     }
 }

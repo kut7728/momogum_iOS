@@ -36,18 +36,34 @@ class MyCardViewModel: ObservableObject {
         let content: String
     }
     
-    struct ResponseData: Codable {
+    struct ResponseData<T: Codable>: Codable {
         let isSuccess: Bool
         let code: String
         let message: String
-        let result: ResultData?
+        let result: T?
     }
 
     struct ResultData: Codable {
         let commentId: Int?
     }
     
-    func fetchMealDiary(mealDiaryId: Int, userId: Int) {
+    struct LikeUser: Codable {
+        let userProfileImage: String?
+        let nickname: String
+        let name: String
+    }
+
+    struct LikeUsersResponse: Codable {
+        let isSuccess: Bool
+        let code: String
+        let message: String
+        let result: [LikeUser]?
+    }
+
+    @Published var likedUsers: [LikeUser] = []
+    
+    func fetchMealDiary(mealDiaryId: Int) {
+        let userId = 9
         let url = "\(BaseAPI)/meal-diaries?mealDairyId=\(mealDiaryId)&userId=\(userId)"
         
         AF.request(url, method: .get)
@@ -108,19 +124,19 @@ class MyCardViewModel: ObservableObject {
     func addComment(mealDiaryId: Int, comment: String) {
         let url = "\(BaseAPI)/meal-diaries/comments"
         let parameters: [String: Any] = [
-            "userId": 1,
+            "userId": 9,
             "mealDiaryId": mealDiaryId,
             "comment": comment
         ]
 
         AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default)
             .validate()
-            .responseDecodable(of: ResponseData.self) { response in
+            .responseDecodable(of: ResponseData<ResultData>.self) { response in
                 switch response.result {
                 case .success(let data):
                     if data.isSuccess {
                         DispatchQueue.main.async {
-                            let newComment = Comment(userProfileImagePath: nil, nickname: self.myCard.nickname, content: comment)
+                            let newComment = Comment(userProfileImagePath: self.myCard.userProfileImageLink, nickname: self.myCard.nickname, content: comment)
                             self.comments.append(newComment)
                         }
                     } else {
@@ -141,7 +157,7 @@ class MyCardViewModel: ObservableObject {
     }
     
     func deleteMealDiary(mealDiaryId: Int) {
-        let url = "\(BaseAPI)/meal-diaries/mealDiaryId/\(mealDiaryId)/userId/1"
+        let url = "\(BaseAPI)/meal-diaries/mealDiaryId/\(mealDiaryId)/userId/9"
         AF.request(url, method: .delete)
             .validate()
             .responseData { response in
@@ -160,8 +176,59 @@ class MyCardViewModel: ObservableObject {
         }
     }
     
+    func toggleBookmarkAPI(mealDiaryId: Int) {
+        let url = "\(BaseAPI)/meal-diaries/bookmarks/userId/9/mealDiaryId/\(mealDiaryId)"
+        
+        let currentBookmarkState = myCard.showBookmark // 기존 북마크 상태 저장
+        let newBookmarkState = !currentBookmarkState  // 반전된 상태
+
+        AF.request(url, method: .post, encoding: JSONEncoding.default)
+            .validate()
+            .responseDecodable(of: ResponseData<String>.self) { response in
+                switch response.result {
+                case .success(let data):
+                    if data.isSuccess {
+                        DispatchQueue.main.async {
+                            self.myCard.showBookmark = newBookmarkState
+                            print("✅ 북마크 상태 변경 성공: \(newBookmarkState)")
+                        }
+                    } else {
+                        print("❌ 북마크 토글 실패: \(data.message)")
+                    }
+                case .failure(let error):
+                    print("❌ 북마크 API 호출 실패: \(error.localizedDescription)")
+                }
+            }
+    }
+    
     func toggleBookmark() {
         myCard.showBookmark.toggle()
+    }
+    
+    func toggleLikeAPI(mealDiaryId: Int) {
+        let url = "\(BaseAPI)/meal-diaries/likes/userId/9/mealDiaryId/\(mealDiaryId)"
+
+        let currentLikeState = myCard.isLiked  // 현재 좋아요 상태 저장
+        let newLikeState = !currentLikeState   // 상태 반전
+
+        AF.request(url, method: .post, encoding: JSONEncoding.default)
+            .validate()
+            .responseDecodable(of: ResponseData<String>.self) { response in
+                switch response.result {
+                case .success(let data):
+                    if data.isSuccess {
+                        DispatchQueue.main.async {
+                            self.myCard.isLiked = newLikeState
+                            self.myCard.likeCount += newLikeState ? 1 : -1
+                            print("✅ 좋아요 상태 변경 성공: \(newLikeState), 좋아요 개수: \(self.myCard.likeCount)")
+                        }
+                    } else {
+                        print("❌ 좋아요 토글 실패: \(data.message)")
+                    }
+                case .failure(let error):
+                    print("❌ 좋아요 API 호출 실패: \(error.localizedDescription)")
+                }
+            }
     }
     
     func toggleLike() {
@@ -180,6 +247,37 @@ class MyCardViewModel: ObservableObject {
     func deletePost(mealDiaryId: Int) {
         showDeleteConfirm = false
         deleteMealDiary(mealDiaryId: mealDiaryId)
+    }
+    
+    func fetchLikedUsers(mealDiaryId: Int) {
+        let url = "\(BaseAPI)/meal-diaries/likes?mealDiaryId=\(mealDiaryId)"
+
+        AF.request(url, method: .get)
+            .validate()
+            .responseData { response in
+                switch response.result {
+                case .success(let data):
+                    if let jsonString = String(data: data, encoding: .utf8) {
+                        print("✅ 좋아요 회원 조회 API 응답: \(jsonString)")
+                    }
+                    
+                    do {
+                        let decodedResponse = try JSONDecoder().decode(LikeUsersResponse.self, from: data)
+                        
+                        DispatchQueue.main.async {
+                            if decodedResponse.isSuccess {
+                                self.likedUsers = decodedResponse.result ?? []
+                            } else {
+                                print("❌ 좋아요 회원 조회 실패: \(decodedResponse.message)")
+                            }
+                        }
+                    } catch {
+                        print("❌ JSON 디코딩 오류: \(error.localizedDescription)")
+                    }
+                case .failure(let error):
+                    print("❌ 좋아요 회원 조회 API 호출 실패: \(error.localizedDescription)")
+                }
+            }
     }
     
     func toggleHeartBottomSheet() {

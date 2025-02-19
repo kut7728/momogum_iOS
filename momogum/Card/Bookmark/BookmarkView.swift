@@ -8,26 +8,22 @@
 import SwiftUI
 
 struct BookmarkView: View {
-    @Binding var showBookmark: Bool
-    @State private var isBookmarked = false
-    
+    var viewModel: MyCardViewModel
+    var mealDiaryId: Int
+    var onBookmarkToggled: () -> Void
+
     var body: some View {
         Button(action: {
-            if !isBookmarked {
-                showBookmark = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    showBookmark = false
-                }
+            let wasBookmarked = viewModel.myCard.showBookmark
+            viewModel.toggleBookmarkAPI(mealDiaryId: mealDiaryId)
+
+            if !wasBookmarked {
+                onBookmarkToggled()
             }
-            isBookmarked.toggle()
         }) {
-            Image(isBookmarked ? "bookmark_fill" : "bookmark")
+            Image(viewModel.myCard.showBookmark ? "bookmark_fill" : "bookmark")
                 .resizable()
                 .frame(width: 24, height: 24)
         }
     }
-}
-
-#Preview {
-    BookmarkView(showBookmark: .constant(false))
 }

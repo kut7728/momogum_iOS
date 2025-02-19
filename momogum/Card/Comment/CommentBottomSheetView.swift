@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CommentBottomSheetView: View {
-    @Environment(\ .dismiss) var dismiss
+    @Environment(\.dismiss) var dismiss
     @State private var newComment = ""
     @FocusState private var isFocused: Bool
     @ObservedObject var viewModel: MyCardViewModel
@@ -42,6 +42,7 @@ struct CommentBottomSheetView: View {
                                 } placeholder: {
                                     Image(systemName: "person.crop.circle.fill")
                                         .resizable()
+                                        .frame(width: 52, height: 52)
                                         .foregroundColor(.gray)
                                 }
                                 .frame(width: 52, height: 52)
@@ -59,9 +60,9 @@ struct CommentBottomSheetView: View {
                                     Text(comment.nickname)
                                         .font(.system(size: 16, weight: .bold))
                                     
-                                    Text("방금")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.gray)
+//                                    Text("방금")
+//                                        .font(.system(size: 14))
+//                                        .foregroundColor(.gray)
                                 }
                                 Text(comment.content)
                                     .font(.system(size: 14))

@@ -11,7 +11,7 @@ import Foundation
 struct MyStoryModel: Codable {
     let isSuccess: Bool
     let code, message: String
-    let result: MyStoryResult
+    let result: [MyStoryResult]
 }
 
 // MARK: - Result
@@ -21,7 +21,6 @@ struct MyStoryResult: Codable {
     let profileImageLink: String
     let mealDiaryImageLinks: String
     let viewed: Bool
-
     enum CodingKeys: String, CodingKey {
         case mealDiaryStoryID = "mealDiaryStoryId"
         case nickname, profileImageLink, mealDiaryImageLinks, viewed

@@ -9,23 +9,8 @@ import SwiftUI
 
 struct HeartBottomSheetView: View {
     @Environment(\.dismiss) var dismiss
-    
-    struct User: Identifiable {
-        let id = UUID()
-        let username: String
-        let name: String
-        var isFollowing: Bool
-    }
-
-    @State private var likeUsers = [
-        User(username: "유저아이디", name: "이름", isFollowing: true),
-        User(username: "유저아이디", name: "이름", isFollowing: false),
-        User(username: "유저아이디", name: "이름", isFollowing: true),
-        User(username: "유저아이디", name: "이름", isFollowing: true),
-        User(username: "유저아이디", name: "이름", isFollowing: false),
-        User(username: "유저아이디", name: "이름", isFollowing: true),
-        User(username: "유저아이디", name: "이름", isFollowing: false)
-    ]
+    @ObservedObject var viewModel: MyCardViewModel
+    var mealDiaryId: Int
 
     var body: some View {
         VStack(spacing: 0) {
@@ -44,44 +29,41 @@ struct HeartBottomSheetView: View {
                 .padding(.top, 24)
             
             List {
-                ForEach(likeUsers.indices, id: \.self) { index in
+                ForEach(viewModel.likedUsers, id: \.nickname) { user in
                     HStack {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .frame(width: 52, height: 52)
-                            .foregroundColor(.gray)
+                        if let imagePath = user.userProfileImage, let url = URL(string: imagePath) {
+                            AsyncImage(url: url) { image in
+                                image.resizable().aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                Image(systemName: "person.crop.circle.fill")
+                                    .resizable()
+                                    .foregroundColor(.gray)
+                            }
+                            .frame(width: 50, height: 50)
+                            .clipShape(Circle())
+                        } else {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .foregroundColor(.gray)
+                        }
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(likeUsers[index].username)
+                            Text(user.nickname)
                                 .font(.system(size: 16, weight: .bold))
-                            Text(likeUsers[index].name)
+                            Text(user.name)
                                 .font(.system(size: 14))
                                 .foregroundColor(.gray)
                         }
                         .frame(width: 160, alignment: .leading)
-                        
-                        Spacer()
-
-                        Button(action: {
-                            likeUsers[index].isFollowing.toggle()
-                        }) {
-                            Text(likeUsers[index].isFollowing ? "팔로잉" : "팔로우")
-                                .font(.system(size: 14, weight: .bold))
-                                .frame(width: 72, height: 28)
-                                .background(likeUsers[index].isFollowing ? Color.white : Color.red)
-                                .foregroundColor(likeUsers[index].isFollowing ? .red : .white)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .stroke(Color.red, lineWidth: likeUsers[index].isFollowing ? 1 : 0)
-                                )
-                                .cornerRadius(4)
-                        }
                     }
                     .padding(.vertical, 8)
+                    .listRowSeparator(.hidden)
                 }
             }
             .listStyle(PlainListStyle())
             .padding(.horizontal, 16)
+            
 
             Spacer()
         }
@@ -89,10 +71,5 @@ struct HeartBottomSheetView: View {
         .background(Color.white)
         .cornerRadius(20)
         .shadow(radius: 0)
-        .presentationDetents([.fraction(2/3)])
     }
-}
-
-#Preview {
-    HeartBottomSheetView()
 }

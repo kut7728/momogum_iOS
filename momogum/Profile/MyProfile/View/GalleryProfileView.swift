@@ -110,13 +110,15 @@ private extension GalleryProfileView {
                 }
                 .frame(width: 44, height: 44)
 
+                Spacer()
+                
                 Text("갤러리에서 선택")
                     .font(.headline)
                     .fontWeight(.bold)
                     .foregroundColor(.black)
-                    .frame(maxWidth: .infinity, alignment: .center)
 
                 Spacer()
+                Spacer().frame(width: 44, height: 44)
             }
             .padding(.horizontal, 16)
             .frame(height: 60)

@@ -1,10 +1,10 @@
 import SwiftUI
 
-struct Story2View: View {
+struct MyStoryView: View {
     @Binding var isTabBarHidden: Bool
     @Environment(\.presentationMode) var presentationMode
-    @StateObject private var viewModel = Story2ViewModel()
     @StateObject private var storyViewModel = StoryViewModel()
+    @StateObject private var viewModel = Story2ViewModel()
 
     let nickname: String
     let storyIDList: [Int]
@@ -15,19 +15,19 @@ struct Story2View: View {
         ZStack {
             Color(.black_5)
                 .edgesIgnoringSafeArea(.all)
-            
+
             VStack {
                 storyProgressBar()
                     .padding(.top, 8)
 
-                headerView()  // 상단 유저 정보 및 신고 버튼
-                postContentView()  // 게시글 내용
-                
+                headerView()
+                postContentView()
+
                 Spacer()
             }
 
             if viewModel.showPopup {
-                popupView()  // 신고 완료 팝업
+                popupView()
             }
         }
         .onAppear {
@@ -35,11 +35,6 @@ struct Story2View: View {
         }
         .onChange(of: currentIndex) { _ in
             fetchCurrentStory()
-        }
-        .onAppear {
-            print(nickname)
-            print("storyIDList: \(storyIDList)")
-            print("currentIndex: \(storyIDList[currentIndex])")
         }
         .sheet(isPresented: $viewModel.showReportSheet) {
             ReportView(showReportSheet: $viewModel.showReportSheet, showPopup: $viewModel.showPopup)
@@ -51,45 +46,25 @@ struct Story2View: View {
 }
 
 // MARK: - UI 컴포넌트 분리
-extension Story2View {
-    
-    private func fetchCurrentStory() {
-        let storyId = storyIDList[currentIndex]
-        print("📌 Fetching story for ID: \(storyId)")
-        storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyId)
-    }
-
-    private func storyProgressBar() -> some View {
-        HStack(spacing: 4) {
-            ForEach(0..<storyIDList.count, id: \.self) { index in
-                Rectangle()
-                    .fill(index <= currentIndex ? Color.red : Color.gray.opacity(0.3))
-                    .frame(height: 6)
-                    .cornerRadius(10)
-                    .animation(.easeInOut, value: currentIndex)
-            }
-        }
-        .frame(width: 352)
-    }
-
+extension MyStoryView {
     private func headerView() -> some View {
         HStack {
             AsyncImage(url: URL(string: profileImageLink)) { image in
-                                    image.resizable()
-                                        .scaledToFill()
-                                } placeholder: {
-                                    Image(systemName: "person.circle.fill")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .foregroundColor(.gray)
-                                }
-                                .frame(width: 64, height: 64)
-                                .clipShape(Circle())
-                                .overlay(
-                                    Circle().stroke(Color.gray, lineWidth: 1)
-                                )
-                                .padding(.leading, 24)
-                                .padding(.top, 22)
+                image.resizable()
+                    .scaledToFill()
+            } placeholder: {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundColor(.gray)
+            }
+            .frame(width: 64, height: 64)
+            .clipShape(Circle())
+            .overlay(
+                Circle().stroke(Color.gray, lineWidth: 1)
+            )
+            .padding(.leading, 24)
+            .padding(.top, 22)
 
 
             VStack {
@@ -107,7 +82,7 @@ extension Story2View {
                             .padding(.top, 22)
                             .padding(.leading, 12)
                     } else {
-                        Text("날짜 변환 실패")
+                            Text("날짜 변환 실패")
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -127,7 +102,7 @@ extension Story2View {
                 .onTapGesture {
                     viewModel.toggleReportSheet()
                 }
-
+                .padding(.trailing, 8)
             Button(action: {
                 presentationMode.wrappedValue.dismiss()
             }) {
@@ -136,8 +111,29 @@ extension Story2View {
                     .frame(width: 38, height: 38)
                     .padding(.top, 22)
             }
+            
             Spacer()
         }
+    }
+
+    /// 현재 선택된 스토리를 가져오는 함수
+    private func fetchCurrentStory() {
+        let storyId = storyIDList[currentIndex]
+        print("📌 Fetching story for ID: \(storyId)")
+        storyViewModel.fetchStoryDetail(for: AuthManager.shared.UUID ?? 1, storyId: storyId)
+    }
+
+    private func storyProgressBar() -> some View {
+        HStack(spacing: 4) {
+            ForEach(0..<storyIDList.count, id: \.self) { index in
+                Rectangle()
+                    .fill(index <= currentIndex ? Color.red : Color.gray.opacity(0.3))
+                    .frame(height: 6)
+                    .cornerRadius(10)
+                    .animation(.easeInOut, value: currentIndex)
+            }
+        }
+        .frame(width: 352)
     }
 
     private func postContentView() -> some View {
@@ -170,7 +166,7 @@ extension Story2View {
                 Spacer()
             }
             .frame(width: 360, height: 534, alignment: .topLeading)
-            
+
             GeometryReader { geometry in
                 HStack(spacing: 0) {
                     Color.clear
@@ -195,7 +191,6 @@ extension Story2View {
             }
         }
     }
-
     private func popupView() -> some View {
         VStack {
             Text("신고가 접수되었습니다.")
@@ -233,7 +228,7 @@ extension Story2View {
             isTabBarHidden = false
         }
     }
-    
+
     private func previousStory() {
         if currentIndex > 0 {
             withAnimation {
@@ -243,7 +238,7 @@ extension Story2View {
     }
 
     private func nextStory() {
-        if currentIndex < storyIDList.count - 1 {
+        if currentIndex < storyIDList.count - 1 { // ❌ storyViewModel.Mystories.count 대신 storyIDList.count 사용
             withAnimation {
                 currentIndex += 1
             }

@@ -17,10 +17,12 @@ struct AccountCell: View {
         self.account = account
         self.isFollowedByOthers = account.searchFollowCount > 0 // 팔로우 수 1명 이상이면 true
 
-        // followersText 자동 생성
-        if let firstFollower = account.searchFollowName.first, account.searchFollowCount > 1 {
+        // ✅ searchFollowName이 nil일 경우 빈 배열로 대체하여 안전하게 처리
+        let followNames = account.searchFollowName ?? []
+
+        if let firstFollower = followNames.first, account.searchFollowCount > 1 {
             self.followersText = "\(firstFollower)님 외 \(account.searchFollowCount - 1)명이 팔로우합니다."
-        } else if let firstFollower = account.searchFollowName.first {
+        } else if let firstFollower = followNames.first {
             self.followersText = "\(firstFollower)님이 팔로우합니다."
         } else {
             self.followersText = nil
@@ -29,18 +31,37 @@ struct AccountCell: View {
 
     var body: some View {
         HStack {
-            // 프로필 이미지 (API에서 가져온 데이터 사용)
-            AsyncImage(url: URL(string: account.userImageURL)) { image in
-                image.resizable()
-                    .scaledToFit()
-                    .frame(width: 64, height: 64)
-                    .clipShape(Circle())
-            } placeholder: {
+            ZStack {
+                if let url = URL(string: account.userImageURL), !account.userImageURL.isEmpty {
+                    AsyncImage(url: url) { image in
+                        image.resizable()
+                            .scaledToFit()
+                            .frame(width: 64, height: 64)
+                            .clipShape(Circle())
+                    } placeholder: {
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 64, height: 64)
+                    }
+                } else {
+                    Circle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(width: 64, height: 64)
+                }
+                
                 Circle()
-                    .fill(Color.black_4)
-                    .frame(width: 64, height: 64)
+                    .strokeBorder(
+                        account.hasStory ?
+                        LinearGradient(gradient: Gradient(colors: [
+                            Color(.Red_3),
+                            Color(.momogumRed)
+                        ]), startPoint: .topLeading, endPoint: .bottomTrailing) :
+                        LinearGradient(gradient: Gradient(colors: [Color.gray.opacity(0.5), Color.gray.opacity(0.5)]), startPoint: .topLeading, endPoint: .bottomTrailing),
+                        lineWidth: 3
+                    )
+                    .frame(width: 70, height: 70)
             }
-            
+
             VStack(alignment: .leading) {
                 Text(account.userName)
                     .font(.mmg(.subheader4))
@@ -68,14 +89,15 @@ struct AccountCell: View {
             
             Spacer()
         }
-        .frame(maxWidth: .infinity)
-        .frame(height:64)
+        .frame(width: 350)
+        .frame(height:70)
         .padding(.leading, 31)
         .background(Color.white)
         .cornerRadius(8)
     }
 }
 
+//// ✅ 미리보기 코드
 //#Preview {
 //    VStack {
 //        AccountCell(account: AccountSearchResult(
@@ -84,16 +106,20 @@ struct AccountCell: View {
 //            userNickName: "yunjin_kim",
 //            userImageURL: "https://via.placeholder.com/64",
 //            searchFollowName: ["김윤진"],
-//            searchFollowCount: 1
+//            searchFollowCount: 1,
+//            hasStory: false,
+//            hasViewedStory: false
 //        ))
 //        
 //        AccountCell(account: AccountSearchResult(
 //            id: 1,
 //            userName: "박지민",
 //            userNickName: "jimin_park",
-//            userImageURL: "https://via.placeholder.com/64",
+//            userImageURL: "",
 //            searchFollowName: ["김윤진", "박지민"],
-//            searchFollowCount: 5
+//            searchFollowCount: 5,
+//            hasStory: true,
+//            hasViewedStory: true
 //        ))
 //    }
 //}
