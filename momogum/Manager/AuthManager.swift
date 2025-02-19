@@ -13,7 +13,9 @@ final class AuthManager : ObservableObject {
     private init() {}
     
     private let defaults = UserDefaults.standard
-    private let accessTokenKey = "momogumAccessToken"
+    private let accessTokenKey = "KakaoAccessToken"
+    private let refreshTokenKey = "KakaoRefreshToken"
+    private let momogumrefreshTokenKey = "momogumRefreshToken"
 
     var UUID: Int? {
         get {
@@ -43,7 +45,7 @@ final class AuthManager : ObservableObject {
     //토큰 저장 키체인
     // 카카오소셜토큰값이 들어왔다가 기존 유저의 경우 isNewUser함수 실행하게 되면 해당 토큰값이 서버쪽 토큰값으로 바뀌게 된다.
     // 신규유저의 경우 isNewUser함수 실행시 토큰이 아닌 true값을 받아 회원가입 진행 후 재 로그인 진행하여 토큰값이 소셜토큰값에서 서버토큰값으로 바뀌게된다.
-    var momogumAccessToken: String? {
+    var KakaoAccessToken: String? {
             get {
                 return KeychainHelper.shared.get(forKey: accessTokenKey)
             }
@@ -55,7 +57,30 @@ final class AuthManager : ObservableObject {
                 }
             }
         }
-    
+    var KakaoRefreshToken: String? {
+            get {
+                return KeychainHelper.shared.get(forKey: accessTokenKey)
+            }
+            set {
+                if let token = newValue {
+                    KeychainHelper.shared.save(token, forKey: accessTokenKey)
+                } else {
+                    KeychainHelper.shared.delete(forKey: accessTokenKey)
+                }
+            }
+        }
+    var MomogumRefreshToken: String? {
+            get {
+                return KeychainHelper.shared.get(forKey: refreshTokenKey)
+            }
+            set {
+                if let token = newValue {
+                    KeychainHelper.shared.save(token, forKey: refreshTokenKey)
+                } else {
+                    KeychainHelper.shared.delete(forKey: refreshTokenKey)
+                }
+            }
+        }
     func updateLoginState(isLoggedIn: Bool) {
             DispatchQueue.main.async {
                 self.isLoggedIn = isLoggedIn
@@ -74,7 +99,7 @@ final class AuthManager : ObservableObject {
     
     // 오토로그인 추후 구현예정    
     func checkAutoLogin() {
-            if let token = momogumAccessToken, !token.isEmpty {
+            if let token = KakaoAccessToken, !token.isEmpty {
                 isLoggedIn = true
                 print("✅ 자동 로그인 성공: \(token)")
             } else {

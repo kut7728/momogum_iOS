@@ -16,6 +16,7 @@ struct ContentView: View {
             if showMainView{
                 if authManager.isLoggedIn{
                     MainTabView()
+                    
                 } else{
                     LoginView()
                         .environment(signupDataModel)
@@ -32,6 +33,7 @@ struct ContentView: View {
                     }
             }
         }
+           
     }
 }
 #Preview {
