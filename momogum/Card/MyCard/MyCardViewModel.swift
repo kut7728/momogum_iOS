@@ -62,7 +62,8 @@ class MyCardViewModel: ObservableObject {
 
     @Published var likedUsers: [LikeUser] = []
     
-    func fetchMealDiary(mealDiaryId: Int, userId: Int) {
+    func fetchMealDiary(mealDiaryId: Int) {
+        let userId = 9
         let url = "\(BaseAPI)/meal-diaries?mealDairyId=\(mealDiaryId)&userId=\(userId)"
         
         AF.request(url, method: .get)
@@ -123,7 +124,7 @@ class MyCardViewModel: ObservableObject {
     func addComment(mealDiaryId: Int, comment: String) {
         let url = "\(BaseAPI)/meal-diaries/comments"
         let parameters: [String: Any] = [
-            "userId": 1,
+            "userId": 9,
             "mealDiaryId": mealDiaryId,
             "comment": comment
         ]
@@ -156,7 +157,7 @@ class MyCardViewModel: ObservableObject {
     }
     
     func deleteMealDiary(mealDiaryId: Int) {
-        let url = "\(BaseAPI)/meal-diaries/mealDiaryId/\(mealDiaryId)/userId/1"
+        let url = "\(BaseAPI)/meal-diaries/mealDiaryId/\(mealDiaryId)/userId/9"
         AF.request(url, method: .delete)
             .validate()
             .responseData { response in
@@ -176,7 +177,7 @@ class MyCardViewModel: ObservableObject {
     }
     
     func toggleBookmarkAPI(mealDiaryId: Int) {
-        let url = "\(BaseAPI)/meal-diaries/bookmarks/userId/1/mealDiaryId/\(mealDiaryId)"
+        let url = "\(BaseAPI)/meal-diaries/bookmarks/userId/9/mealDiaryId/\(mealDiaryId)"
         
         let currentBookmarkState = myCard.showBookmark // 기존 북마크 상태 저장
         let newBookmarkState = !currentBookmarkState  // 반전된 상태
@@ -205,7 +206,7 @@ class MyCardViewModel: ObservableObject {
     }
     
     func toggleLikeAPI(mealDiaryId: Int) {
-        let url = "\(BaseAPI)/meal-diaries/likes/userId/1/mealDiaryId/\(mealDiaryId)"
+        let url = "\(BaseAPI)/meal-diaries/likes/userId/9/mealDiaryId/\(mealDiaryId)"
 
         let currentLikeState = myCard.isLiked  // 현재 좋아요 상태 저장
         let newLikeState = !currentLikeState   // 상태 반전

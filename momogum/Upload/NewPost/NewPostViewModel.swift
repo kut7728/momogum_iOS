@@ -80,7 +80,7 @@ class NewPostViewModel: ObservableObject {
 
         
         let jsonRequest: [String: Any] = [
-            "memberId": 1,  // 백엔드에서 자동 설정?
+            "memberId": 9,  // 백엔드에서 자동 설정?
             "foodCategory": foodCategory,
             "keyword": keywords,
             "location": newPost.mealPlace,
