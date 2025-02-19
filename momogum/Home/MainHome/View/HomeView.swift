@@ -255,16 +255,12 @@ extension HomeView {
         }
     }
     
+    // ✅ 변경된 foodDiaryGridView()
     private func foodDiaryGridView() -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(mealDiaryViewModel.mealDiaries, id: \.id) { diary in
                     FoodDiaryGridItemView(diary: diary, isTabBarHidden: $isTabBarHidden, homeviewModel: homeviewModel)
-                        .onAppear {
-                            if diary.id == mealDiaryViewModel.mealDiaries.last?.id && !mealDiaryViewModel.isLoading {
-                                mealDiaryViewModel.fetchMealDiaries()
-                            }
-                        }
                 }
             }
             .padding(.horizontal, 16)
@@ -313,7 +309,7 @@ extension HomeView {
                             .frame(width: 36, height: 36)
                             .clipShape(Circle())
 
-                            Text(diary.foodCategory.label)
+                            Text(diary.keyWord)
                                 .font(.mmg(.Caption1))
                                 .foregroundColor(.black)
 
@@ -335,6 +331,6 @@ extension HomeView {
 
 
 
-//#Preview {
-//    HomeView(tabIndex: .constant(0), isTabBarHidden: .constant(false))
-//}
+#Preview {
+    HomeView(tabIndex: .constant(0), isTabBarHidden: .constant(false), storyViewModel: StoryViewModel())
+}
