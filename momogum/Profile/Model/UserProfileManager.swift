@@ -38,7 +38,7 @@ class UserProfileManager {
     // 유저가 작성한 밥일기 로드
     func fetchMealDiaries(userId: Int, completion: @escaping (Swift.Result<[ProfileMealDiary], Error>) -> Void) {
         let url = "\(BaseAPI)/userProfiles/\(userId)/meal-diaries"
-
+        
         AF.request(url, method: .get)
             .validate(statusCode: 200..<300)
             .responseDecodable(of: ProfileMealDiaryResponse.self) { response in
@@ -81,14 +81,10 @@ class UserProfileManager {
     }
     
     // 유저 정보 편집
-    func updateUserProfile(userId: Int, updatedProfile: UserProfile, completion: @escaping (Result<Void, Error>) -> Void) {
+    func updateUserProfile(userId: Int, parameters: [String: Any], completion: @escaping (Result<Void, Error>) -> Void) {
         let url = "\(BaseAPI)/userProfiles/\(userId)/profile"
-        let parameters: [String: Any?] = [
-            "nickname": updatedProfile.nickname,
-            "name": updatedProfile.name,
-            "about": updatedProfile.about?.isEmpty == true ? nil : updatedProfile.about
-        ]
         
+        // 변경된 데이터만 보낼 수 있도록 JSONEncoding.default 사용
         AF.request(url, method: .put, parameters: parameters, encoding: JSONEncoding.default)
             .validate(statusCode: 200..<300)
             .response { response in
@@ -102,6 +98,7 @@ class UserProfileManager {
             }
     }
     
+    
     // 유저 프로필 이미지 편집
     func uploadProfileImage(userId: Int, image: UIImage, completion: @escaping (Result<String, Error>) -> Void) {
         let url = "\(BaseAPI)/userProfiles/\(userId)/uploadCustomProfileImage"
@@ -110,7 +107,7 @@ class UserProfileManager {
             completion(.failure(UserProfileError.noData))
             return
         }
-
+        
         AF.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(imageData, withName: "file", fileName: "profile.jpg", mimeType: "image/jpeg")
         }, to: url, method: .put)
@@ -135,22 +132,22 @@ class UserProfileManager {
     // 팔로우 토글
     func toggleFollow(userId: Int, targetUserId: Int, completion: @escaping (Result<Void, Error>) -> Void) {
         let url = "\(BaseAPI)/follows/\(userId)/follow/\(targetUserId)/toggle"
-
+        
         AF.request(url, method: .post)
             .validate(statusCode: 200..<300)
             .responseDecodable(of: FollowResponse.self) { response in
                 switch response.result {
-                case .success(let followResponse):
+                case .success(_):
                     completion(.success(())) // 성공 시 아무 값도 반환하지 않음
-
+                    
                 case .failure(let error):
                     print("❌ 팔로우 토글 실패: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
             }
     }
-
-
+    
+    
 }
 
 // 유저 프로필 에러

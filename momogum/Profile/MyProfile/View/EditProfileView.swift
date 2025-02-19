@@ -170,8 +170,10 @@ private extension EditProfileView {
             HStack {
                 Spacer()
                 Button {
-                    viewModel.saveUserData(userId: 1)
-                    navigationPath.removeLast(1)
+                    if let userId = viewModel.uuid {
+                        viewModel.saveUserData(userId: userId) // 동적으로 현재 사용자 ID를 사용
+                        navigationPath.removeLast(1)
+                    }
                 } label: {
                     Rectangle()
                         .frame(width: 105, height: 52)

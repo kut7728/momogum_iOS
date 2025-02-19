@@ -20,6 +20,11 @@ class ProfileViewModel: ObservableObject {
     @Published var mealDiaries: [ProfileMealDiary] = []
     @Published var bookmarkedMealDiaries: [ProfileMealDiary] = []
     
+    // 기존 값 저장 (서버에서 받아온 초기 값)
+    private var originalUserName: String = ""
+    private var originalUserID: String = ""
+    private var originalUserBio: String = ""
+    
     // 기본 프로필 여부 체크
     var isDefaultProfileImage: Bool {
         return currentPreviewImage?.pngData() == UIImage(named: "defaultProfile")?.pngData()
@@ -64,8 +69,11 @@ extension ProfileViewModel {
                     self.userName = userProfile.name
                     self.userID = userProfile.nickname
                     self.userBio = userProfile.about ?? ""
-                    
-                    // 프로필 이미지 로드
+
+                    self.originalUserName = userProfile.name
+                    self.originalUserID = userProfile.nickname
+                    self.originalUserBio = userProfile.about ?? ""
+
                     if let profileImageURL = userProfile.profileImage, !profileImageURL.isEmpty {
                         self.loadImageAsync(from: profileImageURL)
                     }
@@ -155,14 +163,26 @@ extension ProfileViewModel {
     // 프로필 편집 확정 (완료 버튼 클릭 시 호출)
     func saveUserData(userId: Int) {
         DispatchQueue.main.async {
-            if let newImage = self.currentPreviewImage, newImage != self.profileImage {
-                UserProfileManager.shared.uploadProfileImage(userId: userId, image: newImage) { [weak self] result in
+            // ✅ 기존 값과 비교하여 변경 여부 확인
+            let isNameChanged = self.userName != self.originalUserName
+            let isNicknameChanged = self.userID != self.originalUserID
+            let isBioChanged = self.userBio != self.originalUserBio
+            let isImageChanged = self.currentPreviewImage != self.profileImage
+
+            // ✅ 변경된 값이 없으면 서버 요청을 생략
+            if !isNameChanged && !isNicknameChanged && !isBioChanged && !isImageChanged {
+                print("⚠️ 변경된 정보가 없으므로 서버 요청을 생략합니다.")
+                return
+            }
+
+            // ✅ 변경된 값이 있을 경우 서버로 전송
+            if isImageChanged {
+                UserProfileManager.shared.uploadProfileImage(userId: userId, image: self.currentPreviewImage!) { [weak self] result in
                     guard let self = self else { return }
-                    
+
                     switch result {
                     case .success(let uploadedImageUrl):
                         self.updateProfileInfo(userId: userId, imageUrl: uploadedImageUrl)
-                        
                     case .failure(let error):
                         print("❌ 프로필 이미지 업로드 실패: \(error.localizedDescription)")
                     }
@@ -172,19 +192,23 @@ extension ProfileViewModel {
             }
         }
     }
+
     
     // 프로필 편집 (이름,아이디,한줄소개)
     private func updateProfileInfo(userId: Int, imageUrl: String?) {
-        let updatedProfile = UserProfile(
-            id: Int(userId),
-            name: self.userName,
-            nickname: self.userID,
-            about: self.userBio,
-            profileImage: imageUrl,
-            newUser: false
-        )
-        
-        UserProfileManager.shared.updateUserProfile(userId: userId, updatedProfile: updatedProfile) { result in
+        var updatedParameters: [String: Any] = [
+            "name": self.userName.isEmpty ? originalUserName : self.userName,
+            "nickname": self.userID.isEmpty ? originalUserID : self.userID,
+            "about": self.userBio.isEmpty ? originalUserBio : self.userBio
+        ]
+
+        if let imageUrl = imageUrl {
+            updatedParameters["profileImage"] = imageUrl  // 서버에서 허용하는지 확인 필요
+        }
+
+        print("🔍 서버로 보낼 최종 데이터: \(updatedParameters)")
+
+        UserProfileManager.shared.updateUserProfile(userId: userId, parameters: updatedParameters) { result in
             switch result {
             case .success:
                 print("✅ 프로필 업데이트 성공")
