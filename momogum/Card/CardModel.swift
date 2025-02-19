@@ -1,13 +1,13 @@
 //
-//  MyCardModel.swift
+//  CardModel.swift
 //  momogum
 //
-//  Created by 조승연 on 2/1/25.
+//  Created by 조승연 on 2/20/25.
 //
 
 import Foundation
 
-struct MyCardModel {
+struct CardModel {
     var likeCount: Int          // 좋아요 개수
     var isLiked: Bool           // 좋아요 여부
     var reviewText: String      // 리뷰 내용
