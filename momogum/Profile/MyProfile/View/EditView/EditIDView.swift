@@ -180,7 +180,7 @@ private extension EditIDView {
             .disabled(!(checkCircle1 && checkCircle2))
         }
         .padding(.trailing, 62.5)
-        .padding(.bottom, keyboardObservers.keyboardHeight > 0 ? keyboardObservers.keyboardHeight - 40 : 116)
+        .padding(.bottom, keyboardObservers.keyboardHeight > 0 ? keyboardObservers.keyboardHeight - 10 : 116)
         .animation(.easeInOut(duration: 0.3), value: keyboardObservers.keyboardHeight)
     }
 

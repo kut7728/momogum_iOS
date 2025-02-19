@@ -123,7 +123,7 @@ private extension EditBioView {
             .disabled(draftBio.isEmpty)
         }
         .padding(.trailing, 62.5)
-        .padding(.bottom, keyboardObservers.keyboardHeight > 0 ? keyboardObservers.keyboardHeight - 30 :116)
+        .padding(.bottom, keyboardObservers.keyboardHeight > 0 ? keyboardObservers.keyboardHeight : 116)
         .animation(.easeInOut(duration: 0.3), value: keyboardObservers.keyboardHeight)
     }
 }

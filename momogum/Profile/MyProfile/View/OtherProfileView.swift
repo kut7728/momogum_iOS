@@ -17,9 +17,8 @@ struct OtherProfileView: View {
     @State private var selectedSegment = 0
     @State private var navigateToMyCardView = false
     
-//    @StateObject var viewModel = ProfileViewModel()
-    @State var viewModel: ProfileViewModel
-    @State var followViewModel: FollowViewModel = FollowViewModel()
+    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var followViewModel: FollowViewModel
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -61,33 +60,18 @@ struct OtherProfileView: View {
                     
                     HStack(alignment: .center, spacing: 0){
                         // 프로필 이미지
-                        if let profileImage = viewModel.profileImage {
-                            Image(uiImage: profileImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 78, height: 78)
-                                .clipShape(Circle())
-                                .padding(3)
-                                .overlay(
-                                    Circle()
-                                        .stroke(lineWidth: 4)
-                                        .foregroundStyle(Color.black_4)
-                                )
-                                .padding(.trailing, 38)
-                        } else {
-                            Image("defaultProfile")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 78, height: 78)
-                                .clipShape(Circle())
-                                .padding(3)
-                                .overlay(
-                                    Circle()
-                                        .stroke(lineWidth: 4)
-                                        .foregroundStyle(Color.black_4)
-                                )
-                                .padding(.trailing, 38)
-                        }
+                        Image("defaultProfile")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 78, height: 78)
+                            .clipShape(Circle())
+                            .padding(3)
+                            .overlay(
+                                Circle()
+                                    .stroke(lineWidth: 4)
+                                    .foregroundStyle(Color.black_4)
+                            )
+                            .padding(.trailing, 38)
                         
                         // 이름 / 한 줄 소개
                         VStack(alignment: .leading){
@@ -110,10 +94,10 @@ struct OtherProfileView: View {
                     .padding(.horizontal, 32)
                     .padding(.bottom, 24)
                     
-                    Text("@@@님, ###님 외 n명이 팔로우 합니다.")
-                        .font(.mmg(.Caption2))
-                        .padding(.bottom, 24)
-                        .padding(.leading, 33)
+//                    Text("@@@님, ###님 외 n명이 팔로우 합니다.")
+//                        .font(.mmg(.Caption2))
+//                        .padding(.bottom, 24)
+//                        .padding(.leading, 33)
                     
                     HStack(alignment: .center, spacing: 0){
                         // 팔로워
