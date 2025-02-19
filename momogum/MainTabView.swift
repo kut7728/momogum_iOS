@@ -11,7 +11,7 @@ import SwiftUI
 struct MainTabView: View {
     @State var tabIndex = 0
     @State private var isTabBarHidden = false 
-    @StateObject var storyViewModel = StoryViewModel()
+   
     init() {
         UITabBar.appearance().isHidden = true // 기본 탭 바 숨기기
     }
@@ -19,7 +19,7 @@ struct MainTabView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $tabIndex) {
-                HomeView(tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden, storyViewModel: StoryViewModel())
+                HomeView(tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden)
                     .tag(0)
 
                 GalleryPickerView(tabIndex: $tabIndex, isTabBarHidden: $isTabBarHidden)

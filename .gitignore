@@ -9,6 +9,7 @@ momogum.xcodeproj/xcuserdata/nelime.xcuserdatad/xcschemes/xcschememanagement.pli
 Config.xcconfig
 momogum/Config.xcconfig
 *.xcconfig
+real.mobileprovision
 
 ## Xcode 8 and earlier
 *.xcscmblueprint

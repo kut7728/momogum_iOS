@@ -32,7 +32,6 @@ class StoryViewModel: ObservableObject {
     // 스토리 상세 내역 가져오기 PK값, mealDiaryStoryId
     func fetchStoryDetail(for memberId: Int,storyId: Int) {
         let url = "\(BaseAPI)/meal-stories/memberId/\(memberId)/storyId/\(storyId)"  //  상세 조회
-        self.selectedStory = nil
         print("개별 스토리 API 호출: \(url)")
         AF.request(url, method: .get)
             .validate()
@@ -41,6 +40,7 @@ class StoryViewModel: ObservableObject {
                 case .success(let data):
                     DispatchQueue.main.async {
                         self.selectedStory = data.result
+//                        print("개별스토리:\(self.selectedStory)")
                         print("개별 스토리 응답 성공: \(data.result.name)의 스토리")
                     }
                 case .failure(let error):
@@ -83,7 +83,11 @@ class StoryViewModel: ObservableObject {
         return groupedStories[nickname]?.map { $0.id } ?? []  // 닉네임에 해당하는 모든 스토리 ID 반환
     }
 
-    
+    func MyStoryIDList() -> [Int] {
+        return Mystories
+            .sorted { !$0.viewed && $1.viewed } // viewed == false가 앞에 오도록 정렬
+            .map { $0.mealDiaryStoryID } // 정렬된 후 id 리스트만 반환
+    }
     
     func fetchMyStory(for memberId: Int) {
         let url = "\(BaseAPI)/meal-stories/myStories/memberId/\(memberId)"
@@ -94,6 +98,7 @@ class StoryViewModel: ObservableObject {
                 case .success(let data):
                     DispatchQueue.main.async {
                         self.Mystories = data.result
+                        
                         print("내 스토리 가져오기 성공: \(data.result)의 스토리")
                     }
                 case .failure(let error):

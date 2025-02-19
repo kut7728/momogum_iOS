@@ -33,7 +33,7 @@ struct CommentView: View {
                 .presentationDetents([.fraction(2/3)])
         }
         .onAppear {
-            viewModel.fetchMealDiary(mealDiaryId: mealDiaryId, userId: 1) 
+            viewModel.fetchMealDiary(mealDiaryId: mealDiaryId)
         }
     }
 }
