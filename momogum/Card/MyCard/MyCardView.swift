@@ -12,6 +12,8 @@ struct MyCardView: View {
     @Binding var isTabBarHidden: Bool
     @StateObject private var viewModel = MyCardViewModel()
     
+    @State private var showBookmarkText = false
+
     var mealDiaryId: Int
 
     var body: some View {
@@ -76,21 +78,6 @@ struct MyCardView: View {
                                     .padding(20)
                             }
                         }
-
-                        if viewModel.myCard.showBookmark {
-                            Text("저장됨")
-                                .font(.system(size: 16))
-                                .foregroundColor(.red)
-                                .frame(width: 134, height: 46)
-                                .background(Color.white)
-                                .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.red, lineWidth: 2)
-                                )
-                                .transition(.opacity)
-                                .position(x: UIScreen.main.bounds.width / 2, y: 200)
-                        }
                     }
 
                     Spacer().frame(height: 5)
@@ -102,7 +89,16 @@ struct MyCardView: View {
                         Spacer().frame(width: 20)
                         CommentView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                         Spacer()
-                        BookmarkView(showBookmark: $viewModel.myCard.showBookmark, viewModel: viewModel, mealDiaryId: mealDiaryId)
+                        BookmarkView(
+                            viewModel: viewModel,
+                            mealDiaryId: mealDiaryId,
+                            onBookmarkToggled: {
+                                showBookmarkText = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                    showBookmarkText = false
+                                }
+                            }
+                        )
                         Spacer().frame(width: 10)
                     }
                     .padding(.horizontal, 16)
@@ -193,6 +189,8 @@ struct MyCardView: View {
                     }
                 }
             }
+
+            BookmarkPopupView(showBookmarkText: $showBookmarkText)
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)

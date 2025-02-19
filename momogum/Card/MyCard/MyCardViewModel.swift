@@ -36,11 +36,11 @@ class MyCardViewModel: ObservableObject {
         let content: String
     }
     
-    struct ResponseData: Codable {
+    struct ResponseData<T: Codable>: Codable {
         let isSuccess: Bool
         let code: String
         let message: String
-        let result: String?
+        let result: T?
     }
 
     struct ResultData: Codable {
@@ -123,19 +123,19 @@ class MyCardViewModel: ObservableObject {
     func addComment(mealDiaryId: Int, comment: String) {
         let url = "\(BaseAPI)/meal-diaries/comments"
         let parameters: [String: Any] = [
-            "memberId": 1,
+            "userId": 1,
             "mealDiaryId": mealDiaryId,
             "comment": comment
         ]
 
         AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default)
             .validate()
-            .responseDecodable(of: ResponseData.self) { response in
+            .responseDecodable(of: ResponseData<ResultData>.self) { response in
                 switch response.result {
                 case .success(let data):
                     if data.isSuccess {
                         DispatchQueue.main.async {
-                            let newComment = Comment(userProfileImagePath: nil, nickname: self.myCard.nickname, content: comment)
+                            let newComment = Comment(userProfileImagePath: self.myCard.userProfileImageLink, nickname: self.myCard.nickname, content: comment)
                             self.comments.append(newComment)
                         }
                     } else {
@@ -183,7 +183,7 @@ class MyCardViewModel: ObservableObject {
 
         AF.request(url, method: .post, encoding: JSONEncoding.default)
             .validate()
-            .responseDecodable(of: ResponseData.self) { response in
+            .responseDecodable(of: ResponseData<String>.self) { response in
                 switch response.result {
                 case .success(let data):
                     if data.isSuccess {
@@ -212,7 +212,7 @@ class MyCardViewModel: ObservableObject {
 
         AF.request(url, method: .post, encoding: JSONEncoding.default)
             .validate()
-            .responseDecodable(of: ResponseData.self) { response in
+            .responseDecodable(of: ResponseData<String>.self) { response in
                 switch response.result {
                 case .success(let data):
                     if data.isSuccess {
@@ -249,7 +249,7 @@ class MyCardViewModel: ObservableObject {
     }
     
     func fetchLikedUsers(mealDiaryId: Int) {
-        let url = "\(BaseAPI)/meal-diaries/likes?mealDiaryId=\(mealDiaryId)" // ✅ userId 없음
+        let url = "\(BaseAPI)/meal-diaries/likes?mealDiaryId=\(mealDiaryId)"
 
         AF.request(url, method: .get)
             .validate()
@@ -257,7 +257,7 @@ class MyCardViewModel: ObservableObject {
                 switch response.result {
                 case .success(let data):
                     if let jsonString = String(data: data, encoding: .utf8) {
-                        print("✅ 좋아요 회원 조회 API 응답: \(jsonString)") // 응답 데이터 출력
+                        print("✅ 좋아요 회원 조회 API 응답: \(jsonString)")
                     }
                     
                     do {
@@ -265,7 +265,7 @@ class MyCardViewModel: ObservableObject {
                         
                         DispatchQueue.main.async {
                             if decodedResponse.isSuccess {
-                                self.likedUsers = decodedResponse.result ?? [] // ✅ 빈 배열 처리
+                                self.likedUsers = decodedResponse.result ?? []
                             } else {
                                 print("❌ 좋아요 회원 조회 실패: \(decodedResponse.message)")
                             }
