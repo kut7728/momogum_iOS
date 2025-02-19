@@ -8,13 +8,18 @@
 import SwiftUI
 
 struct BookmarkView: View {
-    @Binding var showBookmark: Bool
     var viewModel: MyCardViewModel
     var mealDiaryId: Int
+    var onBookmarkToggled: () -> Void
 
     var body: some View {
         Button(action: {
+            let wasBookmarked = viewModel.myCard.showBookmark
             viewModel.toggleBookmarkAPI(mealDiaryId: mealDiaryId)
+
+            if !wasBookmarked {
+                onBookmarkToggled()
+            }
         }) {
             Image(viewModel.myCard.showBookmark ? "bookmark_fill" : "bookmark")
                 .resizable()
