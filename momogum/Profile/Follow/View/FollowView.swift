@@ -10,7 +10,7 @@ import SwiftUI
 struct FollowView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: ProfileViewModel
-    @StateObject var followViewModel = FollowViewModel()
+    @ObservedObject var followViewModel: FollowViewModel
     
     @Binding var selectedSegment: Int
     @State private var showPopup = false

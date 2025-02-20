@@ -276,7 +276,7 @@ extension HomeView {
         let homeviewModel: HomeViewModel // `let`으로 선언하여 값이 불변하도록 유지
 
         var body: some View {
-            NavigationLink(destination: OtherCardView(isTabBarHidden: $isTabBarHidden, mealDiaryId: diary.id)) {
+            NavigationLink(destination: OtherCardView(isTabBarHidden: $isTabBarHidden, userID: diary.id, mealDiaryId: diary.id)) {
                 VStack(spacing: 0) {
                     ZStack(alignment: .topLeading) {
                         AsyncImage(url: URL(string: diary.foodImageURLs.first ?? "")) { image in

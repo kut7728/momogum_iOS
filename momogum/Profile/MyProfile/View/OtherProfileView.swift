@@ -18,9 +18,11 @@ struct OtherProfileView: View {
     
     @State private var showReportPopup = false
     @State private var showReportDetailPopup = false
-    
     @State private var selectedSegment = 0
     @State private var isTabBarHidden = true
+    @State private var showFollowList = 0 // 팔로워(0) / 팔로잉(1) 전환 값
+    @State private var navigateToFollowView = false
+    
     
     @State var followViewModel: FollowViewModel = FollowViewModel()
     @StateObject private var viewModel: ProfileViewModel
@@ -84,9 +86,13 @@ struct OtherProfileView: View {
                     .presentationBackground(.clear)
             }
             .onAppear {
-                viewModel.refreshMealDiaries()
+                // 밥일기 로드
                 viewModel.fetchMealDiaries(userId: userID)
                 viewModel.fetchBookmarkedMealDiaries(userId: userID)
+                
+                // 팔로워/팔로잉 정보 로드
+                followViewModel.fetchFollowerList(userId: userID)
+                followViewModel.fetchFollowingList(userId: userID)
             }
             // Popup
             ShowPopup()
@@ -193,6 +199,11 @@ private extension OtherProfileView {
         HStack(alignment: .center, spacing: 0){
             // 팔로워
             Button(action: {
+                DispatchQueue.main.async {
+                    showFollowList = 0
+                    navigateToFollowView = true
+                }
+                isTabBarHidden = true
             }) {
                 VStack(alignment: .center, spacing: 0){
                     Text("팔로워")
@@ -200,7 +211,7 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-                    Text("0")
+                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
                 }
@@ -209,6 +220,11 @@ private extension OtherProfileView {
             
             // 팔로잉
             Button(action: {
+                DispatchQueue.main.async {
+                    showFollowList = 1
+                    navigateToFollowView = true
+                }
+                isTabBarHidden = true
             }) {
                 VStack(alignment: .center, spacing: 0){
                     Text("팔로잉")
@@ -216,7 +232,7 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-                    Text("0")
+                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
                 }
@@ -320,9 +336,9 @@ private extension OtherProfileView {
                     ForEach((selectedSegment == 0 ? viewModel.mealDiaries : viewModel.bookmarkedMealDiaries).reversed(), id: \.mealDiaryId) { mealDiary in
                         NavigationLink(
                             destination: OtherCardView(
-                                mealDiaryId: Int(mealDiary.mealDiaryId),
+                                isTabBarHidden: $isTabBarHidden,
                                 userID: self.userID,
-                                isTabBarHidden: $isTabBarHidden
+                                mealDiaryId: Int(mealDiary.mealDiaryId)
                             )
                         ) {
                             CardPostCell(selectedSegment: $selectedSegment, mealDiary: mealDiary)

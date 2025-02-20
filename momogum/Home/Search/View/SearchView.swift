@@ -207,7 +207,7 @@ struct SearchView: View {
             }
             .navigationDestination(isPresented: $isNavigatingToCard) {
                 if let keyword = selectedKeyword {
-                    OtherCardView(isTabBarHidden: .constant(true), mealDiaryId: keyword.id)
+                    OtherCardView(isTabBarHidden: .constant(true), userID: keyword.id, mealDiaryId: keyword.id)
                 }
             }
         }
