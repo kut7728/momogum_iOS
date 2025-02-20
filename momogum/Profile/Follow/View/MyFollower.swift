@@ -46,9 +46,7 @@ struct MyFollower: View {
                 .padding(.bottom, 10)
                 .listStyle(PlainListStyle())
                 .onAppear {
-                    if let currentUserId = AuthManager.shared.UUID {
-                        followViewModel.fetchFollowerList(userId: currentUserId)
-                    }
+                    followViewModel.fetchFollowerList(userId: followViewModel.userID)
                 }
                 
             }

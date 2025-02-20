@@ -21,7 +21,8 @@ struct MyProfileView: View {
     var mealDiary: ProfileMealDiary? = nil
     
     @StateObject var viewModel : ProfileViewModel
-    @State var followViewModel: FollowViewModel = FollowViewModel()
+    @State var followViewModel: FollowViewModel = FollowViewModel(userId: AuthManager.shared.UUID ?? 1)
+
     
     @Binding var isTabBarHidden: Bool
 

@@ -21,7 +21,10 @@ class FollowViewModel: ObservableObject {
     @Published var followUsers: [String] = [] // 팔로우한 유저 목록
     private var pendingUnfollow: [String] = [] // 언팔로우 예약된 유저 목록
     
-    init() {
+    var userID: Int
+    
+    init(userId: Int) {
+        self.userID = userId
         self.followerCount = 0
         self.followingCount = 0
     }
@@ -96,7 +99,7 @@ class FollowViewModel: ObservableObject {
         pendingUnfollow.removeAll() // 초기화
     }
     
-    //    // 팔로워 삭제
+    // 팔로워 삭제
     func removeFollower(_ userID: Int) {
         allFollowers.removeAll { $0.userId == userID } // userId 기준으로 삭제
         followerCount = allFollowers.count // 팔로워 수 업데이트
