@@ -262,8 +262,18 @@ extension HomeView {
                 ForEach(mealDiaryViewModel.mealDiaries, id: \.id) { diary in
                     FoodDiaryGridItemView(diary: diary, isTabBarHidden: $isTabBarHidden, homeviewModel: homeviewModel)
                 }
+                
+                Spacer()
+                    .frame(height: 80)
+                
             }
             .padding(.horizontal, 16)
+            .border(.black)
+
+        }
+        .refreshable {
+            storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
+            storyViewModel.fetchMyStory(for: AuthManager.shared.UUID ?? 1)
         }
     }
     
