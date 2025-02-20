@@ -33,7 +33,10 @@ class FollowViewModel: ObservableObject {
         if search.isEmpty {
             return Array(allFollowers.prefix(loadedFollowers)) // 검색어가 없으면 현재 로드된 만큼만 반환
         } else {
-            return allFollowers.filter { $0.nickname.localizedCaseInsensitiveContains(search) } // 닉네임 기준으로 검색
+            return allFollowers.filter {
+                $0.nickname.localizedCaseInsensitiveContains(search) ||
+                $0.name.localizedCaseInsensitiveContains(search) // 닉네임 + 이름 검색
+            }
         }
     }
     
@@ -42,7 +45,10 @@ class FollowViewModel: ObservableObject {
         if search.isEmpty {
             return followingUsers // 검색어가 없으면 전체 반환
         } else {
-            return followingUsers.filter { $0.nickname.localizedCaseInsensitiveContains(search) } // 닉네임 기준으로 검색
+            return followingUsers.filter {
+                $0.nickname.localizedCaseInsensitiveContains(search) ||
+                $0.name.localizedCaseInsensitiveContains(search) // 닉네임 + 이름 검색
+            }
         }
     }
     

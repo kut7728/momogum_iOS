@@ -27,6 +27,7 @@ struct OtherProfileView: View {
     @State private var isTabBarHidden = true
     @State private var showFollowList = 0 // 팔로워(0) / 팔로잉(1) 전환 값
     @State private var navigateToFollowView = false
+    @State private var isUserFollowing: Bool = false
     
     @State var followViewModel: FollowViewModel = FollowViewModel()
     @StateObject private var viewModel: ProfileViewModel
@@ -113,6 +114,20 @@ struct OtherProfileView: View {
                 // 팔로워/팔로잉 정보 로드
                 followViewModel.fetchFollowerList(userId: userID)
                 followViewModel.fetchFollowingList(userId: userID)
+                
+                // 현재 유저의 팔로우 상태 업데이트
+                DispatchQueue.main.async {
+                    if let currentUserId = AuthManager.shared.UUID {
+                        followViewModel.fetchFollowingList(userId: currentUserId)  // ✅ 클로저 제거
+
+                        // ✅ 0.5초 후 최신 데이터 반영
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            if let status = followViewModel.followingStatus["\(userID)"] {
+                                self.isUserFollowing = status
+                            }
+                        }
+                    }
+                }
             }
             .navigationDestination(isPresented: $navigateToFollowView) {
                 FollowView(
@@ -241,7 +256,10 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
+//                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
+//                        .font(.mmg(.subheader4))
+//                        .foregroundStyle(Color.black_1)
+                    Text("0")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
                 }
@@ -262,7 +280,10 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
+//                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
+//                        .font(.mmg(.subheader4))
+//                        .foregroundStyle(Color.black_1)
+                    Text("0")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
                 }
@@ -270,38 +291,22 @@ private extension OtherProfileView {
             .padding(.trailing, 67)
             
             // 팔로우 / 팔로잉 버튼
-            if followViewModel.isFollowing(String(userID)) {
-                Button {
-                    followViewModel.unfollow(String(userID))
-                } label: {
-                    RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 72, height: 28)
-                        .foregroundStyle(Color.black_6)
-                        .overlay(
-                            Text("팔로잉")
-                                .font(.mmg(.subheader4))
-                                .foregroundStyle(Color.Red_2)
-                                .padding(6)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .stroke(Color.black_4, lineWidth: 1)
-                        )
-                }
-            } else {
-                Button {
-                    followViewModel.follow(String(userID))
-                } label: {
-                    RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 72, height: 28)
-                        .foregroundStyle(Color.Red_2)
-                        .overlay(
-                            Text("팔로우")
-                                .font(.mmg(.subheader4))
-                                .foregroundStyle(Color.black_6)
-                                .padding(6)
-                        )
-                }
+            Button {
+                toggleFollow(for: userID)
+            } label: {
+                RoundedRectangle(cornerRadius: 4)
+                    .frame(width: 72, height: 28)
+                    .foregroundStyle(isUserFollowing ? Color.black_6 : Color.Red_2)
+                    .overlay(
+                        Text(isUserFollowing ? "팔로잉" : "팔로우")
+                            .font(.mmg(.subheader4))
+                            .foregroundStyle(isUserFollowing ? Color.Red_2 : Color.black_6)
+                            .padding(6)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(isUserFollowing ? Color.black_4 : Color.clear, lineWidth: 1)
+                    )
             }
         }
         .padding(.bottom, 23)
@@ -347,15 +352,6 @@ private extension OtherProfileView {
         }
         .padding(.bottom, 41)
         .padding(.horizontal, 10)
-        //        .navigationDestination(isPresented: $navigateToMyCardView) {
-        //            if let mealDiary = mealDiary {
-        //                MyCardView(isTabBarHidden: $isTabBarHidden, mealDiaryId: Int(mealDiary.mealDiaryId))
-        //                    .onAppear { isTabBarHidden = true }
-        //                    .onDisappear { isTabBarHidden = false }
-        //            } else {
-        //                Text("잘못된 접근입니다.")
-        //            }
-        //        }
     }
     
     // 밥일기 Card
@@ -395,4 +391,30 @@ private extension OtherProfileView {
             }
         }
     }
+    
+    private func toggleFollow(for userId: Int) {
+        guard let currentUserId = AuthManager.shared.UUID else {
+            print("❌ 현재 로그인한 유저 ID를 가져올 수 없습니다.")
+            return
+        }
+
+        // 버튼 클릭 시 즉시 UI 업데이트 (API 응답 기다리지 않음)
+        isUserFollowing.toggle()
+
+        //  팔로우/언팔로우 요청
+        followViewModel.toggleFollow(userId: currentUserId, targetUserId: "\(userId)")
+
+        // API 요청 후 최신 상태를 가져와 UI 반영
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            followViewModel.fetchFollowingList(userId: currentUserId) // 클로저 제거 후 호출
+
+            // 최신 팔로우 상태 확인하여 UI 반영
+            DispatchQueue.main.async {
+                if let status = followViewModel.followingStatus["\(userID)"] {
+                    self.isUserFollowing = status
+                }
+            }
+        }
+    }
+
 }
