@@ -29,7 +29,7 @@ class KeywordSearchViewModel: ObservableObject {
         }
 
         guard !searchQuery.isEmpty, hasMoreData else {
-            print("⚠️ [요청 차단] 검색어가 비어 있거나, 더 이상 불러올 데이터가 없습니다.")
+            //print("⚠️ [요청 차단] 검색어가 비어 있거나, 더 이상 불러올 데이터가 없습니다.")
             return
         }
 
@@ -56,7 +56,7 @@ class KeywordSearchViewModel: ObservableObject {
                 self.isLoading = false
                 if case .failure(let error) = completion {
                     self.errorMessage = "키워드 검색 실패: \(error.localizedDescription)"
-                    print("❌ [오류] API 요청 실패: \(error.localizedDescription)")
+                    //print("❌ [오류] API 요청 실패: \(error.localizedDescription)")
                 }
             }, receiveValue: { response in
                 let newDataCount = response.result.count
