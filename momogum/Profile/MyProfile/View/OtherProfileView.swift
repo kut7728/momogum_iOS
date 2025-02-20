@@ -20,7 +20,7 @@ struct OtherProfileView: View {
     @State private var showReportDetailPopup = false
     
     @State private var selectedSegment = 0
-    @State private var navigateToMyCardView = false
+    @State private var isTabBarHidden = true
     
     @State var followViewModel: FollowViewModel = FollowViewModel()
     @StateObject private var viewModel: ProfileViewModel
@@ -39,50 +39,57 @@ struct OtherProfileView: View {
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
     var body: some View {
-        ZStack{
-            VStack{
-                VStack(alignment: .leading){
-                    
-                    // NavigationBar
-                    MyProfileNavigationBar()
-                    
-                    // 프로필 사진 / 유저정보
-                    MyProfileUserData()
-                    
-                    // @@님이 팔로우 합니다
-                    if let followersText = followersText {
-                        Text(followersText) // 실제 followersText 표시
-                            .font(.mmg(.Caption2))
-                            .padding(.bottom, 24)
-                            .padding(.leading, 33)
+        NavigationStack{
+            ZStack{
+                VStack{
+                    VStack(alignment: .leading){
+                        
+                        // NavigationBar
+                        MyProfileNavigationBar()
+                        
+                        // 프로필 사진 / 유저정보
+                        MyProfileUserData()
+                        
+                        // @@님이 팔로우 합니다
+                        if let followersText = followersText {
+                            Text(followersText) // 실제 followersText 표시
+                                .font(.mmg(.Caption2))
+                                .padding(.bottom, 24)
+                                .padding(.leading, 33)
+                        }
+                        
+                        // 팔로워 / 팔로잉 / 프로필 편집
+                        MyProfileEdit()
+                        
                     }
                     
-                    // 팔로워 / 팔로잉 / 프로필 편집
-                    MyProfileEdit()
+                    
+                    // 내 게시물 / 저장 게시물 SegmentedControl
+                    SegmentedControl()
+                    
+                    // 밥일기 Card
+                    MyCardList()
+                    
                     
                 }
-                
-                
-                // 내 게시물 / 저장 게시물 SegmentedControl
-                SegmentedControl()
-                
-                // 밥일기 Card
-                MyCardList()
-                
+                .toolbar(.hidden, for: .navigationBar)
+                .toolbar(.hidden, for: .tabBar)
+                .disabled(showReportDetailPopup)
                 
             }
-            .toolbar(.hidden, for: .navigationBar)
-            .toolbar(.hidden, for: .tabBar)
-            .disabled(showReportDetailPopup)
-            
+            .sheet(isPresented: $showReportPopup) {
+                ReportPopupView(showReportDetailPopup: $showReportDetailPopup)
+                    .presentationDetents([.fraction(3/4)])
+                    .presentationDragIndicator(.hidden)
+                    .presentationBackground(.clear)
+            }
+            .onAppear {
+                viewModel.refreshMealDiaries()
+                viewModel.fetchMealDiaries(userId: userID)
+                viewModel.fetchBookmarkedMealDiaries(userId: userID)
+            }
             // Popup
             ShowPopup()
-        }
-        .sheet(isPresented: $showReportPopup) {
-            ReportPopupView(showReportDetailPopup: $showReportDetailPopup)
-                .presentationDetents([.fraction(3/4)])
-                .presentationDragIndicator(.hidden)
-                .presentationBackground(.clear)
         }
     }
 }
@@ -311,12 +318,15 @@ private extension OtherProfileView {
             if (selectedSegment == 0 ? viewModel.mealDiaries : viewModel.bookmarkedMealDiaries).isEmpty != true {
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach((selectedSegment == 0 ? viewModel.mealDiaries : viewModel.bookmarkedMealDiaries).reversed(), id: \.mealDiaryId) { mealDiary in
-                        //                        NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden, mealDiaryId: Int(mealDiary.mealDiaryId))
-                        //                            .onAppear { isTabBarHidden = true }
-                        //                            .onDisappear { isTabBarHidden = false }
-                        //                        ) {
-                        //                            CardPostCell(selectedSegment: $selectedSegment, mealDiary: mealDiary)
-                        //                        }
+                        NavigationLink(
+                            destination: OtherCardView(
+                                mealDiaryId: Int(mealDiary.mealDiaryId),
+                                userID: self.userID,
+                                isTabBarHidden: $isTabBarHidden
+                            )
+                        ) {
+                            CardPostCell(selectedSegment: $selectedSegment, mealDiary: mealDiary)
+                        }
                     }
                 }
                 .padding(.horizontal, 20)

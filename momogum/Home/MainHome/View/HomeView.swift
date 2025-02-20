@@ -266,7 +266,7 @@ extension HomeView {
             }
             .padding(.horizontal, 16)
         }
-        .padding(.bottom, 48)
+        .padding(.bottom, 30)
     }
     
     // 그리드 따로 빼기

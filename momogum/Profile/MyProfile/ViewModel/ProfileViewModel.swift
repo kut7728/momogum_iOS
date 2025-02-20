@@ -45,22 +45,6 @@ class ProfileViewModel: ObservableObject {
         fetchMealDiaries(userId: userId)
         fetchBookmarkedMealDiaries(userId: userId)
     }
-    
-//    init(userId: String) {
-//        self.userName = ""
-//        self.userID = userId
-//        self.userBio = ""
-//        self.profileImage = UIImage(named: "defaultProfile")
-//        self.currentPreviewImage = self.profileImage
-//
-//        if let intUserID = Int(userId) {
-//            fetchUserProfile(userId: intUserID)
-//            fetchMealDiaries(userId: intUserID)
-//            fetchBookmarkedMealDiaries(userId: intUserID)
-//        } else {
-//            print("⚠️ userID 변환 실패: \(userId)")
-//        }
-//    }
 }
 
 // MARK: - API 요청
@@ -104,7 +88,6 @@ extension ProfileViewModel {
                 switch result {
                 case .success(let mealDiaries):
                     self.isLoaded = true
-                    print("✅ 유저 \(userId)의 밥일기 로드 성공: \(mealDiaries.count)개")
                     self.mealDiaries = mealDiaries
                 case .failure(let error):
                     print("❌ 유저 \(userId)의 밥일기 로드 실패: \(error.localizedDescription)")
@@ -231,8 +214,6 @@ extension ProfileViewModel {
     func refreshMealDiaries() {
         guard let userId = AuthManager.shared.UUID, !isFetchingMealDiaries else { return } //중복 실행 방지
         
-//        let userId = AuthManager.shared.UUID ?? 1
-//        guard !isFetchingMealDiaries else { return }
         isFetchingMealDiaries = true
         
         let group = DispatchGroup()

@@ -110,7 +110,7 @@ class FollowViewModel: ObservableObject {
     //MARK: - Follow Toggle
     // 팔로우 토글
     func toggleFollow(userId: Int, targetUserId: String) {
-        guard let url = URL(string: "\(BaseAPI)/\(userId)/follow/\(targetUserId)/toggle") else {
+        guard let url = URL(string: "\(BaseAPI)/follows/\(userId)/follow/\(targetUserId)/toggle") else {
             print("❌ 유효하지 않은 URL")
             return
         }
@@ -127,9 +127,17 @@ class FollowViewModel: ObservableObject {
                 return
             }
             
+            // 응답 데이터가 있는지 확인
             guard let data = data else {
                 print("❌ 응답 데이터 없음")
                 return
+            }
+            
+            // 서버 응답 원본 출력 (디버깅용)
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("📥 서버 응답 데이터: \(jsonString)")
+            } else {
+                print("⚠️ 응답을 문자열로 변환할 수 없음")
             }
             
             do {
@@ -139,7 +147,6 @@ class FollowViewModel: ObservableObject {
                         let followingStatus = !(self.followingStatus[targetUserId] ?? false)
                         self.followingStatus[targetUserId] = followingStatus
                         
-                        // ✅ UI 업데이트 반영
                         NotificationCenter.default.post(
                             name: Notification.Name("FollowStatusChanged"),
                             object: nil,
@@ -156,6 +163,7 @@ class FollowViewModel: ObservableObject {
             }
         }.resume()
     }
+
     
     // 유저 ID별 팔로우 여부 로드
     func fetchFollowStatus(userId: Int, targetUserIds: [String]) {

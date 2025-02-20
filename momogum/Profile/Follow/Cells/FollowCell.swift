@@ -57,12 +57,13 @@ struct FollowCell: View {
                 
                 // 팔로우 / 언팔로우 버튼
                 Button {
-                    isFollowing.toggle()
-                    if isFollowing {
-                        followViewModel.follow("\(userId)")
-                    } else {
-                        followViewModel.delayedUnfollow("\(userId)")
-                    }
+                    //                    isFollowing.toggle()
+                    //                    if isFollowing {
+                    //                        followViewModel.follow("\(userId)")
+                    //                    } else {
+                    //                        followViewModel.delayedUnfollow("\(userId)")
+                    //                    }
+                    toggleFollow(for: userId)
                 } label: {
                     RoundedRectangle(cornerRadius: 4)
                         .frame(width: 72, height: 28)
@@ -94,12 +95,13 @@ struct FollowCell: View {
             // 팔로잉 목록일 때 (팔로우/언팔로우 버튼만 표시)
             else {
                 Button {
-                    isFollowing.toggle()
-                    if isFollowing {
-                        followViewModel.follow("\(userId)")
-                    } else {
-                        followViewModel.delayedUnfollow("\(userId)")
-                    }
+                    //                    isFollowing.toggle()
+                    //                    if isFollowing {
+                    //                        followViewModel.follow("\(userId)")
+                    //                    } else {
+                    //                        followViewModel.delayedUnfollow("\(userId)")
+                    //                    }
+                    toggleFollow(for: userId)
                 } label: {
                     RoundedRectangle(cornerRadius: 4)
                         .frame(width: 72, height: 28)
@@ -119,14 +121,32 @@ struct FollowCell: View {
             }
         }
         .onAppear {
-            if isFollowerList {
-                // 팔로워 목록에서는 followViewModel.isFollowing() 값을 기반으로 설정
-                isFollowing = followViewModel.isFollowing("\(userId)")
-            } else {
-                // 팔로잉 목록에서는 기본적으로 '팔로잉' 상태
-                isFollowing = true
+            updateFollowStatus(for: userId)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("FollowStatusChanged"))) { notification in
+            if let userInfo = notification.userInfo,
+               let changedUserID = userInfo["userID"] as? String,
+               let isFollowing = userInfo["isFollowing"] as? Bool,
+               changedUserID == "\(userId)" {
+                self.isFollowing = isFollowing
             }
         }
-
+        
+    }
+    
+    // 팔로우 상태 업데이트
+    private func updateFollowStatus(for userId: Int) {
+        self.isFollowing = followViewModel.isFollowing("\(userId)")
+    }
+    
+    // 팔로우 / 언팔로우 토글
+    private func toggleFollow(for userId: Int) {
+        guard let currentUserId = AuthManager.shared.UUID else {
+            print("❌ 현재 로그인한 유저 ID를 가져올 수 없습니다.")
+            return
+        }
+        
+        isFollowing.toggle()
+        followViewModel.toggleFollow(userId: currentUserId, targetUserId: "\(userId)")
     }
 }
