@@ -8,33 +8,30 @@
 import SwiftUI
 import Alamofire
 
-// MARK: - Appoint Sending Data
-struct SendingData: Codable {
-    let name: String
-    let menu: String
-    let date: Date
-    let place: String
-    let note: String
-}
 
-// MARK: - Response Structure
-struct ApiResponse: Codable {
+// MARK: - api 응답 통합 구조체
+struct ApiResponse<T: Codable>: Codable {
     let isSuccess: Bool
     let code, message: String
-    let result: ApmResult
+    let result: T
 }
 
-struct ApmResult: Codable {
+// MARK: - 약속 고유 ID 발급 구조체
+struct ApmUUID: Codable {
     let appointmentID: Int
-
+    
     enum CodingKeys: String, CodingKey {
         case appointmentID = "appointmentId"
     }
 }
 
+
+
 // MARK: - class
 @Observable
 class NewAppointViewModel {
+    let userId: Int = AuthManager.shared.UUID ?? 9
+    var appointId: Int = 0
     /// 약속 7요소
     var appointName: String = ""
     var menuName: String = ""
@@ -42,48 +39,112 @@ class NewAppointViewModel {
     var placeName: String = ""
     var note: String = ""
     
-    var pickedFriends: [String] = []
+    var pickedFriends: [Friend] = []
     var pickedCard: String = ""
     
     /// 전체 친구 목록
-    var friends: [String] = ["친구1", "친구2", "친구3", "친구4", "친구5", "친구6", "친구7", "친구8", "친구9", "친구10"]
+    var friends: [Friend] = []
     
-   
+    var newAppoint: Appoint?
+    
+    // MARK: - 약속 고유 id 획득
+    func getAppointId() async -> Void {
+        let url = "\(BaseAPI)/appointment/init"
+        
+        do {
+            self.appointId = try await withCheckedThrowingContinuation { continuation in
+                AF.request(url, method: .post)
+                    .validate(statusCode: 200..<300)
+                    .responseDecodable(of: ApiResponse<ApmUUID>.self) { response in
+                        
+                        switch response.result {
+                        case .success(let data):
+                            continuation.resume(returning: data.result.appointmentID)
+                            print("약속 고유 Id : \(data.result.appointmentID)")
+                            if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
+                                            print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
+                                        }
+                        case .failure(let error):
+                            continuation.resume(throwing: error)
+                        }
+                    }
+            }
+        } catch {
+            print("약속 id POST 오류: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - 초대 가능한 친구 목록 반환
+    func getAvailableFriends() async -> Void {
+        let url = "\(BaseAPI)/appointment/\(self.appointId)/invites?userId=\(self.userId)"
+        
+        do {
+            self.friends = try await withCheckedThrowingContinuation {continuation in
+                AF.request(url, method: .get)
+                    .validate(statusCode: 200..<300)
+                    .responseDecodable(of: [Friend].self) { response in
+                        
+                        switch response.result {
+                        case .success(let data):
+                            continuation.resume(returning: data)
+
+                        case .failure(let error):
+                            print("초대 가능한 친구 목록 반환 오류")
+                            continuation.resume(throwing: error)
+                        }
+                    }
+                   
+            }
+        } catch {
+            print("초대 가능 친구 GET 오류: \(error.localizedDescription)")
+        }
+    }
+    
     
     // MARK: - 초대장 발송 및 저장소 초기화
     func createAppoint() {
         let dateFormatter = ISO8601DateFormatter()
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-//        dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+        //        dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         let dateString = dateFormatter.string(from: self.pickedDate)  // 현재 시간을 ISO 8601 형식 문자열로 변환
-
         
-        let parm: Parameters = [
-            "name": self.appointName,
-            "menu": self.menuName,
-            "date": dateString,
-            "location": self.placeName,
-            "notes": self.note
-        ]
+        let mainRequest = AppointmentName(
+            name: self.appointName,
+            menu: self.menuName,
+            date: dateString,
+            location: self.placeName,
+            notes: self.note)
         
+        let parm = NewApmRequest(userId: self.userId,
+                                                appointmentId: self.appointId,
+                                                nicknames: self.pickedFriends.map { $0.nickname },
+                                                cardCategory: "BASIC",
+                                                selectedCardUrl: "https://s3.amazonaws.com/cards/basic1.jpg",
+                                                appointmentName: mainRequest)
+                
         
-        let url = "\(BaseAPI)/appointment/name"
+        let url = "\(BaseAPI)/appointment/whole"
         
         AF.request(url,
                    method: .post,
                    parameters: parm,
-                   encoding: JSONEncoding.default,
-                   headers: ["Content-Type": "application/json"]).responseDecodable(of: ApiResponse.self) { [self] response in
+                   encoder: JSONParameterEncoder.default,
+                   headers: ["Content-Type": "application/json", "Accept": "application/json"])
+        .responseDecodable(of: AppointCreateResponse.self) { [self] response in
             
             switch response.result {
             case .success(let responseBody):
                 print("Response received successfully: \(responseBody)")
-                self.printingForDebug()
+                let responseData = responseBody
+                self.newAppoint = Appoint(from: responseData)
                 self.resetAppoint()
-                print(responseBody.result.appointmentID)
                 
             case .failure(let error):
                 print("Error: \(error.localizedDescription)")
+                
+                if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
+                                print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
+                            }
                 return
             }
         }
@@ -99,7 +160,7 @@ class NewAppointViewModel {
         placeName = ""
         note = ""
         pickedFriends = []
-        pickedCard = "default image"
+        pickedCard = ""
     }
     
     // MARK: - 디버그를 위한 약속잡기 임시저장 데이터 출력

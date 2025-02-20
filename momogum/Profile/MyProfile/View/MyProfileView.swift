@@ -20,10 +20,16 @@ struct MyProfileView: View {
     
     var mealDiary: ProfileMealDiary? = nil
     
-    @StateObject var viewModel = ProfileViewModel(userId: AuthManager.shared.UUID ?? 0) // ✅ UUID 값 사용
+    @StateObject var viewModel : ProfileViewModel
     @State var followViewModel: FollowViewModel = FollowViewModel()
     
     @Binding var isTabBarHidden: Bool
+
+    init(isTabBarHidden: Binding<Bool>) {
+        self._isTabBarHidden = isTabBarHidden
+        _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1))
+    }
+
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -106,7 +112,7 @@ private extension MyProfileView {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 78, height: 78)
                     .clipShape(Circle())
-                    .padding(3)
+                    .padding(4)
                     .overlay(
                         Circle()
                             .stroke(lineWidth: 4)
@@ -119,7 +125,7 @@ private extension MyProfileView {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 78, height: 78)
                     .clipShape(Circle())
-                    .padding(3)
+                    .padding(4)
                     .overlay(
                         Circle()
                             .stroke(lineWidth: 4)
@@ -170,6 +176,11 @@ private extension MyProfileView {
                     Text("\(followViewModel.followerCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
+                        .onAppear {
+                            if let currentUserId = AuthManager.shared.UUID {
+                                followViewModel.fetchFollowerList(userId: currentUserId) // 팔로워 목록 가져오기
+                            }
+                        }
                 }
             }
             .padding(.trailing, 67)
@@ -191,6 +202,11 @@ private extension MyProfileView {
                     Text("\(followViewModel.followingCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
+                        .onAppear {
+                            if let currentUserId = AuthManager.shared.UUID {
+                                followViewModel.fetchFollowingList(userId: currentUserId)
+                            }
+                        }
                 }
             }
             .padding(.trailing, 67)
@@ -222,8 +238,13 @@ private extension MyProfileView {
                     .contentShape(Rectangle())
             }
             .navigationDestination(isPresented: $navigateToFollowView) {
-                FollowView(viewModel: viewModel, followViewModel: followViewModel, selectedSegment: $showFollowList)
+                FollowView(
+                    userID: Int(viewModel.userID) ?? AuthManager.shared.UUID ?? 1,
+                    selectedSegment: $showFollowList,
+                    viewModel: ProfileViewModel(userId: Int(viewModel.userID) ?? AuthManager.shared.UUID ?? 1)
+                )
             }
+
             .navigationDestination(for: String.self) { value in
                 switch value {
                 case "EditProfileView":

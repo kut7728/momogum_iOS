@@ -10,7 +10,9 @@ import SwiftUI
 /// 약속생성의 4단계, 초대장 생성 직전 마지막 편집하는 뷰
 struct AppointCreate4View: View {
     @Environment(\.dismiss) var dismiss
-    @Environment(NewAppointViewModel.self) var appointViewModel
+    @Environment(NewAppointViewModel.self) var newAppointViewModel
+    @Binding var path: [String]
+    @Binding var appointViewModel: AppointViewModel
     @State private var showPopUpWheel: Bool = false
     
     /// 조건 미충족시 경고 및 버튼 비활성화
@@ -19,7 +21,7 @@ struct AppointCreate4View: View {
     @State var placeNecessary: Bool = false
     var isButtonShowing: Bool {!self.menuNecessary && !self.titleNecessary && !self.placeNecessary}
     
-    @Binding var path: [String]
+    
     
     let dateFormatter = {
         let formatter = DateFormatter()
@@ -30,7 +32,7 @@ struct AppointCreate4View: View {
     
     // MARK: - 
     var body: some View {
-        @Bindable var viewModel = appointViewModel
+        @Bindable var viewModel = newAppointViewModel
         
         ScrollView {
 
@@ -115,8 +117,6 @@ struct AppointCreate4View: View {
                                 }
                                 .padding(.trailing, 10)
                             }
-                            
-                            
                         }
                         
                         
@@ -203,7 +203,8 @@ struct AppointCreate4View: View {
 }
 
 #Preview {
-    AppointCreate4View(path: AppointView(isTabBarHidden: .constant(true)).$path)
+    let viewModel = AppointView(isTabBarHidden: .constant(true))
+    AppointCreate4View(path: viewModel.$path, appointViewModel: viewModel.$viewModel)
         .environment(NewAppointViewModel())
 
 }

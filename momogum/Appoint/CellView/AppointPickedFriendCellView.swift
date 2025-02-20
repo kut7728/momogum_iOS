@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AppointPickedFriendCellView: View {
     @Environment(NewAppointViewModel.self) var appointViewModel
-    @State var friend: String
+    @State var friend: Friend
     
     var body: some View {
         @Bindable var viewModel = appointViewModel
@@ -21,7 +21,7 @@ struct AppointPickedFriendCellView: View {
                 .foregroundStyle(.gray.opacity(0.2))
             
             Button {
-                viewModel.pickedFriends.removeAll(where: { $0 == friend })
+                viewModel.pickedFriends.removeAll(where: { $0.nickname == friend.name })
             } label: {
                 Image("close_cc")
                     .resizable()
@@ -38,6 +38,6 @@ struct AppointPickedFriendCellView: View {
 }
 
 #Preview {
-    AppointPickedFriendCellView(friend: "친구더미")
+    AppointPickedFriendCellView(friend: Friend.demoFriends)
         .environment(NewAppointViewModel())
 }

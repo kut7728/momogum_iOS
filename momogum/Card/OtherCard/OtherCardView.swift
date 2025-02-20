@@ -15,6 +15,7 @@ struct OtherCardView: View {
     
     @State private var showBookmarkText = false
     
+    var userID: Int
     var mealDiaryId: Int
 
     var body: some View {

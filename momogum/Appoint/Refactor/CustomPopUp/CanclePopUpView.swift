@@ -1,14 +1,17 @@
 import SwiftUI
 
-struct CustomPopUpView: View {
+/// 약속 취소 팝업
+struct CanclePopUpView: View {
     // MARK: - properites
     // 해당 프로퍼티로 팝업을 띄울지 말지를 부모뷰의 state 값으로 전달 받을 예정
     @Binding var showPopUp: Bool
+    @Binding var showAlarm: Bool
     
-    let title: String // 공지 이름
-    let message: String // 공지 내용
-    let btn1: String // 왼쪽 버튼 text
-    let btn2: String // 오른쪽 버튼 text
+    let title: String = "약속을 취소해요"// 공지 이름
+    let message: String = "취소된 약속은 다시 불러올 수 없습니다." // 공지 내용
+    let btn1: String = "돌아가기" // 왼쪽 버튼 text
+    let btn2: String = "약속 취소" // 오른쪽 버튼 text
+    
     
     // MARK: - body
     var body: some View {
@@ -23,7 +26,7 @@ struct CustomPopUpView: View {
             VStack(spacing: 12) {
                 
                 Text(title)
-                    .foregroundStyle( (title == "약속을 취소해요") ? .Red_2 : .black_1)
+                    .foregroundStyle( .Red_2 )
                     .frame(maxWidth: .infinity)
                     .frame(height: 30)
                     .fontWeight(.bold)
@@ -41,7 +44,7 @@ struct CustomPopUpView: View {
                 /// 버튼 뭉치
                 HStack(spacing: 8) {
                     
-                    /// 왼쪽 버튼
+                    /// 왼쪽 버튼 - 돌아가기
                     Button(action: {
                         showPopUp = false
                     }, label: {
@@ -55,10 +58,12 @@ struct CustomPopUpView: View {
                     
                     Divider()
                     
-                    /// 오른쪽 버튼
+                    /// 오른쪽 버튼 - 약속 취소
                     Button(action: {
-                        print("취소 누름")
                         showPopUp = false
+                        withAnimation {
+                            showAlarm = true
+                        }
                     }, label: {
                         Text(btn2)
                             .font(.mmg(.subheader3))
@@ -88,11 +93,8 @@ struct CustomPopUpView: View {
 }
 
 #Preview {
-    CustomPopUpView(
+    CanclePopUpView(
         showPopUp: .constant(false),
-        title: "공지",
-        message: "정말로 삭제를 하시겠습니까?",
-        btn1: "확인",
-        btn2: "취소"
+        showAlarm: .constant(false)
     )
 }

@@ -189,13 +189,11 @@ struct SearchView: View {
             .navigationDestination(isPresented: $isNavigatingToProfile) {
                 if let user = selectedUser {
                     OtherProfileView(
-                        userID: user.userNickName,
+                        userID: user.id,
                         isFollowing: false,
                         userName: user.userName,
                         profileImageURL: user.userImageURL,
                         about: user.about,
-                        hasStory: user.hasStory,
-                        hasViewedStory: user.hasViewedStory, 
                         followersText: {
                             if let firstFollower = user.searchFollowName?.first, user.searchFollowCount > 1 {
                                 return "\(firstFollower)님 외 \(user.searchFollowCount - 1)명이 팔로우합니다."
@@ -204,16 +202,14 @@ struct SearchView: View {
                             } else {
                                 return nil
                             }
-                        }(), // ✅ 여기서 즉시 실행
-                        followerCount: user.follower,
-                        followingCount: user.following,
-                        viewModel: ProfileViewModel(userId: user.id)
+                        }(), hasStory: user.hasStory,
+                        hasViewedStory: user.hasViewedStory
                     )
                 }
             }
-            .navigationDestination(isPresented: $isNavigatingToCard) {
+            navigationDestination(isPresented: $isNavigatingToCard) {
                 if let keyword = selectedKeyword {
-                    OtherCardView(isTabBarHidden: .constant(true), mealDiaryId: keyword.id)
+                    OtherCardView(isTabBarHidden: .constant(true), userID: keyword.id, mealDiaryId: keyword.id)
                 }
             }
         }
