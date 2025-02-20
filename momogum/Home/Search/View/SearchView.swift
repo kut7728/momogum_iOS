@@ -15,6 +15,7 @@ struct SearchView: View {
 
     @Environment(\.presentationMode) var presentationMode
     @FocusState private var isFocused: Bool
+    @State private var hasStartedEditing: Bool = false // 입력 여부 추가
     
     @State private var selectedUser: AccountSearchResult?
     @State private var isNavigatingToProfile = false
@@ -40,7 +41,8 @@ struct SearchView: View {
                         .padding(8)
                         .textInputAutocapitalization(.never)
                         .focused($isFocused)
-                        .onChange(of: searchQuery) {
+                        .onChange(of: searchQuery) { newValue, _ in
+                            hasStartedEditing = !newValue.isEmpty
                             performSearch()
                         }
                         
@@ -50,6 +52,7 @@ struct SearchView: View {
                                     searchQuery = ""
                                     accountViewModel.clearSearch()
                                     keywordViewModel.clearSearch()
+                                    hasStartedEditing = false // 검색어 삭제 시 UI 숨김
                                 }
                                 isFocused = false
                             }) {
@@ -69,49 +72,53 @@ struct SearchView: View {
                     .padding(.top, 24)
                 }
                 
-                // ✅ 항상 표시되도록 수정 (hasStartedEditing 조건 제거)
-                VStack {
-                    Divider()
-                        .background(Color.gray)
-                        .padding(.top, 12)
-                    
-                    HStack(spacing: 48) {
-                        Button(action: {
-                            selectedButton = "계정"
-                            performSearch()
-                        }) {
-                            VStack {
-                                Text("계정")
-                                    .font(.mmg(.subheader4))
-                                    .fontWeight(selectedButton == "계정" ? .bold : .regular)
-                                    .foregroundColor(selectedButton == "계정" ? .black : .gray)
-                                    .frame(width: 140, height: 48)
-                                
-                                Rectangle()
-                                    .fill(selectedButton == "계정" ? Color.black : Color.clear)
-                                    .frame(width: 140, height: 2)
-                            }
-                        }
+                // 사용자가 입력하면 UI 표시 (hasStartedEditing이 true일 때만)
+                if hasStartedEditing {
+                    VStack {
+                        Divider()
+                            .background(Color.gray)
+                            .padding(.top, 30)
                         
-                        Button(action: {
-                            selectedButton = "키워드"
-                            performSearch()
-                        }) {
-                            VStack {
-                                Text("키워드")
-                                    .font(.mmg(.subheader4))
-                                    .fontWeight(selectedButton == "키워드" ? .bold : .regular)
-                                    .foregroundColor(selectedButton == "키워드" ? .black : .gray)
-                                    .frame(width: 140, height: 48)
-                                
-                                Rectangle()
-                                    .fill(selectedButton == "키워드" ? Color.black : Color.clear)
-                                    .frame(width: 140, height: 2)
+                        HStack(spacing: 48) {
+                            Button(action: {
+                                selectedButton = "계정"
+                                performSearch()
+                            }) {
+                                VStack {
+                                    Text("계정")
+                                        .font(.mmg(.subheader4))
+                                        .fontWeight(selectedButton == "계정" ? .bold : .regular)
+                                        .foregroundColor(selectedButton == "계정" ? .black : .gray)
+                                        .frame(width: 140, height: 48)
+                                    
+                                    Rectangle()
+                                        .fill(selectedButton == "계정" ? Color.black : Color.clear)
+                                        .frame(width: 140, height: 2)
+                                }
                             }
+                            .animation(nil, value: selectedButton)
+                            
+                            Button(action: {
+                                selectedButton = "키워드"
+                                performSearch()
+                            }) {
+                                VStack {
+                                    Text("키워드")
+                                        .font(.mmg(.subheader4))
+                                        .fontWeight(selectedButton == "키워드" ? .bold : .regular)
+                                        .foregroundColor(selectedButton == "키워드" ? .black : .gray)
+                                        .frame(width: 140, height: 48)
+                                    
+                                    Rectangle()
+                                        .fill(selectedButton == "키워드" ? Color.black : Color.clear)
+                                        .frame(width: 140, height: 2)
+                                }
+                            }
+                            .animation(nil, value: selectedButton)
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
                 }
 
                 Spacer()

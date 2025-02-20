@@ -277,7 +277,7 @@ extension HomeView {
                 }
             }
             .padding(.top, 24)
-            .padding(.leading, 12)
+            .padding(.leading, 25)
             .padding(.bottom, 10)
         }
     }
