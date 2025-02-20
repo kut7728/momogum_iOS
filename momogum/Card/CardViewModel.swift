@@ -61,6 +61,12 @@ class CardViewModel: ObservableObject {
         let message: String
         let result: [LikeUser]?
     }
+    
+    struct ReportRequest: Codable {
+        let userID: Int
+        let mealDiaryId: Int
+        let reportReason: String
+    }
 
     @Published var likedUsers: [LikeUser] = []
     
@@ -140,6 +146,8 @@ class CardViewModel: ObservableObject {
                         DispatchQueue.main.async {
                             let newComment = Comment(userProfileImagePath: self.card.userProfileImageLink, nickname: self.card.nickname, content: comment)
                             self.comments.append(newComment)
+                            self.card.commentCount += 1 // 댓글 개수 업데이트
+                            self.objectWillChange.send()
                         }
                     } else {
                         print("❌ 댓글 추가 실패: \(data.message)")
@@ -249,6 +257,29 @@ class CardViewModel: ObservableObject {
     func deletePost(mealDiaryId: Int) {
         showDeleteConfirm = false
         deleteMealDiary(mealDiaryId: mealDiaryId)
+    }
+    
+    func reportMealDiary(mealDiaryId: Int, reason: String) {
+        let url = "\(BaseAPI)/meal-diaries/report"
+        let parameters = ReportRequest(userID: 9, mealDiaryId: mealDiaryId, reportReason: reason)
+
+        print("📡 신고 API 요청 시작 - URL: \(url)")
+        print("📡 신고 API 요청 - Parameters: \(parameters)")
+
+        AF.request(url, method: .post, parameters: parameters, encoder: JSONParameterEncoder.default)
+            .validate()
+            .responseDecodable(of: ResponseData<ResultData>.self) { response in
+                switch response.result {
+                case .success(let data):
+                    print("✅ 신고 성공: \(data.message)")
+                    self.showReportCompleted()
+                case .failure(let error):
+                    print("❌ 신고 API 호출 실패: \(error.localizedDescription)")
+                    if let data = response.data, let errorString = String(data: data, encoding: .utf8) {
+                        print("❌ 서버 응답 내용: \(errorString)")
+                    }
+                }
+            }
     }
     
     func toggleReportSheet() {
