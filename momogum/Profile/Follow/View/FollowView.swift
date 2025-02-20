@@ -10,10 +10,10 @@ import SwiftUI
 struct FollowView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: ProfileViewModel
-    @StateObject var followViewModel = FollowViewModel()
+    @StateObject var followViewModel: FollowViewModel
     
     var userID: Int
-    var selectedUserID: Int
+    @State private var selectedUserID: Int
     
     @Binding var selectedSegment: Int
     @State private var showPopup = false
@@ -24,9 +24,12 @@ struct FollowView: View {
     init(userID: Int, selectedSegment: Binding<Int>, viewModel: ProfileViewModel) {
         self.userID = userID
         self._selectedSegment = selectedSegment
-        self.selectedUserID = userID 
         self._viewModel = ObservedObject(wrappedValue: viewModel)
+        self._followViewModel = StateObject(wrappedValue: FollowViewModel(userId: userID))
+        
+        _selectedUserID = State(initialValue: userID)
     }
+
     
     
     var body: some View {
@@ -66,7 +69,7 @@ struct FollowView: View {
                             .foregroundColor(selectedSegment == 0 ? Color.black_1 : Color.black_3)
                             .onTapGesture {
                                 selectedSegment = 0
-                                followViewModel.fetchFollowerList(userId: selectedUserID)
+                                followViewModel.fetchFollowerList(userId: userID)
                             }
                             .padding(.bottom, 15)
                         
@@ -84,7 +87,7 @@ struct FollowView: View {
                             .foregroundColor(selectedSegment == 1 ? Color.black_1 : Color.black_3)
                             .onTapGesture {
                                 selectedSegment = 1
-                                followViewModel.fetchFollowingList(userId: selectedUserID)
+                                followViewModel.fetchFollowingList(userId: userID)
                             }
                             .padding(.bottom, 15)
                         
@@ -140,13 +143,9 @@ struct FollowView: View {
             }
         }
         .onAppear {
-            if let userID = Int(viewModel.userID) {
-                followViewModel.fetchFollowerList(userId: userID)
-                followViewModel.fetchFollowingList(userId: userID)
-            } else {
-                print("❌ userID 변환 실패: \(viewModel.userID)")
-            }
+            followViewModel.fetchFollowerList(userId: userID)
+            followViewModel.fetchFollowingList(userId: userID)
         }
-
+        
     }
 }

@@ -36,10 +36,13 @@ struct MyFollowing: View {
                         .onTapGesture {
                             selectedUserID = "\(followingUser.userId)"
                         }
+//                        .onAppear {
+//                            if followingUser.userId == followViewModel.followingUsers.last?.userId {
+//                                followViewModel.loadMoreFollowers()
+//                            }
+//                        }
                         .onAppear {
-                            if followingUser.userId == followViewModel.followingUsers.last?.userId {
-                                followViewModel.loadMoreFollowers()
-                            }
+                            followViewModel.fetchFollowingList(userId: followViewModel.userID)
                         }
                         .listRowSeparator(.hidden)
                         .buttonStyle(PlainButtonStyle())

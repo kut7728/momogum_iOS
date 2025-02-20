@@ -29,7 +29,7 @@ struct OtherProfileView: View {
     @State private var navigateToFollowView = false
     @State private var isUserFollowing: Bool = false
     
-    @State var followViewModel: FollowViewModel = FollowViewModel()
+    @State var followViewModel: FollowViewModel
     @StateObject private var viewModel: ProfileViewModel
     
     init(
@@ -56,6 +56,7 @@ struct OtherProfileView: View {
         self.hasViewedStory = hasViewedStory
         
         _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userID)) // 해당 유저의 프로필 로드
+        _followViewModel = State(initialValue: FollowViewModel(userId: userID))
     }
     
     
@@ -261,10 +262,7 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-                    //                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
-                    //                        .font(.mmg(.subheader4))
-                    //                        .foregroundStyle(Color.black_1)
-                    Text("0")
+                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
                 }
@@ -285,10 +283,7 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-                    //                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
-                    //                        .font(.mmg(.subheader4))
-                    //                        .foregroundStyle(Color.black_1)
-                    Text("0")
+                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
                 }
