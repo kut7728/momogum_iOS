@@ -46,7 +46,7 @@ struct MyFollower: View {
                 OtherProfileView(
                     userID: userID,
                     isFollowing: followViewModel.isFollowing(userID),
-                    userName: "", about: "", viewModel: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1), followViewModel: followViewModel
+                    userName: "", about: "", hasStory: false, hasViewedStory: false,viewModel: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1), followViewModel: followViewModel
                 )
             }
         }

@@ -36,13 +36,13 @@ struct StoryView: View {
                 }) {
                     Text("바로 밥일기 작성하기")
                         .font(.mmg(.subheader3))
-                        .foregroundColor(Color(red: 224/255, green: 90/255, blue: 85/255))
+                        .foregroundColor(Color.Red_2)
                         .padding()
                         .frame(width: 312, height: 52)
                         .background(Color.clear)
                         .overlay(
                             RoundedRectangle(cornerRadius: 25)
-                                .stroke(Color(red: 224/255, green: 90/255, blue: 85/255), lineWidth: 2)
+                                .stroke(Color.Red_2, lineWidth: 2)
                         )
                 }
                 .padding(.top, 100)

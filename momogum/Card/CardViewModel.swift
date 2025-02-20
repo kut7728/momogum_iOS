@@ -1,15 +1,15 @@
 //
-//  MyCardViewModel.swift
+//  CardViewModel.swift
 //  momogum
 //
-//  Created by 조승연 on 2/1/25.
+//  Created by 조승연 on 2/20/25.
 //
 
 import SwiftUI
 import Alamofire
 
-class MyCardViewModel: ObservableObject {
-    @Published var myCard = MyCardModel(
+class CardViewModel: ObservableObject {
+    @Published var card = CardModel(
         likeCount: 0,
         isLiked: false,
         reviewText: "",
@@ -28,6 +28,8 @@ class MyCardViewModel: ObservableObject {
     @Published var showPopup = false
     @Published var showDeleteConfirm = false
     @Published var showDeleted = false
+    @Published var showReportSheet = false
+    @Published var showCompletedAlert = false
     @Published var showHeartBottomSheet = false
     
     struct Comment: Codable {
@@ -83,7 +85,7 @@ class MyCardViewModel: ObservableObject {
                                 let commentCount = result["mealDiaryCommentCount"] as? Int ?? 0
                                 print("✅ 불러온 댓글 개수: \(commentCount)")
                                 
-                                self.myCard = MyCardModel(
+                                self.card = CardModel(
                                     likeCount: result["mealDiaryLikeCount"] as? Int ?? 0,
                                     isLiked: result["like"] as? Bool ?? false,
                                     reviewText: result["review"] as? String ?? "",
@@ -136,7 +138,7 @@ class MyCardViewModel: ObservableObject {
                 case .success(let data):
                     if data.isSuccess {
                         DispatchQueue.main.async {
-                            let newComment = Comment(userProfileImagePath: self.myCard.userProfileImageLink, nickname: self.myCard.nickname, content: comment)
+                            let newComment = Comment(userProfileImagePath: self.card.userProfileImageLink, nickname: self.card.nickname, content: comment)
                             self.comments.append(newComment)
                         }
                     } else {
@@ -149,7 +151,7 @@ class MyCardViewModel: ObservableObject {
     }
     
     func getRevisitImage() -> String {
-        switch myCard.isRevisit {
+        switch card.isRevisit {
         case "GOOD": return "good_fill"
         case "BAD": return "bad_fill"
         default: return "soso_fill"
@@ -179,7 +181,7 @@ class MyCardViewModel: ObservableObject {
     func toggleBookmarkAPI(mealDiaryId: Int) {
         let url = "\(BaseAPI)/meal-diaries/bookmarks/userId/9/mealDiaryId/\(mealDiaryId)"
         
-        let currentBookmarkState = myCard.showBookmark // 기존 북마크 상태 저장
+        let currentBookmarkState = card.showBookmark // 기존 북마크 상태 저장
         let newBookmarkState = !currentBookmarkState  // 반전된 상태
 
         AF.request(url, method: .post, encoding: JSONEncoding.default)
@@ -189,7 +191,7 @@ class MyCardViewModel: ObservableObject {
                 case .success(let data):
                     if data.isSuccess {
                         DispatchQueue.main.async {
-                            self.myCard.showBookmark = newBookmarkState
+                            self.card.showBookmark = newBookmarkState
                             print("✅ 북마크 상태 변경 성공: \(newBookmarkState)")
                         }
                     } else {
@@ -202,13 +204,13 @@ class MyCardViewModel: ObservableObject {
     }
     
     func toggleBookmark() {
-        myCard.showBookmark.toggle()
+        card.showBookmark.toggle()
     }
     
     func toggleLikeAPI(mealDiaryId: Int) {
         let url = "\(BaseAPI)/meal-diaries/likes/userId/9/mealDiaryId/\(mealDiaryId)"
 
-        let currentLikeState = myCard.isLiked  // 현재 좋아요 상태 저장
+        let currentLikeState = card.isLiked  // 현재 좋아요 상태 저장
         let newLikeState = !currentLikeState   // 상태 반전
 
         AF.request(url, method: .post, encoding: JSONEncoding.default)
@@ -218,9 +220,9 @@ class MyCardViewModel: ObservableObject {
                 case .success(let data):
                     if data.isSuccess {
                         DispatchQueue.main.async {
-                            self.myCard.isLiked = newLikeState
-                            self.myCard.likeCount += newLikeState ? 1 : -1
-                            print("✅ 좋아요 상태 변경 성공: \(newLikeState), 좋아요 개수: \(self.myCard.likeCount)")
+                            self.card.isLiked = newLikeState
+                            self.card.likeCount += newLikeState ? 1 : -1
+                            print("✅ 좋아요 상태 변경 성공: \(newLikeState), 좋아요 개수: \(self.card.likeCount)")
                         }
                     } else {
                         print("❌ 좋아요 토글 실패: \(data.message)")
@@ -232,12 +234,12 @@ class MyCardViewModel: ObservableObject {
     }
     
     func toggleLike() {
-        myCard.isLiked.toggle()
-        myCard.likeCount += myCard.isLiked ? 1 : -1
+        card.isLiked.toggle()
+        card.likeCount += card.isLiked ? 1 : -1
     }
     
     func resetLikeCount() {
-        myCard.likeCount = 0
+        card.likeCount = 0
     }
     
     func confirmDelete() {
@@ -247,6 +249,17 @@ class MyCardViewModel: ObservableObject {
     func deletePost(mealDiaryId: Int) {
         showDeleteConfirm = false
         deleteMealDiary(mealDiaryId: mealDiaryId)
+    }
+    
+    func toggleReportSheet() {
+        showReportSheet.toggle()
+    }
+
+    func showReportCompleted() {
+        showReportSheet = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.showCompletedAlert = true
+        }
     }
     
     func fetchLikedUsers(mealDiaryId: Int) {

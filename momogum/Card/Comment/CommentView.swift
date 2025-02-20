@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CommentView: View {
     @State private var showCommentBottomSheet = false
-    @ObservedObject var viewModel: MyCardViewModel
+    @ObservedObject var viewModel: CardViewModel
     
     var mealDiaryId: Int
 
@@ -25,7 +25,7 @@ struct CommentView: View {
             
             Spacer().frame(width: 12)
 
-            Text("\(viewModel.myCard.commentCount)")
+            Text("\(viewModel.card.commentCount)")
                 .font(.system(size: 16))
         }
         .sheet(isPresented: $showCommentBottomSheet) {

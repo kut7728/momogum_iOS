@@ -10,7 +10,7 @@ import SwiftUI
 struct DeleteConfirmView: View {
     @Binding var showDeleteConfirmation: Bool
     @Binding var showDeletedPopup: Bool
-    var viewModel: MyCardViewModel
+    var viewModel: CardViewModel
     var mealDiaryId: Int
     
     var body: some View {

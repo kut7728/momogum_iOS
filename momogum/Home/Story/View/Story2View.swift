@@ -86,7 +86,7 @@ extension Story2View {
                                 .frame(width: 64, height: 64)
                                 .clipShape(Circle())
                                 .overlay(
-                                    Circle().stroke(Color.gray, lineWidth: 1)
+                                    Circle().stroke(Color.black_4, lineWidth: 1)
                                 )
                                 .padding(.leading, 24)
                                 .padding(.top, 22)
