@@ -12,14 +12,14 @@ struct AccountCell: View {
     var account: AccountSearchResult
     var isFollowedByOthers: Bool
     var followersText: String? // "(유저이름)님 외 n명이 팔로우합니다." 형식
-
+    
     init(account: AccountSearchResult) {
         self.account = account
         self.isFollowedByOthers = account.searchFollowCount > 0 // 팔로우 수 1명 이상이면 true
-
+        
         // ✅ searchFollowName이 nil일 경우 빈 배열로 대체하여 안전하게 처리
         let followNames = account.searchFollowName ?? []
-
+        
         if let firstFollower = followNames.first, account.searchFollowCount > 1 {
             self.followersText = "\(firstFollower)님 외 \(account.searchFollowCount - 1)명이 팔로우합니다."
         } else if let firstFollower = followNames.first {
@@ -28,7 +28,7 @@ struct AccountCell: View {
             self.followersText = nil
         }
     }
-
+    
     var body: some View {
         HStack {
             ZStack {
@@ -42,7 +42,6 @@ struct AccountCell: View {
                         Circle()
                             .fill(Color.gray.opacity(0.3))
                             .frame(width: 64, height: 64)
-                            .padding(2)
                     }
                 } else {
                     Circle()
@@ -52,17 +51,24 @@ struct AccountCell: View {
                 
                 Circle()
                     .strokeBorder(
-                        account.hasStory ?
-                        LinearGradient(gradient: Gradient(colors: [
-                            Color(.Red_3),
-                            Color(.momogumRed)
-                        ]), startPoint: .topLeading, endPoint: .bottomTrailing) :
-                        LinearGradient(gradient: Gradient(colors: [Color.gray.opacity(0.5), Color.gray.opacity(0.5)]), startPoint: .topLeading, endPoint: .bottomTrailing),
-                        lineWidth: 4
+                        account.hasStory ? 
+                        (account.hasViewedStory ?
+                         LinearGradient(gradient: Gradient(colors: [
+                            Color.black_4, Color.black_4  // 본 스토리는 검정 단색
+                         ]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                         :
+                            LinearGradient(gradient: Gradient(colors: [
+                                Color.Red_3, Color.momogumRed  // 안 본 스토리는 빨강 그라데이션
+                            ]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                        )
+                        :
+                            LinearGradient(gradient: Gradient(colors: [Color.clear, Color.clear]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                        , lineWidth: 3
                     )
                     .frame(width: 70, height: 70)
+                
             }
-
+            
             VStack(alignment: .leading) {
                 Text(account.userName)
                     .font(.mmg(.subheader4))
@@ -111,7 +117,7 @@ struct AccountCell: View {
 //            hasStory: false,
 //            hasViewedStory: false
 //        ))
-//        
+//
 //        AccountCell(account: AccountSearchResult(
 //            id: 1,
 //            userName: "박지민",
