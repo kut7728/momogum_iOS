@@ -12,11 +12,13 @@ import Alamofire
 class ProfileViewModel: ObservableObject {
     @Published var isLoaded = false // 중복 호출 방지 플래그
     @Published private var isFetchingMealDiaries = false // API 요청 중인지 확인
-    @Published var profileImage: UIImage? // 확정된 프로필 이미지
-    @Published var currentPreviewImage: UIImage? // 편집 중에 보여지는 미리보기 이미지
-    @Published var userName: String
-    @Published var userID: String
-    @Published var userBio: String
+    @Published var profileImage: UIImage? = UIImage(named: "defaultProfile") // 확정된 프로필 이미지
+    @Published var currentPreviewImage: UIImage? = UIImage(named: "defaultProfile")// 편집 중에 보여지는 미리보기 이미지
+    
+    @Published var userName: String = ""
+    @Published var userID: String = ""
+    @Published var userBio: String = ""
+    
     @Published var mealDiaries: [ProfileMealDiary] = []
     @Published var bookmarkedMealDiaries: [ProfileMealDiary] = []
     
@@ -35,21 +37,10 @@ class ProfileViewModel: ObservableObject {
     }
     
     init(userId: Int) {
-        self.userName = ""
-        self.userID = ""
-        self.userBio = ""
-        
-        self.profileImage = UIImage(named: "defaultProfile")
-        self.currentPreviewImage = self.profileImage
-        
-        guard let uuid = self.uuid else {
-            print("⚠️ UUID가 없습니다. ProfileViewModel 초기화 중단")
-            return
-        }
-        
-        fetchUserProfile(userId: uuid)
-        fetchMealDiaries(userId: uuid)
-        fetchBookmarkedMealDiaries(userId: uuid)
+        self.userID = String(userId)
+        fetchUserProfile(userId: userId)
+        fetchMealDiaries(userId: userId)
+        fetchBookmarkedMealDiaries(userId: userId)
     }
 }
 
@@ -94,7 +85,6 @@ extension ProfileViewModel {
                 switch result {
                 case .success(let mealDiaries):
                     self.isLoaded = true
-                    print("✅ 유저 \(userId)의 밥일기 로드 성공: \(mealDiaries.count)개")
                     self.mealDiaries = mealDiaries
                 case .failure(let error):
                     print("❌ 유저 \(userId)의 밥일기 로드 실패: \(error.localizedDescription)")
@@ -221,8 +211,6 @@ extension ProfileViewModel {
     func refreshMealDiaries() {
         guard let userId = AuthManager.shared.UUID, !isFetchingMealDiaries else { return } //중복 실행 방지
         
-//        let userId = AuthManager.shared.UUID ?? 1
-//        guard !isFetchingMealDiaries else { return }
         isFetchingMealDiaries = true
         
         let group = DispatchGroup()
