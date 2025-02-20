@@ -36,11 +36,8 @@ class ProfileViewModel: ObservableObject {
         return AuthManager.shared.UUID
     }
     
-    init(userId: Int? = nil) {
-        let idToUse = userId ?? AuthManager.shared.UUID // 전달된 userId가 없으면 로그인한 유저 사용
-        
-        guard let userId = idToUse else { return }
-        
+    init(userId: Int) {
+        self.userID = String(userId)
         fetchUserProfile(userId: userId)
         fetchMealDiaries(userId: userId)
         fetchBookmarkedMealDiaries(userId: userId)

@@ -10,13 +10,24 @@ import SwiftUI
 struct FollowView: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var viewModel: ProfileViewModel
-    @ObservedObject var followViewModel: FollowViewModel
+    @StateObject var followViewModel = FollowViewModel()
+    
+    var userID: Int
+    var selectedUserID: Int
     
     @Binding var selectedSegment: Int
     @State private var showPopup = false
     @State private var showCompletedPopup = false
     @State private var profileUserID: String? // 타인 프로필 이동용
     @State private var popupUserID: String? // 팔로워 목록에서 삭제할 유저 ID
+    
+    init(userID: Int, selectedSegment: Binding<Int>, viewModel: ProfileViewModel) {
+        self.userID = userID
+        self._selectedSegment = selectedSegment
+        self.selectedUserID = userID 
+        self._viewModel = ObservedObject(wrappedValue: viewModel)
+    }
+    
     
     var body: some View {
         ZStack {
@@ -55,6 +66,7 @@ struct FollowView: View {
                             .foregroundColor(selectedSegment == 0 ? Color.black_1 : Color.black_3)
                             .onTapGesture {
                                 selectedSegment = 0
+                                followViewModel.fetchFollowerList(userId: selectedUserID)
                             }
                             .padding(.bottom, 15)
                         
@@ -72,6 +84,7 @@ struct FollowView: View {
                             .foregroundColor(selectedSegment == 1 ? Color.black_1 : Color.black_3)
                             .onTapGesture {
                                 selectedSegment = 1
+                                followViewModel.fetchFollowingList(userId: selectedUserID)
                             }
                             .padding(.bottom, 15)
                         
@@ -86,7 +99,7 @@ struct FollowView: View {
                 // 팔로워 / 팔로잉 목록
                 if selectedSegment == 0 {
                     MyFollower(followViewModel: followViewModel, showPopup: $showPopup, profileUserID: $profileUserID, popupUserID: $popupUserID)
-                } else if selectedSegment == 1 {
+                } else {
                     MyFollowing(followViewModel: followViewModel)
                 }
             }
@@ -94,12 +107,7 @@ struct FollowView: View {
             .edgesIgnoringSafeArea(.all)
             .toolbar(.hidden, for: .tabBar)
             .navigationBarBackButtonHidden()
-            .onAppear {
-                if let currentUserId = AuthManager.shared.UUID {
-                    followViewModel.fetchFollowerList(userId: currentUserId) // 팔로워 목록 불러오기
-                    followViewModel.fetchFollowingList(userId: currentUserId) // 팔로잉 목록 불러오기
-                }
-            }
+            
             
             if showPopup {
                 Color.black.opacity(0.001)
@@ -131,5 +139,14 @@ struct FollowView: View {
                     }
             }
         }
+        .onAppear {
+            if let userID = Int(viewModel.userID) {
+                followViewModel.fetchFollowerList(userId: userID)
+                followViewModel.fetchFollowingList(userId: userID)
+            } else {
+                print("❌ userID 변환 실패: \(viewModel.userID)")
+            }
+        }
+
     }
 }

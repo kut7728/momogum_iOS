@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct OtherCardView: View {
-    @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
     @Binding var isTabBarHidden: Bool
     

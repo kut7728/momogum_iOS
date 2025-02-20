@@ -20,21 +20,16 @@ struct MyProfileView: View {
     
     var mealDiary: ProfileMealDiary? = nil
     
-    @StateObject var viewModel = ProfileViewModel()
+    @StateObject var viewModel : ProfileViewModel
     @State var followViewModel: FollowViewModel = FollowViewModel()
     
     @Binding var isTabBarHidden: Bool
-    
+
     init(isTabBarHidden: Binding<Bool>) {
         self._isTabBarHidden = isTabBarHidden
-
-        if let userID = AuthManager.shared.UUID {
-            _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userID))
-        } else {
-            _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: 1)) // 기본값 설정
-            print("⚠️ UUID가 없어서 기본값 1을 사용합니다.")
-        }
+        _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1))
     }
+
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -243,8 +238,13 @@ private extension MyProfileView {
                     .contentShape(Rectangle())
             }
             .navigationDestination(isPresented: $navigateToFollowView) {
-                FollowView(viewModel: viewModel, followViewModel: followViewModel, selectedSegment: $showFollowList)
+                FollowView(
+                    userID: Int(viewModel.userID) ?? AuthManager.shared.UUID ?? 1,
+                    selectedSegment: $showFollowList,
+                    viewModel: ProfileViewModel(userId: Int(viewModel.userID) ?? AuthManager.shared.UUID ?? 1)
+                )
             }
+
             .navigationDestination(for: String.self) { value in
                 switch value {
                 case "EditProfileView":

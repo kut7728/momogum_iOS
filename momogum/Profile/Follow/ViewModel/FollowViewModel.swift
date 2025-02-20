@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 class FollowViewModel: ObservableObject {
-    @Published var followingUsers: [FollowingUser] = []  // ✅ 팔로우한 유저 리스트 (모델 배열로 변경)
+    @Published var followingUsers: [FollowingUser] = []  // 팔로우한 유저 리스트
     @Published var followingStatus: [String: Bool] = [:] // 유저 ID별 팔로우 여부
     
     @Published var followerCount: Int
@@ -17,7 +17,7 @@ class FollowViewModel: ObservableObject {
     
     @Published var search: String = ""
     @Published var loadedFollowers = 20 // 초기 로딩 개수
-    @Published var allFollowers: [Follower] = [] // ✅ 팔로워 목록도 모델 배열로 변경
+    @Published var allFollowers: [Follower] = [] // 팔로워 목록
     @Published var followUsers: [String] = [] // 팔로우한 유저 목록
     private var pendingUnfollow: [String] = [] // 언팔로우 예약된 유저 목록
     
@@ -119,8 +119,6 @@ class FollowViewModel: ObservableObject {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        print("📡 팔로우 요청 보냄: \(url.absoluteString)")
-        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ 팔로우 토글 실패: \(error.localizedDescription)")
@@ -131,13 +129,6 @@ class FollowViewModel: ObservableObject {
             guard let data = data else {
                 print("❌ 응답 데이터 없음")
                 return
-            }
-            
-            // 서버 응답 원본 출력 (디버깅용)
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("📥 서버 응답 데이터: \(jsonString)")
-            } else {
-                print("⚠️ 응답을 문자열로 변환할 수 없음")
             }
             
             do {
