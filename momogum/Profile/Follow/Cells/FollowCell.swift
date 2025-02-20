@@ -52,39 +52,34 @@ struct FollowCell: View {
             
             Spacer()
             
-            // 팔로워 목록일 때 (X 버튼 + 팔로우/언팔로우 버튼)
+            // 팔로우 / 언팔로우 버튼
+            Button {
+                toggleFollow(for: userId)
+            } label: {
+                RoundedRectangle(cornerRadius: 4)
+                    .frame(width: 72, height: 28)
+                    .foregroundStyle(isFollowing ? Color.black_6 : Color.Red_2)
+                    .overlay(
+                        Text(isFollowing ? "팔로잉" : "팔로우")
+                            .font(.mmg(.subheader4))
+                            .foregroundStyle(isFollowing ? Color.Red_2 : Color.black_6)
+                            .padding(6)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(isFollowing ? Color.black_4 : Color.clear, lineWidth: 1)
+                    )
+            }
+            .padding(.trailing, isFollowerList ? 25 : 30)
+            
             if isFollowerList {
-                
-                // 팔로우 / 언팔로우 버튼
-                Button {
-                    //                    isFollowing.toggle()
-                    //                    if isFollowing {
-                    //                        followViewModel.follow("\(userId)")
-                    //                    } else {
-                    //                        followViewModel.delayedUnfollow("\(userId)")
-                    //                    }
-                    toggleFollow(for: userId)
-                } label: {
-                    RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 72, height: 28)
-                        .foregroundStyle(isFollowing ? Color.black_6 : Color.Red_2)
-                        .overlay(
-                            Text(isFollowing ? "팔로잉" : "팔로우")
-                                .font(.mmg(.subheader4))
-                                .foregroundStyle(isFollowing ? Color.Red_2 : Color.black_6)
-                                .padding(6)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .stroke(isFollowing ? Color.black_4 : Color.clear, lineWidth: 1)
-                        )
-                }
-                .padding(.trailing, 25)
-                
                 // X 버튼 (팔로워 목록에서만 표시)
                 Button {
                     popupUserID = "\(userId)"
                     showPopup = true
+                    if let userID = AuthManager.shared.UUID, let targetUserId = Int("\(userId)") {
+                        followViewModel.deleteFollower(userId: userID, followerId: targetUserId)
+                    }
                 } label: {
                     Image("close_s")
                         .resizable()
@@ -92,61 +87,50 @@ struct FollowCell: View {
                 }
             }
             
-            // 팔로잉 목록일 때 (팔로우/언팔로우 버튼만 표시)
-            else {
-                Button {
-                    //                    isFollowing.toggle()
-                    //                    if isFollowing {
-                    //                        followViewModel.follow("\(userId)")
-                    //                    } else {
-                    //                        followViewModel.delayedUnfollow("\(userId)")
-                    //                    }
-                    toggleFollow(for: userId)
-                } label: {
-                    RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 72, height: 28)
-                        .foregroundStyle(isFollowing ? Color.black_6 : Color.Red_2)
-                        .overlay(
-                            Text(isFollowing ? "팔로잉" : "팔로우")
-                                .font(.mmg(.subheader4))
-                                .foregroundStyle(isFollowing ? Color.Red_2 : Color.black_6)
-                                .padding(6)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .stroke(isFollowing ? Color.black_4 : Color.clear, lineWidth: 1)
-                        )
-                }
-                .padding(.trailing, 30)
-            }
         }
         .onAppear {
-            updateFollowStatus(for: userId)
+            if let status = followViewModel.followingStatus["\(userId)"] {
+                self.isFollowing = status
+            } else {
+                self.isFollowing = false // 기본값
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("FollowStatusChanged"))) { notification in
             if let userInfo = notification.userInfo,
                let changedUserID = userInfo["userID"] as? String,
-               let isFollowing = userInfo["isFollowing"] as? Bool,
+               let newFollowStatus = userInfo["isFollowing"] as? Bool,
                changedUserID == "\(userId)" {
-                self.isFollowing = isFollowing
+                self.isFollowing = newFollowStatus
             }
         }
-        
     }
     
-    // 팔로우 상태 업데이트
+    
     private func updateFollowStatus(for userId: Int) {
-        self.isFollowing = followViewModel.isFollowing("\(userId)")
+        self.isFollowing = followViewModel.followingStatus["\(userId)"] ?? false
     }
     
-    // 팔로우 / 언팔로우 토글
+    
     private func toggleFollow(for userId: Int) {
         guard let currentUserId = AuthManager.shared.UUID else {
             print("❌ 현재 로그인한 유저 ID를 가져올 수 없습니다.")
             return
         }
         
-        isFollowing.toggle()
+        // 현재 팔로우 상태를 가져오기
+        let wasFollowing = isFollowing
+        
+        // UI 변경을 바로 하지 않고, 서버 응답 후 반영
         followViewModel.toggleFollow(userId: currentUserId, targetUserId: "\(userId)")
+        
+        // 서버 응답을 받으면 업데이트 (API에서 성공 여부 확인)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // API 응답 시점 반영
+            if let newStatus = self.followViewModel.followingStatus["\(userId)"] {
+                self.isFollowing = newStatus
+            } else {
+                self.isFollowing = !wasFollowing // 만약 API 응답이 없으면 원래 상태로 복원
+            }
+        }
     }
+
 }

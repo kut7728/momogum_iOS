@@ -33,7 +33,10 @@ class FollowViewModel: ObservableObject {
         if search.isEmpty {
             return Array(allFollowers.prefix(loadedFollowers)) // 검색어가 없으면 현재 로드된 만큼만 반환
         } else {
-            return allFollowers.filter { $0.nickname.localizedCaseInsensitiveContains(search) } // 닉네임 기준으로 검색
+            return allFollowers.filter {
+                $0.nickname.localizedCaseInsensitiveContains(search) ||
+                $0.name.localizedCaseInsensitiveContains(search) // 닉네임 + 이름 검색
+            }
         }
     }
     
@@ -42,7 +45,10 @@ class FollowViewModel: ObservableObject {
         if search.isEmpty {
             return followingUsers // 검색어가 없으면 전체 반환
         } else {
-            return followingUsers.filter { $0.nickname.localizedCaseInsensitiveContains(search) } // 닉네임 기준으로 검색
+            return followingUsers.filter {
+                $0.nickname.localizedCaseInsensitiveContains(search) ||
+                $0.name.localizedCaseInsensitiveContains(search) // 닉네임 + 이름 검색
+            }
         }
     }
     
@@ -90,7 +96,7 @@ class FollowViewModel: ObservableObject {
         pendingUnfollow.removeAll() // 초기화
     }
     
-//    // 팔로워 삭제
+    //    // 팔로워 삭제
     func removeFollower(_ userID: Int) {
         allFollowers.removeAll { $0.userId == userID } // userId 기준으로 삭제
         followerCount = allFollowers.count // 팔로워 수 업데이트
@@ -154,7 +160,7 @@ class FollowViewModel: ObservableObject {
             }
         }.resume()
     }
-
+    
     
     // 유저 ID별 팔로우 여부 로드
     func fetchFollowStatus(userId: Int, targetUserIds: [String]) {
@@ -182,28 +188,31 @@ class FollowViewModel: ObservableObject {
             print("❌ 유효하지 않은 URL")
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ 팔로잉 목록 요청 실패: \(error.localizedDescription)")
                 return
             }
-
+            
             guard let data = data else {
                 print("❌ 응답 데이터 없음")
                 return
             }
-
+            
             do {
                 let decodedResponse = try JSONDecoder().decode(FollowingListResponse.self, from: data)
                 DispatchQueue.main.async {
                     if decodedResponse.isSuccess {
                         self.followingUsers = decodedResponse.result
                         self.followingCount = self.followingUsers.count
+                        
+                        // 팔로우 상태 저장
+                        self.updateFollowingStatus()
                     } else {
                         print("❌ API 요청 실패: \(decodedResponse.message)")
                     }
@@ -213,7 +222,8 @@ class FollowViewModel: ObservableObject {
             }
         }.resume()
     }
-
+    
+    
     
     
     
@@ -223,14 +233,66 @@ class FollowViewModel: ObservableObject {
             print("❌ 유효하지 않은 URL")
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ 팔로워 목록 요청 실패: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let data = data else {
+                print("❌ 응답 데이터 없음")
+                return
+            }
+            
+            do {
+                let decodedResponse = try JSONDecoder().decode(FollowerListResponse.self, from: data)
+                DispatchQueue.main.async {
+                    if decodedResponse.isSuccess {
+                        self.allFollowers = decodedResponse.result
+                        self.followerCount = self.allFollowers.count
+
+                        // 팔로우 상태 저장
+                        self.updateFollowingStatus()
+                    } else {
+                        print("❌ API 요청 실패: \(decodedResponse.message)")
+                    }
+                }
+            } catch {
+                print("❌ JSON 디코딩 오류: \(error.localizedDescription)")
+            }
+        }.resume()
+    }
+    
+    func updateFollowingStatus() {
+        for user in followingUsers {
+            followingStatus["\(user.userId)"] = true
+        }
+        for user in allFollowers {
+            if followingStatus["\(user.userId)"] == nil {
+                followingStatus["\(user.userId)"] = false
+            }
+        }
+    }
+    
+    // 팔로워 삭제
+    func deleteFollower(userId: Int, followerId: Int) {
+        guard let url = URL(string: "\(BaseAPI)/follows/\(userId)/delete/\(followerId)/toggle") else {
+            print("❌ 유효하지 않은 URL")
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("❌ 팔로워 목록 요청 실패: \(error.localizedDescription)")
+                print("❌ 팔로워 삭제 실패: \(error.localizedDescription)")
                 return
             }
 
@@ -240,11 +302,10 @@ class FollowViewModel: ObservableObject {
             }
 
             do {
-                let decodedResponse = try JSONDecoder().decode(FollowerListResponse.self, from: data)
+                let decodedResponse = try JSONDecoder().decode(FollowResponse.self, from: data)
                 DispatchQueue.main.async {
                     if decodedResponse.isSuccess {
-                        self.allFollowers = decodedResponse.result // 닉네임 리스트 저장
-                        self.followerCount = self.allFollowers.count // 팔로워 수 업데이트
+                        print("서버에서 팔로워 삭제 성공: \(followerId)")
                     } else {
                         print("❌ API 요청 실패: \(decodedResponse.message)")
                     }

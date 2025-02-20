@@ -27,6 +27,7 @@ struct OtherProfileView: View {
     @State private var isTabBarHidden = true
     @State private var showFollowList = 0 // 팔로워(0) / 팔로잉(1) 전환 값
     @State private var navigateToFollowView = false
+    @State private var isUserFollowing: Bool = false
     
     @State var followViewModel: FollowViewModel = FollowViewModel()
     @StateObject private var viewModel: ProfileViewModel
@@ -53,10 +54,10 @@ struct OtherProfileView: View {
         self.followingCount = followingCount
         self.hasStory = hasStory
         self.hasViewedStory = hasViewedStory
-
+        
         _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userID)) // 해당 유저의 프로필 로드
     }
-
+    
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -113,6 +114,25 @@ struct OtherProfileView: View {
                 // 팔로워/팔로잉 정보 로드
                 followViewModel.fetchFollowerList(userId: userID)
                 followViewModel.fetchFollowingList(userId: userID)
+                
+                // 현재 유저의 팔로우 상태 업데이트
+                DispatchQueue.main.async {
+                    if let currentUserId = AuthManager.shared.UUID {
+                        // 팔로우 상태를 즉시 가져와 버튼 상태 반영
+                        if let existingStatus = followViewModel.followingStatus["\(userID)"] {
+                            self.isUserFollowing = existingStatus
+                        }
+                        
+                        // API 요청하여 최신 상태 가져오기 (이미 변경된 경우 업데이트 방지)
+                        followViewModel.fetchFollowingList(userId: currentUserId)
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            if let updatedStatus = followViewModel.followingStatus["\(userID)"], updatedStatus != self.isUserFollowing {
+                                self.isUserFollowing = updatedStatus
+                            }
+                        }
+                    }
+                }
             }
             .navigationDestination(isPresented: $navigateToFollowView) {
                 FollowView(
@@ -121,7 +141,7 @@ struct OtherProfileView: View {
                     viewModel: viewModel
                 )
             }
-
+            
             
             // Popup
             ShowPopup()
@@ -137,7 +157,7 @@ private extension OtherProfileView {
         HStack(alignment: .center){
             
             Button{
-//                dismiss()
+                //                dismiss()
                 presentationMode.wrappedValue.dismiss()
             }label:{
                 Image("back")
@@ -241,7 +261,10 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
+                    //                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
+                    //                        .font(.mmg(.subheader4))
+                    //                        .foregroundStyle(Color.black_1)
+                    Text("0")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
                 }
@@ -262,7 +285,10 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
+                    //                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
+                    //                        .font(.mmg(.subheader4))
+                    //                        .foregroundStyle(Color.black_1)
+                    Text("0")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
                 }
@@ -270,38 +296,22 @@ private extension OtherProfileView {
             .padding(.trailing, 67)
             
             // 팔로우 / 팔로잉 버튼
-            if followViewModel.isFollowing(String(userID)) {
-                Button {
-                    followViewModel.unfollow(String(userID))
-                } label: {
-                    RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 72, height: 28)
-                        .foregroundStyle(Color.black_6)
-                        .overlay(
-                            Text("팔로잉")
-                                .font(.mmg(.subheader4))
-                                .foregroundStyle(Color.Red_2)
-                                .padding(6)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .stroke(Color.black_4, lineWidth: 1)
-                        )
-                }
-            } else {
-                Button {
-                    followViewModel.follow(String(userID))
-                } label: {
-                    RoundedRectangle(cornerRadius: 4)
-                        .frame(width: 72, height: 28)
-                        .foregroundStyle(Color.Red_2)
-                        .overlay(
-                            Text("팔로우")
-                                .font(.mmg(.subheader4))
-                                .foregroundStyle(Color.black_6)
-                                .padding(6)
-                        )
-                }
+            Button {
+                toggleFollow(for: userID)
+            } label: {
+                RoundedRectangle(cornerRadius: 4)
+                    .frame(width: 72, height: 28)
+                    .foregroundStyle(isUserFollowing ? Color.black_6 : Color.Red_2)
+                    .overlay(
+                        Text(isUserFollowing ? "팔로잉" : "팔로우")
+                            .font(.mmg(.subheader4))
+                            .foregroundStyle(isUserFollowing ? Color.Red_2 : Color.black_6)
+                            .padding(6)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(isUserFollowing ? Color.black_4 : Color.clear, lineWidth: 1)
+                    )
             }
         }
         .padding(.bottom, 23)
@@ -347,15 +357,6 @@ private extension OtherProfileView {
         }
         .padding(.bottom, 41)
         .padding(.horizontal, 10)
-        //        .navigationDestination(isPresented: $navigateToMyCardView) {
-        //            if let mealDiary = mealDiary {
-        //                MyCardView(isTabBarHidden: $isTabBarHidden, mealDiaryId: Int(mealDiary.mealDiaryId))
-        //                    .onAppear { isTabBarHidden = true }
-        //                    .onDisappear { isTabBarHidden = false }
-        //            } else {
-        //                Text("잘못된 접근입니다.")
-        //            }
-        //        }
     }
     
     // 밥일기 Card
@@ -395,4 +396,36 @@ private extension OtherProfileView {
             }
         }
     }
+    
+    private func toggleFollow(for userId: Int) {
+        guard let currentUserId = AuthManager.shared.UUID else {
+            print("❌ 현재 로그인한 유저 ID를 가져올 수 없습니다.")
+            return
+        }
+        
+        // 기존 상태 저장
+        let previousState = isUserFollowing
+        
+        // 버튼 클릭 시 즉시 UI 업데이트
+        isUserFollowing.toggle()
+        
+        // 팔로우/언팔로우 요청
+        followViewModel.toggleFollow(userId: currentUserId, targetUserId: "\(userId)")
+        
+        // API 요청 후 상태 업데이트
+        DispatchQueue.main.asyncAfter(deadline: .now()) {
+            followViewModel.fetchFollowingList(userId: currentUserId)
+            
+            DispatchQueue.main.async {
+                if let status = followViewModel.followingStatus["\(userID)"] {
+                    if status != self.isUserFollowing {  //API 응답과 UI 상태가 다르면 보정
+                        self.isUserFollowing = status
+                    }
+                } else {
+                    self.isUserFollowing = previousState
+                }
+            }
+        }
+    }
+    
 }
