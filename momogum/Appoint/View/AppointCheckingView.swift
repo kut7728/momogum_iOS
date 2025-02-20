@@ -13,8 +13,17 @@ import SwiftUI
 struct AppointCheckingView: View {
     @Environment(\.dismiss) var dismiss
     
-    @State var showConfirmPopUp: Bool = false
-    @State var showCanclePopUp: Bool = false
+    @State var showConfirmPopUp: Bool = false // 약속 확정
+    @State var showCanclePopUp: Bool = false // 약속 취소
+    
+    private var isOther: Bool { appoint.senderId != AuthManager.shared.UUID }
+    @State var showDeclinePopUp: Bool = false  // 약속 거절
+    @State var showApprovePopUp: Bool = false  // 약속 수락
+    
+    @State var showConfirmAlarm: Bool = false  // 약속 확정 알람
+    @State var showCancleAlarm: Bool = false  // 약속 취소 알람
+    @State var showDeclineAlarm: Bool = false  // 약속 거절 알람
+    @State var showApproveAlarm: Bool = false  // 약속 수락 알람
     
     let appoint: Appoint
     
@@ -37,7 +46,7 @@ struct AppointCheckingView: View {
                         Image(appoint.pickedCard)
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(width: 170)
+                            .frame(width: 200)
                             .padding(.vertical, 20)
                             .frame(maxWidth: .infinity, alignment: .center)
                         
@@ -105,10 +114,14 @@ struct AppointCheckingView: View {
                     HStack {
                         Button {
                             withAnimation {
-                                showCanclePopUp = true
+                                if isOther {
+                                    showDeclinePopUp = true
+                                } else {
+                                    showCanclePopUp = true
+                                }
                             }
                         } label: {
-                            Text("약속 취소")
+                            Text(isOther ? "약속 거절" : "약속 취소")
                                 .font(.mmg(.subheader3))
                                 .frame(height: 50)
                                 .frame(maxWidth: .infinity)
@@ -116,7 +129,7 @@ struct AppointCheckingView: View {
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(lineWidth: 2)
                                 }
-                                .foregroundStyle(.Red_2)
+                                .foregroundStyle(isOther ? .black_3 : .Red_2)
                         }
                         
                         Spacer()
@@ -124,10 +137,14 @@ struct AppointCheckingView: View {
                         
                         Button {
                             withAnimation {
-                                showConfirmPopUp = true
+                                if isOther {
+                                    showApprovePopUp = true
+                                } else {
+                                    showConfirmPopUp = true
+                                }
                             }
                         } label: {
-                            Text("약속 확정")
+                            Text(isOther ? "약속 수락" : "약속 확정")
                                 .font(.mmg(.subheader3))
                                 .frame(height: 50)
                                 .frame(maxWidth: .infinity)
@@ -135,7 +152,7 @@ struct AppointCheckingView: View {
                                     RoundedRectangle(cornerRadius: 12)
                                         .stroke(lineWidth: 2)
                                 }
-                                .foregroundStyle(.black_3)
+                                .foregroundStyle(isOther ? .Red_2 : .black_3)
                         }
                         
                     }
@@ -160,39 +177,30 @@ struct AppointCheckingView: View {
                     }
                 }
                 
+                
+                
                 if showConfirmPopUp {
-                    appointConfirmPopup()
+                    ConfirmPopUpView(showPopUp: $showConfirmPopUp, showAlarm: $showConfirmAlarm)
+                } else if showCanclePopUp {
+                    CanclePopUpView(showPopUp: $showCanclePopUp, showAlarm: $showCancleAlarm)
+                } else if showDeclinePopUp {
+                    DeclinePopUpView(showPopUp: $showDeclinePopUp, showAlarm: $showDeclineAlarm, name: appoint.appointName)
+                } else if showApprovePopUp {
+                    ApprovePopUpView(showPopUp: $showApprovePopUp, showAlarm: $showApproveAlarm)
                 }
                 
-                if showCanclePopUp {
-                    appointCancelPopup()
+                if showCancleAlarm {
+                    CancleAlarmView(showAlarm: $showCancleAlarm)
+                } else if showDeclineAlarm {
+                    DeclineAlarmView(showAlarm: $showDeclineAlarm)
+                } else if showApproveAlarm {
+                    ApproveAlarmView(showAlarm: $showApproveAlarm)
+                } else if showConfirmAlarm {
+                    ConfirmAlarmView(showAlarm: $showConfirmAlarm)
                 }
             }
         }
     }
-}
-
-// MARK: - extensions
-extension AppointCheckingView {
-    func appointConfirmPopup() -> some View {
-        CustomPopUpView(showPopUp: $showConfirmPopUp,
-                        title: "약속을 확정해요",
-                        message: "지금까지 초대를 수락한 참가자와 약속을 확정합니다. 더 이상 다른 참가자가 초대를 수락할 수 없습니다.",
-                        btn1: "돌아가기",
-                        btn2: "약속 확정")
-
-    }
-    
-    func appointCancelPopup() -> some View {
-        CustomPopUpView(showPopUp: $showCanclePopUp,
-                        title: "약속을 취소해요",
-                        message: "취소된 약속은 다시 불러올 수 없습니다.",
-                        btn1: "돌아가기",
-                        btn2: "약속 취소")
-
-    }
-    
-    
 }
 
 #Preview {

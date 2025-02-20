@@ -11,7 +11,9 @@ import SwiftUI
 struct AppointSentView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var path: [String]
+    
     @State var isPresented: Bool = false
+    var appoint: Appoint
     
     var body: some View {
         VStack {
@@ -21,10 +23,12 @@ struct AppointSentView: View {
                 .font(.mmg(.subheader2))
                 .padding(.bottom, 20)
             
-            Rectangle()
-                .frame(width: 170, height: 120)
-                .foregroundStyle(.gray.opacity(0.2))
-                .padding()
+            Image(appoint.pickedCard)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 270)
+                .padding(.vertical, 20)
+                .frame(maxWidth: .infinity, alignment: .center)
             
             Spacer()
             
@@ -47,7 +51,7 @@ struct AppointSentView: View {
             Spacer()
         }
         .fullScreenCover(isPresented: $isPresented) {
-            AppointCheckingView(appoint: Appoint.DUMMY_APM)
+            AppointCheckingView(appoint: appoint)
         }
         
         .padding(.horizontal)
@@ -70,5 +74,7 @@ struct AppointSentView: View {
 }
 
 #Preview {
-    AppointSentView(path: AppointView(isTabBarHidden: .constant(true)).$path)
+    let appointView = AppointView.init(isTabBarHidden: .constant(true))
+    
+    AppointSentView(path: appointView.$path, appoint: Appoint.DUMMY_APM)
 }

@@ -14,7 +14,7 @@ struct WaitingConfirmCellView: View {
     
     let dateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy년 M월 d일 HH:mm"
+        formatter.dateFormat = "yyyy년 M월 d일"
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter
     }
@@ -23,56 +23,44 @@ struct WaitingConfirmCellView: View {
     var body: some View {
         
         Rectangle()
-            .frame(width: 215, height: 170)
-            .foregroundStyle(.black_6)
+            .frame(width: 160, height: 220)
+            .foregroundStyle(.black_5)
             .clipShape(RoundedRectangle(cornerRadius: 10))
-            .overlay(RoundedRectangle(cornerRadius: 10)
-                .stroke(lineWidth: 2)
-                .foregroundStyle(.black_4))
             .overlay {
-                VStack (alignment: .leading, spacing: 0) {
+                VStack (alignment: .leading) {
                     Text("\(appoint.pickedDate, formatter: dateFormatter())")
                         .font(.mmg(.Caption2))
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    Text(appoint.placeName)
-                        .font(.mmg(.Caption2))
-
                     Spacer()
+                    
+                    Text(appoint.senderName)
+                        .font(.mmg(.Body4))
+                    + Text("님이")
+                        .font(.mmg(.Body3))
                     
                     Text(appoint.appointName)
-                        .font(.mmg(.subheader3))
-                        .padding(.bottom, 5)
-                    HStack {
-                        Image("menu")
-                            .resizable()
-                            .frame(width: 16, height: 16)
-                        Text(appoint.menuName)
-                            .font(.mmg(.Caption2))
-                    }
-
+                        .font(.mmg(.Body4))
+                    + Text("에 초대합니다")
+                        .font(.mmg(.Body3))
                     
                     Spacer()
-                    
                     Button {
                         isPresented = true
-                        } label: {
-                            Text("약속 자세히 보기")
-                                .font(.mmg(.Caption1))
-                                .frame(width: 170, height: 30)
-                                .background(.black_6)
-                                .foregroundStyle(.Red_2)
-                                .overlay(RoundedRectangle(cornerRadius: 4)
-                                    .stroke(lineWidth: 2)
-                                    .foregroundStyle(.Red_2)
-                                )
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
+                    } label: {
+                        Text("초대장 열기")
+                            .font(.mmg(.Caption1))
+                            .frame(width: 120, height: 25)
+                            .background(.Red_2)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                    }
                     
                 }
                 .padding(.horizontal)
-                .padding(.vertical, 15)
+                .padding(.top, 20)
+                .padding(.bottom, 30)
             }
-            .padding(3)
+            .padding(.trailing, 10)
     }
 }
 

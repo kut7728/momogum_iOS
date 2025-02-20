@@ -16,11 +16,18 @@ struct AppointView: View {
     
     @Binding var isTabBarHidden: Bool
     
+    /// 자세한 초대장 확인 뷰에 들어갈 데이터
+    @State var targetAppoint: Appoint = Appoint.DUMMY_APM
+    
     var body: some View {
         NavigationStack (path: $path) {
             ScrollView {
                 VStack (alignment: .leading) {
                     Button {
+                        Task {
+                            await newAppointViewModel.getAppointId() // 약속 id 할당 POST
+                            await newAppointViewModel.getAvailableFriends() // 초대 가능 친구 GET
+                        }
                         path.append("create1")
                         isTabBarHidden = true
                     } label: {
@@ -56,23 +63,23 @@ struct AppointView: View {
                             AppointCreate3View(path: $path)
                                 .environment(newAppointViewModel)
                         } else if (value == "create4") {
-                            AppointCreate4View(path: $path)
+                            AppointCreate4View(path: $path, appointViewModel: $viewModel)
                                 .environment(newAppointViewModel)
                         } else {
-                            AppointSentView(path: $path)
+                            AppointSentView(path: $path, appoint: newAppointViewModel.newAppoint ?? Appoint.DUMMY_APM)
                         }
                         
                     }
                     .frame(maxWidth: .infinity)
                     
-                    
+                    // MARK: - 미확정 약속 목록
                     VStack (alignment: .leading) {
                         Text("수락 대기 중인 약속")
                             .font(.mmg(.subheader3))
                             .padding(.leading, 30)
                         
                         
-                        if (viewModel.appoints.isEmpty) {
+                        if (viewModel.pendingAppoints.isEmpty) {
                             Rectangle()
                                 .foregroundStyle(.black_5)
                                 .frame(width: 336, height: 156)
@@ -95,8 +102,8 @@ struct AppointView: View {
                                     Spacer()
                                         .frame(width: 30)
                                     
-                                    ForEach(viewModel.appoints) { appoint in
-                                        NearAppointCellView(isPresented: $isPresented, appoint: appoint)
+                                    ForEach(viewModel.pendingAppoints) { appoint in
+                                        WaitingConfirmCellView(isPresented: $isPresented, appoint: appoint)
                                     }
                                 }
                             }
@@ -104,11 +111,15 @@ struct AppointView: View {
                             .scrollIndicators(.hidden)
                         }
                         
+                        
+                        // MARK: - 확정 약속 목록
                         Text("다가오는 식사 약속")
                             .font(.mmg(.subheader3))
                             .padding(.leading, 30)
                         
-                        if (viewModel.appoints.isEmpty) {
+                        if (viewModel.confirmedAppoints.isEmpty) {
+                            
+                            // 확정 약속이 없는 경우
                             Rectangle()
                                 .foregroundStyle(.black_5)
                                 .frame(width: 336, height: 156)
@@ -120,14 +131,17 @@ struct AppointView: View {
                                         .foregroundStyle(.black_3)
                                 }
                                 .padding(.vertical, 20)
+                            
                         } else {
+                            
+                            // 확정 약속이 있는 경우
                             ScrollView (.horizontal, showsIndicators: true) {
                                 HStack {
                                     Spacer()
                                         .frame(width: 30)
                                     
-                                    ForEach(viewModel.appoints) { appoint in
-                                        WaitingConfirmCellView(isPresented: $isPresented, appoint: appoint)
+                                    ForEach(viewModel.confirmedAppoints) { appoint in
+                                        NearAppointCellView(isPresented: $isPresented, targetAppoint: $targetAppoint, appoint: appoint)
                                     }
                                 }
                             }
@@ -142,14 +156,14 @@ struct AppointView: View {
                 }
             }
             .refreshable {
-                await viewModel.loadAllAppoints()
+                viewModel.loadMyAppoints()
             }
             .task {
-                await viewModel.loadAllAppoints()
+                viewModel.loadMyAppoints()
                 isTabBarHidden = false
             }
             .fullScreenCover(isPresented: $isPresented) {
-                AppointCheckingView(appoint: Appoint.DUMMY_APM)
+                AppointCheckingView(appoint: targetAppoint)
             }
         }
     }

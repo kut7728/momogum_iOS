@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct ApmInvitedFriends: View {
-    let pickedFriends: [String]
+    let pickedFriends: [Friend]
     let isEditing: Bool
     
     var body: some View {
         HStack(spacing: -10) {
-            ForEach(Array(pickedFriends.enumerated()), id: \.1) { index, name in
+            ForEach(pickedFriends, id: \.name) { profile in
                 Image("emptyAvatar")
                     .resizable()
                     .frame(width: 40, height: 40)
