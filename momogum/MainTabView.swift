@@ -71,21 +71,27 @@ struct CustomTabItem: View {
     let tab: Int
     
     var body: some View {
-        VStack {
+        VStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.system(size: 22))
+                .font(.system(size: 24))
                 .foregroundColor(selectedTab == tab ? Color.Red_2 : Color.black_3)
-
+                
             Text(title)
-                .font(.system(size: 12))
+                .font(.mmg(.Caption1))
                 .foregroundColor(selectedTab == tab ? Color.Red_2 : Color.black_3)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: true, vertical: false)
         }
+        .padding(.vertical,11)
+        .padding(.horizontal,24)
         .onTapGesture {
             selectedTab = tab
         }
     }
+        
 }
-
 #Preview {
     MainTabView()
 }
