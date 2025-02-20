@@ -71,7 +71,7 @@ class AccountSearchViewModel: ObservableObject {
                     print("계정 검색 완료")
                 case .failure(let error):
                     self.errorMessage = "계정 검색 실패: \(error.localizedDescription)"
-                    print("❌ [오류] API 요청 실패: \(error.localizedDescription)")
+                    //print("❌ [오류] API 요청 실패: \(error.localizedDescription)")
                 }
             }, receiveValue: { [weak self] results in
                 guard let self = self else { return }
