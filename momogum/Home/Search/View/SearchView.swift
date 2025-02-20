@@ -11,11 +11,10 @@ struct SearchView: View {
     @StateObject private var accountViewModel = AccountSearchViewModel()
     @StateObject private var keywordViewModel = KeywordSearchViewModel()
     @State private var selectedButton: String = "계정"
-    @State private var isEditing: Bool = false
+    @State private var searchQuery: String = "" // 검색어 상태 추가
 
     @Environment(\.presentationMode) var presentationMode
     @FocusState private var isFocused: Bool
-    @State private var hasStartedEditing: Bool = false
     
     @State private var selectedUser: AccountSearchResult?
     @State private var isNavigatingToProfile = false
@@ -33,30 +32,22 @@ struct SearchView: View {
                             .foregroundColor(.black)
                             .padding(.leading, 8)
                         
-                        TextField("계정 및 키워드 검색", text: selectedButton == "계정" ? $accountViewModel.searchQuery : $keywordViewModel.searchQuery, onCommit: {
-                            hasStartedEditing = true
+                        TextField("계정 및 키워드 검색", text: $searchQuery, onCommit: {
+                            performSearch()
                         })
                         .font(.mmg(.subheader4))
                         .foregroundColor(.primary)
                         .padding(8)
                         .textInputAutocapitalization(.never)
                         .focused($isFocused)
-                        .onChange(of: accountViewModel.searchQuery) {
-                            if selectedButton == "계정" {
-                                accountViewModel.searchAccounts(reset: true)
-                                hasStartedEditing = true
-                            }
-                        }
-                        .onChange(of: keywordViewModel.searchQuery) {
-                            if selectedButton == "키워드" {
-                                keywordViewModel.searchKeywords(reset: true)
-                                hasStartedEditing = true
-                            }
+                        .onChange(of: searchQuery) {
+                            performSearch()
                         }
                         
-                        if !accountViewModel.searchQuery.isEmpty || !keywordViewModel.searchQuery.isEmpty {
+                        if !searchQuery.isEmpty {
                             Button(action: {
                                 withAnimation {
+                                    searchQuery = ""
                                     accountViewModel.clearSearch()
                                     keywordViewModel.clearSearch()
                                 }
@@ -78,53 +69,51 @@ struct SearchView: View {
                     .padding(.top, 24)
                 }
                 
-                if hasStartedEditing {
-                    VStack {
-                        Divider()
-                            .background(Color.gray)
-                            .padding(.top, 12)
-                        
-                        HStack(spacing: 48) {
-                            Button(action: {
-                                selectedButton = "계정"
-                                accountViewModel.clearSearch()
-                            }) {
-                                VStack {
-                                    Text("계정")
-                                        .font(.mmg(.subheader4))
-                                        .fontWeight(selectedButton == "계정" ? .bold : .regular)
-                                        .foregroundColor(selectedButton == "계정" ? .black : .gray)
-                                        .frame(width: 140, height: 48)
-                                    
-                                    Rectangle()
-                                        .fill(selectedButton == "계정" ? Color.black : Color.clear)
-                                        .frame(width: 140, height: 2)
-                                }
-                            }
-                            
-                            Button(action: {
-                                selectedButton = "키워드"
-                                keywordViewModel.clearSearch()
-                                keywordViewModel.searchKeywords(reset: true)
-                            }) {
-                                VStack {
-                                    Text("키워드")
-                                        .font(.mmg(.subheader4))
-                                        .fontWeight(selectedButton == "키워드" ? .bold : .regular)
-                                        .foregroundColor(selectedButton == "키워드" ? .black : .gray)
-                                        .frame(width: 140, height: 48)
-                                    
-                                    Rectangle()
-                                        .fill(selectedButton == "키워드" ? Color.black : Color.clear)
-                                        .frame(width: 140, height: 2)
-                                }
+                // ✅ 항상 표시되도록 수정 (hasStartedEditing 조건 제거)
+                VStack {
+                    Divider()
+                        .background(Color.gray)
+                        .padding(.top, 12)
+                    
+                    HStack(spacing: 48) {
+                        Button(action: {
+                            selectedButton = "계정"
+                            performSearch()
+                        }) {
+                            VStack {
+                                Text("계정")
+                                    .font(.mmg(.subheader4))
+                                    .fontWeight(selectedButton == "계정" ? .bold : .regular)
+                                    .foregroundColor(selectedButton == "계정" ? .black : .gray)
+                                    .frame(width: 140, height: 48)
+                                
+                                Rectangle()
+                                    .fill(selectedButton == "계정" ? Color.black : Color.clear)
+                                    .frame(width: 140, height: 2)
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 8)
+                        
+                        Button(action: {
+                            selectedButton = "키워드"
+                            performSearch()
+                        }) {
+                            VStack {
+                                Text("키워드")
+                                    .font(.mmg(.subheader4))
+                                    .fontWeight(selectedButton == "키워드" ? .bold : .regular)
+                                    .foregroundColor(selectedButton == "키워드" ? .black : .gray)
+                                    .frame(width: 140, height: 48)
+                                
+                                Rectangle()
+                                    .fill(selectedButton == "키워드" ? Color.black : Color.clear)
+                                    .frame(width: 140, height: 2)
+                            }
+                        }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
                 }
-                
+
                 Spacer()
                     .frame(height: 32)
                 
@@ -143,7 +132,7 @@ struct SearchView: View {
                         }
                         .padding(.horizontal, 16)
                     } else {
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) { 
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                             ForEach(keywordViewModel.keywordResults) { keyword in
                                 Button(action: {
                                     selectedKeyword = keyword
@@ -158,7 +147,6 @@ struct SearchView: View {
                     }
                 }
                 .transition(.opacity)
-                
                 
                 Spacer()
             }
@@ -207,14 +195,25 @@ struct SearchView: View {
                     )
                 }
             }
-            navigationDestination(isPresented: $isNavigatingToCard) {
+            .navigationDestination(isPresented: $isNavigatingToCard) {
                 if let keyword = selectedKeyword {
                     OtherCardView(isTabBarHidden: .constant(true), userID: keyword.id, mealDiaryId: keyword.id)
                 }
             }
         }
     }
+    
+    private func performSearch() {
+        if selectedButton == "계정" {
+            accountViewModel.searchQuery = searchQuery
+            accountViewModel.searchAccounts(reset: true)
+        } else {
+            keywordViewModel.searchQuery = searchQuery
+            keywordViewModel.searchKeywords(reset: true)
+        }
+    }
 }
+
 
 #Preview {
     SearchView()

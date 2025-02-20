@@ -46,6 +46,8 @@ struct KeywordCell: View {
                     Text(keyword.foodName)
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.black_1)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
 
                     Spacer()
                 }
