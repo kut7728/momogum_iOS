@@ -188,7 +188,7 @@ struct SearchView: View {
             .navigationDestination(isPresented: $isNavigatingToProfile) {
                 if let user = selectedUser {
                     OtherProfileView(
-                        userID: user.userNickName,
+                        userID: user.id,
                         isFollowing: false,
                         userName: user.userName,
                         profileImageURL: user.userImageURL,
@@ -201,8 +201,7 @@ struct SearchView: View {
                             } else {
                                 return nil
                             }
-                        }(), // ✅ 여기서 즉시 실행
-                        viewModel: ProfileViewModel(userId: user.id)
+                        }()
                     )
                 }
             }

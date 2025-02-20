@@ -53,11 +53,18 @@ struct MyFollower: View {
                 
             }
             .navigationDestination(item: $profileUserID) { userID in
-                OtherProfileView(
-                    userID: userID,
-                    isFollowing: followViewModel.isFollowing(userID),
-                    userName: "", about: "", viewModel: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1), followViewModel: followViewModel
-                )
+                if let intUserID = Int(userID) {
+                    OtherProfileView(
+                        userID: intUserID,
+                        isFollowing: followViewModel.isFollowing(userID),
+                        userName: "",
+                        profileImageURL: nil,
+                        about: "",
+                        followersText: nil
+                    )
+                } else {
+                    Text("잘못된 유저 ID입니다.") // ✅ 변환 실패 시 대비
+                }
             }
         }
     }

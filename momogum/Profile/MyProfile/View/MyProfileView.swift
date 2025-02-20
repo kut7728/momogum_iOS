@@ -20,10 +20,21 @@ struct MyProfileView: View {
     
     var mealDiary: ProfileMealDiary? = nil
     
-    @StateObject var viewModel = ProfileViewModel(userId: AuthManager.shared.UUID ?? 0) // ✅ UUID 값 사용
+    @StateObject var viewModel = ProfileViewModel()
     @State var followViewModel: FollowViewModel = FollowViewModel()
     
     @Binding var isTabBarHidden: Bool
+    
+    init(isTabBarHidden: Binding<Bool>) {
+        self._isTabBarHidden = isTabBarHidden
+
+        if let userID = AuthManager.shared.UUID {
+            _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userID))
+        } else {
+            _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: 1)) // 기본값 설정
+            print("⚠️ UUID가 없어서 기본값 1을 사용합니다.")
+        }
+    }
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     

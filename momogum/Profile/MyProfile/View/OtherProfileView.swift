@@ -9,20 +9,32 @@ import SwiftUI
 
 struct OtherProfileView: View {
     @Environment(\.dismiss) var dismiss
-    var userID: String
+    var userID: Int // 타인 유저 아이디
     var isFollowing: Bool
-    var userName: String //검색뷰에서 이름 받기
-    var profileImageURL: String? //검색뷰에서 이미지 받기
-    let about: String? // 한줄소개 넘겨받기
-    var followersText: String? // 검색부에서 맞팔중인사람
+    var userName: String
+    var profileImageURL: String?
+    let about: String?
+    var followersText: String? // @@님이 팔로우 합니다
+    
     @State private var showReportPopup = false
     @State private var showReportDetailPopup = false
     
     @State private var selectedSegment = 0
     @State private var navigateToMyCardView = false
     
-    @State var viewModel: ProfileViewModel
     @State var followViewModel: FollowViewModel = FollowViewModel()
+    @StateObject private var viewModel: ProfileViewModel
+
+    init(userID: Int, isFollowing: Bool, userName: String, profileImageURL: String?, about: String?, followersText: String?) {
+        self.userID = userID
+        self.isFollowing = isFollowing
+        self.userName = userName
+        self.profileImageURL = profileImageURL
+        self.about = about
+        self.followersText = followersText
+        
+        _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userID)) // 해당 유저의 프로필 로드
+    }
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -43,7 +55,7 @@ struct OtherProfileView: View {
                         Spacer()
                         
                         // 유저 아이디
-                        Text(userID)
+                        Text(viewModel.userID)
                             .frame(height: 20)
                             .fontWeight(.semibold)
                         
@@ -63,24 +75,20 @@ struct OtherProfileView: View {
                     .padding(.bottom, 20)
                     
                     HStack(alignment: .center, spacing: 0) {
-                        // 서버에서 받은 프로필 이미지 표시
-                        if let imageUrl = profileImageURL, let url = URL(string: imageUrl) {
-                            AsyncImage(url: url) { image in
-                                image.resizable()
-                            } placeholder: {
-                                Image("defaultProfile") // 로딩 중 기본 이미지
-                                    .resizable()
-                            }
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 78, height: 78)
-                            .clipShape(Circle())
-                            .padding(4)
-                            .overlay(
-                                Circle()
-                                    .stroke(lineWidth: 4)
-                                    .foregroundStyle(Color.black_4)
-                            )
-                            .padding(.trailing, 38)
+                        // 프로필 이미지
+                        if let profileImage = viewModel.profileImage {
+                            Image(uiImage: profileImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 78, height: 78)
+                                .clipShape(Circle())
+                                .padding(4)
+                                .overlay(
+                                    Circle()
+                                        .stroke(lineWidth: 4)
+                                        .foregroundStyle(Color.black_4)
+                                )
+                                .padding(.trailing, 38)
                         } else {
                             Image("defaultProfile")
                                 .resizable()
@@ -102,15 +110,13 @@ struct OtherProfileView: View {
                         VStack(alignment: .leading){
                             VStack(alignment: .leading){
                                 // 이름
-                                Text(userName)
+                                Text(viewModel.userName)
                                     .font(.mmg(.subheader4))
                                     .padding(.bottom, 13)
                                 
-                                if let about = about, !about.isEmpty {
-                                    Text(about)
-                                        .font(.mmg(.Caption2))
-                                        .foregroundStyle(Color.black_2)
-                                }
+                                Text(viewModel.userBio)
+                                    .font(.mmg(.Caption2))
+                                    .foregroundStyle(Color.black_2)
                             }
                         }
                         
@@ -162,9 +168,9 @@ struct OtherProfileView: View {
                         .padding(.trailing, 67)
                         
                         // 팔로우 / 팔로잉 버튼
-                        if followViewModel.isFollowing(userID) {
+                        if followViewModel.isFollowing(String(userID)) {
                             Button {
-                                followViewModel.unfollow(userID)
+                                followViewModel.unfollow(String(userID))
                             } label: {
                                 RoundedRectangle(cornerRadius: 4)
                                     .frame(width: 72, height: 28)
@@ -182,7 +188,7 @@ struct OtherProfileView: View {
                             }
                         } else {
                             Button {
-                                followViewModel.follow(userID)
+                                followViewModel.follow(String(userID))
                             } label: {
                                 RoundedRectangle(cornerRadius: 4)
                                     .frame(width: 72, height: 28)
@@ -281,6 +287,7 @@ struct OtherProfileView: View {
     }
 }
 
-//#Preview {
-//    OtherProfileView(userID: "", isFollowing: false, userName: "", viewModel: ProfileViewModel(userId: 1))
-//}
+// MARK: - extension
+private extension OtherProfileView {
+    
+}
