@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HeartView: View {
-    @ObservedObject var viewModel: MyCardViewModel
+    @ObservedObject var viewModel: CardViewModel
     var mealDiaryId: Int
     @State private var showHeartBottomSheet = false
 
@@ -17,7 +17,7 @@ struct HeartView: View {
             Button(action: {
                 viewModel.toggleLikeAPI(mealDiaryId: mealDiaryId)
             }) {
-                Image(viewModel.myCard.isLiked ? "heart_fill" : "heart")
+                Image(viewModel.card.isLiked ? "heart_fill" : "heart")
                     .resizable()
                     .frame(width: 24, height: 24)
             }
@@ -27,9 +27,9 @@ struct HeartView: View {
 
             Spacer().frame(width: 12)
 
-            Text(viewModel.myCard.likeCount >= 99 ? "99+" : "\(viewModel.myCard.likeCount)")
+            Text(viewModel.card.likeCount >= 99 ? "99+" : "\(viewModel.card.likeCount)")
                 .font(.system(size: 16))
-                .opacity(viewModel.myCard.likeCount > 0 ? 1 : 0)
+                .opacity(viewModel.card.likeCount > 0 ? 1 : 0)
         }
         .sheet(isPresented: $viewModel.showHeartBottomSheet) {
             HeartBottomSheetView(viewModel: viewModel, mealDiaryId: mealDiaryId)

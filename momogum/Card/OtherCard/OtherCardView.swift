@@ -12,7 +12,11 @@ struct OtherCardView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var isTabBarHidden: Bool
     
-    @StateObject private var viewModel = OtherCardViewModel()
+    @StateObject private var viewModel = CardViewModel()
+    
+    @State private var showBookmarkText = false
+    
+    var mealDiaryId: Int
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -49,43 +53,32 @@ struct OtherCardView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Spacer().frame(height: 70)
 
-//                    UserInfoView()
+                    UserInfoView(viewModel: viewModel)
                         .padding(.leading, 22)
                     
                     Spacer().frame(height: 10)
 
                     ZStack {
-                        Image("cardExample")
-                            .resizable()
-                            .aspectRatio(1, contentMode: .fit)
+                        if let imageUrl = viewModel.card.mealDiaryImageURL, let url = URL(string: imageUrl) {
+                            AsyncImage(url: url) { image in
+                                image.resizable().aspectRatio(1, contentMode: .fit)
+                            } placeholder: {
+                                Color.gray
+                            }
                             .frame(maxWidth: .infinity)
-                            .background(Color.gray)
+                        } else {
+                            Color.gray.frame(maxWidth: .infinity)
+                        }
                         
                         VStack {
                             Spacer()
                             HStack {
                                 Spacer()
-                                Image("good_fill")
+                                Image(viewModel.getRevisitImage())
                                     .resizable()
                                     .frame(width: 72, height: 72)
-                                    .foregroundColor(.yellow)
                                     .padding(20)
                             }
-                        }
-
-                        if viewModel.otherCard.showBookmark {
-                            Text("저장됨")
-                                .font(.system(size: 16))
-                                .foregroundColor(.red)
-                                .frame(width: 134, height: 46)
-                                .background(Color.white)
-                                .cornerRadius(10)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.red, lineWidth: 2)
-                                )
-                                .transition(.opacity)
-                                .position(x: UIScreen.main.bounds.width / 2, y: 200)
                         }
                     }
 
@@ -93,12 +86,21 @@ struct OtherCardView: View {
                     
                     HStack {
                         Spacer().frame(width: 10)
-//                        HeartView(likeCount: $viewModel.otherCard.likeCount)
+                        HeartView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                             .fixedSize()
                         Spacer().frame(width: 20)
-//                        CommentView(viewModel: viewModel)
+                        CommentView(viewModel: viewModel, mealDiaryId: mealDiaryId)
                         Spacer()
-//                        BookmarkView(showBookmark: $viewModel.otherCard.showBookmark)
+                        BookmarkView(
+                            viewModel: viewModel,
+                            mealDiaryId: mealDiaryId,
+                            onBookmarkToggled: {
+                                showBookmarkText = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                    showBookmarkText = false
+                                }
+                            }
+                        )
                         Spacer().frame(width: 10)
                     }
                     .padding(.horizontal, 16)
@@ -109,12 +111,11 @@ struct OtherCardView: View {
                     Button(action: {
                         viewModel.toggleHeartBottomSheet()
                     }) {
-                        Text("\(viewModel.otherCard.likeCount)명이 이 밥일기를 좋아합니다.")
+                        Text("\(viewModel.card.likeCount)명이 이 밥일기를 좋아합니다.")
                             .font(.system(size: 14))
                             .foregroundColor(.black)
                             .padding(.leading, 28)
                             .padding(.top, 5)
-                            .opacity(viewModel.otherCard.likeCount > 0 ? 1 : 0)
                             .frame(height: 20)
                     }
                     
@@ -127,7 +128,7 @@ struct OtherCardView: View {
                                 .frame(width: 10, height: 13)
                                 .padding(.trailing, 5)
                             
-                            Text("식사장소")
+                            Text(viewModel.card.location)
                                 .font(.system(size: 16))
                                 .foregroundColor(.black)
                         }
@@ -138,7 +139,7 @@ struct OtherCardView: View {
                                 .frame(width: 12, height: 13)
                                 .padding(.trailing, 5)
                             
-                            Text("메뉴1, 메뉴2, 메뉴3, 메뉴4, 메뉴5")
+                            Text(viewModel.card.keywords.joined(separator: ", "))
                                 .font(.system(size: 14))
                                 .foregroundColor(.gray)
                         }
@@ -152,7 +153,7 @@ struct OtherCardView: View {
                             .frame(width: 330, height: 79)
 
                         ScrollView {
-                            Text(viewModel.otherCard.reviewText)
+                            Text(viewModel.card.reviewText)
                                 .font(.system(size: 16))
                                 .foregroundColor(.black)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -167,21 +168,23 @@ struct OtherCardView: View {
                 }
                 .padding(.bottom, 20)
             }
+            
+            BookmarkPopupView(showBookmarkText: $showBookmarkText)
         }
-        .onAppear {
+        .onAppear{
             isTabBarHidden = true
         }
-        .onDisappear {
+        .onDisappear{
             isTabBarHidden = false
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
         
-//        .sheet(isPresented: $viewModel.showHeartBottomSheet) {
-//            HeartBottomSheetView()
-//                .presentationDetents([.fraction(2/3)])
-//        }
-//        
+        .sheet(isPresented: $viewModel.showHeartBottomSheet) {
+            HeartBottomSheetView(viewModel: viewModel, mealDiaryId: mealDiaryId)
+                .presentationDetents([.fraction(2/3)])
+        }
+        
         .sheet(isPresented: $viewModel.showReportSheet) {
             ReportBottomSheet(isPresented: $viewModel.showReportSheet, showCompletedModal: $viewModel.showCompletedAlert)
                 .presentationDetents([.fraction(2/3)])
@@ -193,8 +196,4 @@ struct OtherCardView: View {
             Text("검토는 최대 24시간 소요됩니다.")
         }
     }
-}
-
-#Preview {
-    OtherCardView(isTabBarHidden: .constant(false))
 }

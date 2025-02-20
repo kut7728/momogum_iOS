@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct UserInfoView: View {
-    @ObservedObject var viewModel: MyCardViewModel
+    @ObservedObject var viewModel: CardViewModel
 
     var body: some View {
         HStack(spacing: 12) {
-            if let profileImageUrl = viewModel.myCard.userProfileImageLink, let url = URL(string: profileImageUrl) {
+            if let profileImageUrl = viewModel.card.userProfileImageLink, let url = URL(string: profileImageUrl) {
                 AsyncImage(url: url) { image in
                     image.resizable()
                         .aspectRatio(contentMode: .fill)
@@ -30,10 +30,10 @@ struct UserInfoView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(viewModel.myCard.nickname)
+                Text(viewModel.card.nickname)
                     .font(.system(size: 16, weight: .bold))
 
-                Text(convertToFormattedDate(viewModel.myCard.mealDiaryCreatedAt))
+                Text(convertToFormattedDate(viewModel.card.mealDiaryCreatedAt))
                     .font(.system(size: 13))
                     .foregroundColor(.gray)
             }
