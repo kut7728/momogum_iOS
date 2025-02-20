@@ -8,7 +8,7 @@
 import SwiftUI
 
 class HomeViewModel: ObservableObject {
-    @Published var selectedButtonIndex: Int? = nil
+    @Published var selectedButtonIndex: Int = 0
     @Published var userInput: String = ""
     @Published var unreadNotificationCount: Int = 2
     @Published var selectedCategory: FoodCategory? = nil // FoodCategory enum 타입으로 변경
