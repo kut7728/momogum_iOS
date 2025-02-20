@@ -29,7 +29,7 @@ struct ACRResult: Codable {
     let notes: String?
     let createdAt: String?
     let invitedFriends: [Friend]
-    let selectedCards: [SelectedCard]
+    let selectedCards: SelectedCard
     let appointmentId: Int
     let senderId: Int
     let senderName: String

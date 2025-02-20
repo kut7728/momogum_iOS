@@ -15,10 +15,30 @@ struct AppointPickedFriendCellView: View {
         @Bindable var viewModel = appointViewModel
         
         ZStack {
-            Image("emptyAvatar")
-                .resizable()
-                .frame(width: 50, height: 50)
-                .foregroundStyle(.gray.opacity(0.2))
+            if let url = URL(string: friend.profileImage) {
+                AsyncImage(url: url) { image in
+                    image
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                        .clipShape(Circle())
+                } placeholder: {
+                    Image("pixelsImage")
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                    .clipShape(Circle())                }
+                
+            } else {
+                Image("pixelsImage")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                .clipShape(Circle())
+            }
+            
+            
+//            Image("emptyAvatar")
+//                .resizable()
+//                .frame(width: 50, height: 50)
+//                .foregroundStyle(.gray.opacity(0.2))
             
             Button {
                 viewModel.pickedFriends.removeAll(where: { $0.nickname == friend.name })

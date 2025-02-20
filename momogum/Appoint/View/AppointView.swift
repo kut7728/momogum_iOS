@@ -103,7 +103,7 @@ struct AppointView: View {
                                         .frame(width: 30)
                                     
                                     ForEach(viewModel.pendingAppoints) { appoint in
-                                        WaitingConfirmCellView(isPresented: $isPresented, appoint: appoint)
+                                        WaitingConfirmCellView(isPresented: $isPresented, targetAppoint: $targetAppoint, appoint: appoint)
                                     }
                                 }
                             }

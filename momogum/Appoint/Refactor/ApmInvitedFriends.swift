@@ -14,9 +14,30 @@ struct ApmInvitedFriends: View {
     var body: some View {
         HStack(spacing: -10) {
             ForEach(pickedFriends, id: \.name) { profile in
-                Image("emptyAvatar")
-                    .resizable()
-                    .frame(width: 40, height: 40)
+                
+                if let url = URL(string: profile.profileImage) {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                    } placeholder: {
+                        Image("pixelsImage")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                    }
+                    
+                } else {
+                    Image("pixelsImage")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .clipShape(Circle())
+                }
+                
+//                Image("emptyAvatar")
+//                    .resizable()
+//                    .frame(width: 40, height: 40)
             }
                 
             

@@ -62,8 +62,8 @@ class NewAppointViewModel {
                             continuation.resume(returning: data.result.appointmentID)
                             print("약속 고유 Id : \(data.result.appointmentID)")
                             if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-                                            print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
-                                        }
+                                print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
+                            }
                         case .failure(let error):
                             continuation.resume(throwing: error)
                         }
@@ -76,7 +76,7 @@ class NewAppointViewModel {
     
     // MARK: - 초대 가능한 친구 목록 반환
     func getAvailableFriends() async -> Void {
-        let url = "\(BaseAPI)/appointment/\(self.appointId)/invites?userId=\(self.userId)"
+        let url = "\(BaseAPI)/appointment/8/invites?userId=\(self.userId)"
         
         do {
             self.friends = try await withCheckedThrowingContinuation {continuation in
@@ -87,13 +87,13 @@ class NewAppointViewModel {
                         switch response.result {
                         case .success(let data):
                             continuation.resume(returning: data)
-
+                            
                         case .failure(let error):
-                            print("초대 가능한 친구 목록 반환 오류")
+                            print("초대 가능한 친구 목록 반환 오류 \(response)")
                             continuation.resume(throwing: error)
                         }
                     }
-                   
+                
             }
         } catch {
             print("초대 가능 친구 GET 오류: \(error.localizedDescription)")
@@ -116,12 +116,12 @@ class NewAppointViewModel {
             notes: self.note)
         
         let parm = NewApmRequest(userId: self.userId,
-                                                appointmentId: self.appointId,
-                                                nicknames: self.pickedFriends.map { $0.nickname },
-                                                cardCategory: "BASIC",
-                                                selectedCardUrl: "https://s3.amazonaws.com/cards/basic1.jpg",
-                                                appointmentName: mainRequest)
-                
+                                 appointmentId: self.appointId,
+                                 userIds: self.pickedFriends.map { $0.userId ?? 9 },
+                                 cardCategory: "BASIC",
+                                 selectedCardUrl: "https://s3.amazonaws.com/cards/basic1.jpg",
+                                 appointmentName: mainRequest)
+        
         
         let url = "\(BaseAPI)/appointment/whole"
         
@@ -143,8 +143,8 @@ class NewAppointViewModel {
                 print("Error: \(error.localizedDescription)")
                 
                 if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-                                print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
-                            }
+                    print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
+                }
                 return
             }
         }

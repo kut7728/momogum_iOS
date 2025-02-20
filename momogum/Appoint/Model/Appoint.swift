@@ -80,7 +80,7 @@ struct Appoint: Codable, Identifiable {
         self.pickedDate = dateFormatter.date(from: result.date) ?? Date()
         
         self.pickedFriends = result.invitedFriends
-        self.pickedCard = String(result.selectedCards[0].imageUrl.split(separator: "/").last!)
+        self.pickedCard = String(result.selectedCards.imageUrl.split(separator: "/").last!)
         
         self.isConfirmed = false
     }

@@ -12,11 +12,34 @@ struct AppointFriendListCellView: View {
     
     var body: some View {
         HStack {
-            Image("emptyAvatar")
-                .resizable()
-                .frame(width: 50, height: 50)
-                .foregroundStyle(.gray.opacity(0.2))
-                .padding(.trailing)
+            if let url = URL(string: profile.profileImage) {
+                AsyncImage(url: url) { image in
+                    image
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                        .clipShape(Circle())
+                        .padding(.trailing)
+                } placeholder: {
+                    Image("pixelsImage")
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                        .clipShape(Circle())
+                        .padding(.trailing)
+                }
+                
+            } else {
+                Image("pixelsImage")
+                    .resizable()
+                    .frame(width: 50, height: 50)
+                    .clipShape(Circle())
+                    .padding(.trailing)
+            }
+            
+//            Image("emptyAvatar")
+//                .resizable()
+//                .frame(width: 50, height: 50)
+//                .foregroundStyle(.gray.opacity(0.2))
+//                .padding(.trailing)
             
             VStack (alignment: .leading) {
                 Text(profile.nickname)
