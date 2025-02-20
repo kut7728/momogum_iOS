@@ -25,6 +25,8 @@ struct FollowCell: View {
         let profileImage = follower?.profileImage ?? followingUser?.profileImage ?? ""
         
         let isCurrentUser = userId == AuthManager.shared.UUID // 현재 로그인한 유저인지 확인
+        let isViewingOwnProfile = followViewModel.userID == AuthManager.shared.UUID // 본인의 팔로워 목록인지 확인
+        
         
         HStack(alignment: .center, spacing: 0) {
             // 프로필 이미지 로드
@@ -75,20 +77,20 @@ struct FollowCell: View {
                         )
                 }
                 .padding(.trailing, isFollowerList ? 25 : 30)
-            }
-            
-            if isFollowerList {
-                // X 버튼 (팔로워 목록에서만 표시)
-                Button {
-                    popupUserID = "\(userId)"
-                    showPopup = true
-                    if let userID = AuthManager.shared.UUID, let targetUserId = Int("\(userId)") {
-                        followViewModel.deleteFollower(userId: userID, followerId: targetUserId)
+                
+                if isFollowerList && isViewingOwnProfile {
+                    // X 버튼 (팔로워 목록에서만 표시)
+                    Button {
+                        popupUserID = "\(userId)"
+                        showPopup = true
+                        if let userID = AuthManager.shared.UUID, let targetUserId = Int("\(userId)") {
+                            followViewModel.deleteFollower(userId: userID, followerId: targetUserId)
+                        }
+                    } label: {
+                        Image("close_s")
+                            .resizable()
+                            .frame(width: 24, height: 24)
                     }
-                } label: {
-                    Image("close_s")
-                        .resizable()
-                        .frame(width: 24, height: 24)
                 }
             }
             
@@ -137,5 +139,4 @@ struct FollowCell: View {
             }
         }
     }
-
 }
