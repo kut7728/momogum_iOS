@@ -37,13 +37,13 @@ struct StoryItemCell: View {
                                     ]), startPoint: .topLeading, endPoint: .bottomTrailing),
                                     lineWidth: 4
                                 )
-                                .frame(width: 90, height: 90)
-                                .padding(3)
+                                .frame(width: 80, height: 80)
+                                
                         } else {
                             Circle()
                                 .strokeBorder(Color.gray.opacity(0.5), lineWidth: 4)
-                                .frame(width: 90, height: 90)
-                                .padding(3)
+                                .frame(width: 85, height: 85)
+                                
                         }
                         
                         AsyncImage(url: URL(string: profileImageLink)) { image in
@@ -55,7 +55,7 @@ struct StoryItemCell: View {
                                                     .scaledToFit()
                                                     .foregroundColor(.gray)
                                             }
-                                            .frame(width: 71, height: 71)
+                                            .frame(width: 74, height: 74)
                                             .clipShape(Circle())
                         
                     }
