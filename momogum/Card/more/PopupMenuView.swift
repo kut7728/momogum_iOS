@@ -16,7 +16,7 @@ struct PopupMenuView: View {
     @State private var showDeletedPopup = false
     @State private var navigateToFixPostView = false
     
-    var viewModel: MyCardViewModel
+    var viewModel: CardViewModel
     var mealDiaryId: Int
 
     var body: some View {

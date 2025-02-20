@@ -10,7 +10,7 @@ import SwiftUI
 struct MyCardView: View {
     @Environment(\.dismiss) var dismiss
     @Binding var isTabBarHidden: Bool
-    @StateObject private var viewModel = MyCardViewModel()
+    @StateObject private var viewModel = CardViewModel()
     
     @State private var showBookmarkText = false
 
@@ -57,7 +57,7 @@ struct MyCardView: View {
                     Spacer().frame(height: 10)
 
                     ZStack {
-                        if let imageUrl = viewModel.myCard.mealDiaryImageURL, let url = URL(string: imageUrl) {
+                        if let imageUrl = viewModel.card.mealDiaryImageURL, let url = URL(string: imageUrl) {
                             AsyncImage(url: url) { image in
                                 image.resizable().aspectRatio(1, contentMode: .fit)
                             } placeholder: {
@@ -109,7 +109,7 @@ struct MyCardView: View {
                     Button(action: {
                         viewModel.toggleHeartBottomSheet()
                     }) {
-                        Text("\(viewModel.myCard.likeCount)명이 이 밥일기를 좋아합니다.")
+                        Text("\(viewModel.card.likeCount)명이 이 밥일기를 좋아합니다.")
                             .font(.system(size: 14))
                             .foregroundColor(.black)
                             .padding(.leading, 28)
@@ -126,7 +126,7 @@ struct MyCardView: View {
                                 .frame(width: 10, height: 13)
                                 .padding(.trailing, 5)
                             
-                            Text(viewModel.myCard.location)
+                            Text(viewModel.card.location)
                                 .font(.system(size: 16))
                                 .foregroundColor(.black)
                         }
@@ -137,7 +137,7 @@ struct MyCardView: View {
                                 .frame(width: 12, height: 13)
                                 .padding(.trailing, 5)
                             
-                            Text(viewModel.myCard.keywords.joined(separator: ", "))
+                            Text(viewModel.card.keywords.joined(separator: ", "))
                                 .font(.system(size: 14))
                                 .foregroundColor(.gray)
                         }
@@ -151,7 +151,7 @@ struct MyCardView: View {
                             .frame(width: 330, height: 79)
 
                         ScrollView {
-                            Text(viewModel.myCard.reviewText)
+                            Text(viewModel.card.reviewText)
                                 .font(.system(size: 16))
                                 .foregroundColor(.black)
                                 .frame(maxWidth: .infinity, alignment: .leading)
