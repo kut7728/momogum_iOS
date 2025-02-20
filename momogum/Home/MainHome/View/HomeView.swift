@@ -142,14 +142,7 @@ extension HomeView {
                                 profileImageLink: story.profileImageLink,
                                 isTabBarHidden: $isTabBarHidden
                             )
-                            .onAppear(){
-                                print("스토리디테일:\(storyViewModel.selectedStory)")
-                                print(story.viewed)
-                                print("StoryIDs : \(StoryIDList)")
-                                print(firstUnviewedStory)
-                                print("📌 \(nickname) - \(stories.map { $0.viewed })")
-                            }
-                          
+                                                      
                             
                             
                             // StoryItem 을 넣을 예정
@@ -182,7 +175,7 @@ extension HomeView {
                 .onAppear { isTabBarHidden = true }
             ) {
                 ZStack {
-                    if viewed {
+                    if !viewed {
                         Circle()
                             .strokeBorder(
                                 LinearGradient(gradient: Gradient(colors: [

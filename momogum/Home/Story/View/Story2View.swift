@@ -33,7 +33,7 @@ struct Story2View: View {
         .onAppear {
             fetchCurrentStory()
         }
-        .onChange(of: currentIndex) { _ in
+        .onChange(of: currentIndex) {  
             fetchCurrentStory()
         }
         .onAppear {

@@ -37,11 +37,11 @@ struct StoryItemCell: View {
                                     ]), startPoint: .topLeading, endPoint: .bottomTrailing),
                                     lineWidth: 6
                                 )
-                                .frame(width: 90, height: 90)
+                                .frame(width: 85, height: 85)
                         } else {
                             Circle()
                                 .strokeBorder(Color.gray.opacity(0.5), lineWidth: 6)
-                                .frame(width: 90, height: 90)
+                                .frame(width: 85, height: 85)
                         }
                         
                         AsyncImage(url: URL(string: profileImageLink)) { image in
@@ -53,12 +53,11 @@ struct StoryItemCell: View {
                                                     .scaledToFit()
                                                     .foregroundColor(.gray)
                                             }
-                                            .frame(width: 76, height: 76)
+                                            .frame(width: 71, height: 71)
                                             .clipShape(Circle())
                         
                     }
                     Text(nickname)
-                        .bold()
                         .foregroundColor(.black)
                         .font(.mmg(.Caption2))
                 }

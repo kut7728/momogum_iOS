@@ -116,11 +116,11 @@ final class AuthViewModel: ObservableObject {
                     completion(false)
                 } else if let oauthToken = oauthToken {
                     DispatchQueue.main.async {
-                        print(" 카카오 계정 로그인 성공, accessToken: \(oauthToken.accessToken)")
+                        print(" 카카오 계정 로그인 성공")
                         AuthManager.shared.KakaoAccessToken = oauthToken.accessToken  //  accessToken 저장
                         AuthManager.shared.KakaoRefreshToken = oauthToken.refreshToken
 
-                        print(" 카카오 액세스 토큰 저장 완료: \(AuthManager.shared.KakaoAccessToken ?? "없음")")
+                        
                         completion(true)
                     }
                 }
@@ -160,6 +160,7 @@ final class AuthViewModel: ObservableObject {
             }
             else {
                 print("logout() success.")
+                AuthManager.shared.isLoggedIn = false
             }
         }
     }

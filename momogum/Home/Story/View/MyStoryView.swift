@@ -5,7 +5,9 @@ struct MyStoryView: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var storyViewModel = StoryViewModel()
     @StateObject private var viewModel = Story2ViewModel()
-
+    @State private var dragOffset: CGFloat = 0
+    
+    
     let nickname: String
     let storyIDList: [Int]
     @State private var currentIndex: Int = 0
@@ -18,7 +20,7 @@ struct MyStoryView: View {
 
             VStack {
                 storyProgressBar()
-                    .padding(.top, 8)
+                    .padding(.top, 16)
 
                 headerView()
                 postContentView()
@@ -33,7 +35,7 @@ struct MyStoryView: View {
         .onAppear {
             fetchCurrentStory()
         }
-        .onChange(of: currentIndex) { _ in
+        .onChange(of: currentIndex) { 
             fetchCurrentStory()
         }
         .sheet(isPresented: $viewModel.showReportSheet) {
@@ -79,8 +81,9 @@ extension MyStoryView {
                     let date = Date.fromStringWithKST(createdAt) {
                         Text("\(date.relativeDateString())")
                             .foregroundColor(.black_3)
-                            .padding(.top, 22)
+                            .padding(.top, 24)
                             .padding(.leading, 12)
+                            .font(.mmg(.subheader4))
                     } else {
                             Text("날짜 변환 실패")
                     }
@@ -110,10 +113,31 @@ extension MyStoryView {
                     .resizable()
                     .frame(width: 38, height: 38)
                     .padding(.top, 22)
+                    .padding(.trailing, 13)
             }
             
             Spacer()
         }
+        .offset(y: dragOffset) // ✅ 드래그 거리만큼 뷰 이동
+                    .gesture(
+                        DragGesture()
+                            .onChanged { gesture in
+                                if gesture.translation.height > 0 { // ✅ 아래로 스와이프할 때만 적용
+                                    dragOffset = gesture.translation.height
+                                }
+                            }
+                            .onEnded { gesture in
+                                                   if gesture.translation.height > 100 { // ✅ 일정 거리 이상이면 닫기
+                                                       withAnimation {
+                                                           presentationMode.wrappedValue.dismiss()
+                                                       }
+                                                   } else {
+                                                       withAnimation {
+                                                           dragOffset = 0 // ✅ 원래 위치로 돌아가기
+                                                       }
+                                                   }
+                                               }
+                         )
     }
 
     /// 현재 선택된 스토리를 가져오는 함수
@@ -154,14 +178,14 @@ extension MyStoryView {
                     }
                     .frame(width: 328, height: 328)
                     .clipped()
-                    .padding(.top, 35)
-                    .padding(.leading, 17)
+                    .padding(.top, 24)
+                    .padding(.leading, 16)
                 }
 
                 Text(storyViewModel.selectedStory?.description ?? "진짜 최고로 맛있다...✨")
                     .font(.mmg(.subheader3))
-                    .padding(.top, 32)
-                    .padding(.leading, 17)
+                    .padding(.top, 20)
+                    .padding(.leading, 16)
 
                 Spacer()
             }
@@ -245,3 +269,5 @@ extension MyStoryView {
         }
     }
 }
+
+
