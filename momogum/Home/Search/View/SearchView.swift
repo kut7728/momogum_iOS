@@ -12,6 +12,7 @@ struct SearchView: View {
     @StateObject private var keywordViewModel = KeywordSearchViewModel()
     @State private var selectedButton: String = "계정"
     @State private var isEditing: Bool = false
+
     @Environment(\.presentationMode) var presentationMode
     @FocusState private var isFocused: Bool
     @State private var hasStartedEditing: Bool = false
@@ -129,7 +130,7 @@ struct SearchView: View {
                 
                 ScrollView {
                     if selectedButton == "계정" {
-                        LazyVStack(spacing: 10) { // ✅ 기존 계정 검색 결과는 유지
+                        LazyVStack(spacing: 10) {
                             ForEach(accountViewModel.accountResults) { account in
                                 Button(action: {
                                     selectedUser = account
@@ -142,7 +143,7 @@ struct SearchView: View {
                         }
                         .padding(.horizontal, 16)
                     } else {
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) { // ✅ 키워드 검색 결과를 2열 그리드로 변경
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) { 
                             ForEach(keywordViewModel.keywordResults) { keyword in
                                 Button(action: {
                                     selectedKeyword = keyword
@@ -193,6 +194,8 @@ struct SearchView: View {
                         userName: user.userName,
                         profileImageURL: user.userImageURL,
                         about: user.about,
+                        hasStory: user.hasStory,
+                        hasViewedStory: user.hasViewedStory, 
                         followersText: {
                             if let firstFollower = user.searchFollowName?.first, user.searchFollowCount > 1 {
                                 return "\(firstFollower)님 외 \(user.searchFollowCount - 1)명이 팔로우합니다."
@@ -202,6 +205,8 @@ struct SearchView: View {
                                 return nil
                             }
                         }(), // ✅ 여기서 즉시 실행
+                        followerCount: user.follower,
+                        followingCount: user.following,
                         viewModel: ProfileViewModel(userId: user.id)
                     )
                 }
