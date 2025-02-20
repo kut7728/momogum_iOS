@@ -249,7 +249,7 @@ class FollowViewModel: ObservableObject {
                     if decodedResponse.isSuccess {
                         self.allFollowers = decodedResponse.result
                         self.followerCount = self.allFollowers.count
-                        
+
                         // 팔로우 상태 저장
                         self.updateFollowingStatus()
                     } else {
@@ -299,9 +299,7 @@ class FollowViewModel: ObservableObject {
                 let decodedResponse = try JSONDecoder().decode(FollowResponse.self, from: data)
                 DispatchQueue.main.async {
                     if decodedResponse.isSuccess {
-                        // ✅ 성공 시 UI 업데이트
-                        self.removeFollower(followerId)
-                        print("✅ 팔로워 삭제 성공: \(followerId)")
+                        print("서버에서 팔로워 삭제 성공: \(followerId)")
                     } else {
                         print("❌ API 요청 실패: \(decodedResponse.message)")
                     }
@@ -311,5 +309,6 @@ class FollowViewModel: ObservableObject {
             }
         }.resume()
     }
+
 
 }

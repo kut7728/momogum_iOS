@@ -105,9 +105,11 @@ struct FollowCell: View {
         }
     }
     
+    
     private func updateFollowStatus(for userId: Int) {
         self.isFollowing = followViewModel.followingStatus["\(userId)"] ?? false
     }
+    
     
     private func toggleFollow(for userId: Int) {
         guard let currentUserId = AuthManager.shared.UUID else {

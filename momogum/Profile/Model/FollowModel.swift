@@ -37,7 +37,7 @@ struct Follower: Codable {
     let userId: Int
     let nickname: String
     let name: String
-    let profileImage: String
+    let profileImage: String?
     let searchQuery: String?
 }
 
