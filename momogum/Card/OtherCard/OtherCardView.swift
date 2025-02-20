@@ -185,7 +185,7 @@ struct OtherCardView: View {
         }
         
         .sheet(isPresented: $viewModel.showReportSheet) {
-            ReportBottomSheet(isPresented: $viewModel.showReportSheet, showCompletedModal: $viewModel.showCompletedAlert)
+            ReportBottomSheet(isPresented: $viewModel.showReportSheet, showCompletedModal: $viewModel.showCompletedAlert, viewModel: viewModel, mealDiaryId: mealDiaryId)
                 .presentationDetents([.fraction(2/3)])
         }
         
