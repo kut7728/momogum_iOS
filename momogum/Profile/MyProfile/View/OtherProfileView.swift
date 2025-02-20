@@ -54,10 +54,10 @@ struct OtherProfileView: View {
         self.followingCount = followingCount
         self.hasStory = hasStory
         self.hasViewedStory = hasViewedStory
-
+        
         _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userID)) // 해당 유저의 프로필 로드
     }
-
+    
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -118,12 +118,17 @@ struct OtherProfileView: View {
                 // 현재 유저의 팔로우 상태 업데이트
                 DispatchQueue.main.async {
                     if let currentUserId = AuthManager.shared.UUID {
-                        followViewModel.fetchFollowingList(userId: currentUserId)  // ✅ 클로저 제거
-
-                        // ✅ 0.5초 후 최신 데이터 반영
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            if let status = followViewModel.followingStatus["\(userID)"] {
-                                self.isUserFollowing = status
+                        // 팔로우 상태를 즉시 가져와 버튼 상태 반영
+                        if let existingStatus = followViewModel.followingStatus["\(userID)"] {
+                            self.isUserFollowing = existingStatus
+                        }
+                        
+                        // API 요청하여 최신 상태 가져오기 (이미 변경된 경우 업데이트 방지)
+                        followViewModel.fetchFollowingList(userId: currentUserId)
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            if let updatedStatus = followViewModel.followingStatus["\(userID)"], updatedStatus != self.isUserFollowing {
+                                self.isUserFollowing = updatedStatus
                             }
                         }
                     }
@@ -136,7 +141,7 @@ struct OtherProfileView: View {
                     viewModel: viewModel
                 )
             }
-
+            
             
             // Popup
             ShowPopup()
@@ -152,7 +157,7 @@ private extension OtherProfileView {
         HStack(alignment: .center){
             
             Button{
-//                dismiss()
+                //                dismiss()
                 presentationMode.wrappedValue.dismiss()
             }label:{
                 Image("back")
@@ -256,9 +261,9 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-//                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
-//                        .font(.mmg(.subheader4))
-//                        .foregroundStyle(Color.black_1)
+                    //                    Text("\(followViewModel.followerCount.formattedFollowerCount())")
+                    //                        .font(.mmg(.subheader4))
+                    //                        .foregroundStyle(Color.black_1)
                     Text("0")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
@@ -280,9 +285,9 @@ private extension OtherProfileView {
                         .foregroundStyle(Color.black_1)
                         .padding(.bottom, 16)
                     
-//                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
-//                        .font(.mmg(.subheader4))
-//                        .foregroundStyle(Color.black_1)
+                    //                    Text("\(followViewModel.followingCount.formattedFollowerCount())")
+                    //                        .font(.mmg(.subheader4))
+                    //                        .foregroundStyle(Color.black_1)
                     Text("0")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
@@ -397,24 +402,30 @@ private extension OtherProfileView {
             print("❌ 현재 로그인한 유저 ID를 가져올 수 없습니다.")
             return
         }
-
-        // 버튼 클릭 시 즉시 UI 업데이트 (API 응답 기다리지 않음)
+        
+        // 기존 상태 저장
+        let previousState = isUserFollowing
+        
+        // 버튼 클릭 시 즉시 UI 업데이트
         isUserFollowing.toggle()
-
-        //  팔로우/언팔로우 요청
+        
+        // 팔로우/언팔로우 요청
         followViewModel.toggleFollow(userId: currentUserId, targetUserId: "\(userId)")
-
-        // API 요청 후 최신 상태를 가져와 UI 반영
+        
+        // API 요청 후 상태 업데이트
         DispatchQueue.main.asyncAfter(deadline: .now()) {
-            followViewModel.fetchFollowingList(userId: currentUserId) // 클로저 제거 후 호출
-
-            // 최신 팔로우 상태 확인하여 UI 반영
+            followViewModel.fetchFollowingList(userId: currentUserId)
+            
             DispatchQueue.main.async {
                 if let status = followViewModel.followingStatus["\(userID)"] {
-                    self.isUserFollowing = status
+                    if status != self.isUserFollowing {  //API 응답과 UI 상태가 다르면 보정
+                        self.isUserFollowing = status
+                    }
+                } else {
+                    self.isUserFollowing = previousState
                 }
             }
         }
     }
-
+    
 }
