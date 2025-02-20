@@ -33,7 +33,7 @@ struct Story2View: View {
         .onAppear {
             fetchCurrentStory()
         }
-        .onChange(of: currentIndex) { _ in
+        .onChange(of: currentIndex) {  
             fetchCurrentStory()
         }
         .onAppear {
@@ -135,6 +135,7 @@ extension Story2View {
                     .resizable()
                     .frame(width: 38, height: 38)
                     .padding(.top, 22)
+                    .padding(.trailing, 13)
             }
             Spacer()
         }

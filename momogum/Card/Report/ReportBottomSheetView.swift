@@ -10,9 +10,17 @@ import SwiftUI
 struct ReportBottomSheet: View {
     @Binding var isPresented: Bool
     @Binding var showCompletedModal: Bool
+    @ObservedObject var viewModel: CardViewModel
+    
+    let mealDiaryId: Int
 
-    let reasons = ["잘못된 정보", "상업적 광고", "음란물", "폭력성"]
-
+    let reasons = [
+        ("잘못된 정보", "WRONG_INFO"),
+        ("상업적 광고", "COMMERCIAL_ADV"),
+        ("음란물", "PORNO"),
+        ("폭력성", "VIOLET")
+    ]
+    
     var body: some View {
         VStack(spacing: 0) {
             Capsule()
@@ -47,20 +55,21 @@ struct ReportBottomSheet: View {
                 .padding(.top, 40)
 
             VStack(spacing: 0) {
-                ForEach(reasons, id: \.self) { reason in
+                ForEach(reasons, id: \.0) { reasonText, reasonCode in
                     Button(action: {
-                        print("\(reason) 신고 선택됨")
+                        print("\(reasonText) 신고 선택됨")
+                        viewModel.reportMealDiary(mealDiaryId: mealDiaryId, reason: reasonCode)
                         isPresented = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             showCompletedModal = true
                         }
                     }) {
-                        Text(reason)
+                        Text(reasonText)
                             .font(.system(size: 16))
                             .foregroundColor(.black)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, 20)
-                            .padding(.leading, 40)
+                            .padding(.leading, 60)
                     }
                     Divider()
                         .frame(width: 304.5, height: 0.5)
@@ -74,8 +83,4 @@ struct ReportBottomSheet: View {
         .background(Color.white)
         .cornerRadius(20)
     }
-}
-
-#Preview {
-    ReportBottomSheet(isPresented: .constant(false), showCompletedModal: .constant(false))
 }

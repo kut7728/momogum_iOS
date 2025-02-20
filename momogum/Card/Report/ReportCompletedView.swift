@@ -46,7 +46,3 @@ struct ReportCompletedView: View {
         .background(Color.black.opacity(0.4).ignoresSafeArea())
     }
 }
-
-#Preview {
-    ReportCompletedView(showCompletedModal: .constant(false))
-}

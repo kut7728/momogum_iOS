@@ -12,7 +12,6 @@ struct SignupStep2View: View {
     @Environment(\.dismiss) var dismiss
     @ObservedObject var authViewModel: AuthViewModel
     @Environment(SignupDataModel.self) var signupDataModel
-    //    @State private var inputText: String = ""
     @FocusState private var isFocused: Bool
     @State private var lengthCheck: Bool = false
     @State private var hasAllowedCharactersOnly: Bool = false
@@ -190,8 +189,6 @@ struct SignupStep2View: View {
                         }
                         else{  //조건에 맞지않고 + //조건에 맞는데 true인경우
                             Button{
-                                print(signupDataModel.creatUser())
-
                                 authViewModel.checkUsernameisDuplicated()
                                 
                             }label:{

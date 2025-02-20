@@ -35,7 +35,8 @@ final class AuthService {
     func signup(signupModel: SignupModel, completion: @escaping (Result<SignupResponseModel, APIError>) -> Void) {
         Messaging.messaging().token { fcmToken, error in
             if let error = error {
-                print("❌ FCM 토큰 가져오기 실패: \(error.localizedDescription)")
+                print(error)
+//                print("❌ FCM 토큰 가져오기 실패: \(error.localizedDescription)")
                 return
             }
             

@@ -36,24 +36,23 @@ struct LoginView: View {
             Button{
                     authViewModel.handleKakaoLogin { success in
                         if success {
-                            print("카카오 로그인 성공!")
-                            
-                            authViewModel.checkIsNewUser { isSuccess, isNew in
-                                if isSuccess { //로그인 성공 true
-                                    if isNew { //신규인경우 true
-                                        path.append(.SignupStartView)
-                                        print("신규 유저입니다. 회원가입이 필요합니다.")
-                                    } else { // true false  기존유저
-                                        AuthManager.shared.isLoggedIn = true
-                                        authViewModel.fetchUserUUID()
-                                        print("기존 유저 로그인 완료")
-                                    }
-                                } else {
-                                    print(" 유저 확인 실패")
-                                }
-                            }  } else {
+                            path.append(.SignupStartView)
+//                            authViewModel.checkIsNewUser { isSuccess, isNew in
+//                                if isSuccess { //로그인 성공 true
+//                                    if isNew { //신규인경우 true
+//                                        path.append(.SignupStartView)
+//                                        print("신규 유저입니다. 회원가입이 필요합니다.")
+//                                    } else { // true false  기존유저
+//                                        AuthManager.shared.isLoggedIn = true
+//                                        authViewModel.fetchUserUUID()
+//                                        print("기존 유저 로그인 완료")
+//                                    }
+//                                } else {
+//                                    print(" 유저 확인 실패")
+//                                }
+//                            }  } else {
                                 
-                                print(" 카카오 로그인 실패")
+//                                print(" 카카오 로그인 실패")
                             }
                     }
             }
@@ -79,8 +78,7 @@ struct LoginView: View {
                 
 
                 Button{
-                    authViewModel.handleKakaoLogout()
-                    print("카카오 로그아웃 성공")
+                    
                 }
                 label: {
                     Image("appleSignin")

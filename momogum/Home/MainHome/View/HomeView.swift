@@ -40,13 +40,7 @@ struct HomeView: View {
                 isTabBarHidden = false
             }
             
-            .navigationDestination(for: String.self) { story in
-                if story == "내 스토리" {
-                    StoryView(userID: "유저아이디", tabIndex: $tabIndex, isTabBarHidden: .constant(false))
-                } else {
-                    //                    Story2View(userID: "유저아이디", isTabBarHidden: .constant(false))
-                }
-            }
+          
             .onAppear{
                 storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
                 storyViewModel.fetchMyStory(for: AuthManager.shared.UUID ?? 1)
@@ -110,15 +104,18 @@ extension HomeView {
                 if let firstStory = storyViewModel.Mystories.first {
                     
                     let sortedStoryIDList = storyViewModel.MyStoryIDList()
-                    storyItem(
-                        title: firstStory.nickname,
-                        viewed: firstStory.viewed,
-                        nickname: firstStory.nickname,
-                        profileImage: firstStory.profileImageLink,
-                        storyIDList: sortedStoryIDList // 전체 스토리 ID 리스트 전달
-                    )
-                }else{
-                    
+                    if !sortedStoryIDList.isEmpty{
+                        storyItem(
+                            title: "내 스토리",
+                            viewed: firstStory.viewed,
+                            nickname: firstStory.nickname,
+                            profileImage: firstStory.profileImageLink,
+                            storyIDList: sortedStoryIDList // 전체 스토리 ID 리스트 전달
+                        )
+                    } else{
+                        storyItem2(
+                            profileImage: firstStory.profileImageLink)
+                    }
                 }
                 
                 let sortedStories = storyViewModel.sortedGroupedStories //정렬이 끝난 스토리값
@@ -143,14 +140,8 @@ extension HomeView {
                                 profileImageLink: story.profileImageLink,
                                 isTabBarHidden: $isTabBarHidden
                             )
-                            .onAppear(){
-                                print("스토리디테일:\(storyViewModel.selectedStory)")
-                                print(story.viewed)
-                                print("StoryIDs : \(StoryIDList)")
-                                print(firstUnviewedStory)
-                                print("📌 \(nickname) - \(stories.map { $0.viewed })")
-                            }
-                          
+                            .padding(.horizontal,2)
+                                                      
                             
                             
                             // StoryItem 을 넣을 예정
@@ -183,7 +174,7 @@ extension HomeView {
                 .onAppear { isTabBarHidden = true }
             ) {
                 ZStack {
-                    if viewed {
+                    if !viewed {
                         Circle()
                             .strokeBorder(
                                 LinearGradient(gradient: Gradient(colors: [
@@ -192,11 +183,11 @@ extension HomeView {
                                 ]), startPoint: .topLeading, endPoint: .bottomTrailing),
                                 lineWidth: 4
                             )
-                            .frame(width: 90, height: 90)
+                            .frame(width: 85, height: 85)
                     } else {
                         Circle()
                             .strokeBorder(Color.gray.opacity(0.5), lineWidth: 4)
-                            .frame(width: 90, height: 90)
+                            .frame(width: 85, height: 85)
                     }
 
                     if let url = URL(string: profileImage) {
@@ -206,7 +197,7 @@ extension HomeView {
                             Image("pixelsImage")
                                 .resizable()
                         }
-                        .frame(width: 76, height: 76)
+                        .frame(width: 74, height: 74)
                         .clipShape(Circle())
                     } else {
                         Image("pixelsImage")
@@ -217,13 +208,47 @@ extension HomeView {
                 }
             }
             Text(title)
-                .bold()
+                .foregroundStyle(Color.black_1)
                 .font(.mmg(.Caption2))
         }
         .padding(.leading, 24)
     }
 
-    
+    private func storyItem2(profileImage: String) -> some View {
+        VStack {
+            NavigationLink(
+                destination: StoryView(userID: "유저아이디", tabIndex: $tabIndex, isTabBarHidden: .constant(false))
+                .onAppear { isTabBarHidden = true }
+            ) {
+                ZStack {
+                        Circle()
+                            .strokeBorder(Color.gray.opacity(0.5), lineWidth: 4)
+                            .frame(width: 85, height: 85)
+                    
+
+                    if let url = URL(string: profileImage) {
+                        AsyncImage(url: url) { image in
+                            image.resizable()
+                        } placeholder: {
+                            Image("pixelsImage")
+                                .resizable()
+                        }
+                        .frame(width: 74, height: 74)
+                        .clipShape(Circle())
+                    } else {
+                        Image("pixelsImage")
+                            .resizable()
+                            .frame(width: 76, height: 76)
+                            .clipShape(Circle())
+                    }
+                }
+            }
+            Text("내 스토리")
+                .foregroundStyle(Color.black_1)
+                .font(.mmg(.Caption2))
+        }
+        .padding(.leading, 24)
+    }
     
     private func categoryTitle() -> some View {
         HStack {
@@ -290,10 +315,11 @@ extension HomeView {
                 VStack(spacing: 0) {
                     ZStack(alignment: .topLeading) {
                         AsyncImage(url: URL(string: diary.foodImageURLs.first ?? "")) { image in
-                            image.resizable().scaledToFit()
+                            image.resizable().scaledToFill()
                         } placeholder: {
                             Image("post_image")
                                 .resizable()
+                                .scaledToFill()
                                 .frame(width: 166, height: 166)
                         }
                         .frame(width: 166, height: 166)
