@@ -21,17 +21,20 @@ struct MyFollower: View {
             VStack {
                 List {
                     searchBar
-                    // 팔로워 목록
-                    ForEach(followViewModel.filteredFollowers, id: \.self) { userID in
-                        FollowerCell(followViewModel: followViewModel, showPopup: $showPopup, popupUserID: $popupUserID, userID: userID)
-                        {
-                            followViewModel.removeFollower(userID)
-                        }
+                    ForEach(followViewModel.filteredFollowers, id: \.userId) { follower in
+                        FollowCell(
+                            followViewModel: followViewModel,
+                            showPopup: $showPopup,
+                            popupUserID: $popupUserID,
+                            follower: follower,
+                            followingUser: nil, 
+                            isFollowerList: true
+                        )
                         .onTapGesture {
-                            profileUserID = userID
+                            profileUserID = "\(follower.userId)"
                         }
                         .onAppear {
-                            if userID == followViewModel.filteredFollowers.last {
+                            if follower.userId == followViewModel.filteredFollowers.last?.userId {
                                 followViewModel.loadMoreFollowers()
                             }
                         }
@@ -40,14 +43,28 @@ struct MyFollower: View {
                         .padding(.horizontal, 5)
                     }
                 }
+                .padding(.bottom, 10)
                 .listStyle(PlainListStyle())
+                .onAppear {
+                    if let currentUserId = AuthManager.shared.UUID {
+                        followViewModel.fetchFollowerList(userId: currentUserId)
+                    }
+                }
+                
             }
             .navigationDestination(item: $profileUserID) { userID in
-                OtherProfileView(
-                    userID: userID,
-                    isFollowing: followViewModel.isFollowing(userID),
-                    userName: "", about: "", hasStory: false, hasViewedStory: false,viewModel: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1), followViewModel: followViewModel
-                )
+                if let intUserID = Int(userID) {
+                    OtherProfileView(
+                        userID: intUserID,
+                        isFollowing: followViewModel.isFollowing(userID),
+                        userName: "",
+                        profileImageURL: nil,
+                        about: "",
+                        followersText: nil
+                    )
+                } else {
+                    Text("잘못된 유저 ID입니다.") // ✅ 변환 실패 시 대비
+                }
             }
         }
     }

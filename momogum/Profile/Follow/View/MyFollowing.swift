@@ -13,20 +13,31 @@ struct MyFollowing: View {
     @State private var showCloseButton = false
     @State private var isEditing = false // 텍스트필드 활성화 여부
     @State private var selectedUserID: String? = nil
+    @State private var showPopup: Bool = false
+    @State private var popupUserID: String? = nil
+
     
     var body: some View {
-        NavigationStack{
+        NavigationStack {
             VStack {
                 List {
                     searchBar
-                    // 팔로워 목록
-                    ForEach(followViewModel.filteredFollowing, id: \.self) { userID in
-                        FollowingCell(followViewModel: followViewModel, userID: userID)
+                    
+                    ForEach(followViewModel.filteredFollowing, id: \.userId) { followingUser in
+                        FollowCell(
+                            followViewModel: followViewModel,
+                            showPopup: $showPopup,
+                            popupUserID: $popupUserID,
+                            follower: nil,
+                            followingUser: followingUser,
+                            isFollowerList: false
+                        )
+                        
                         .onTapGesture {
-                            selectedUserID = userID
+                            selectedUserID = "\(followingUser.userId)"
                         }
                         .onAppear {
-                            if userID == followViewModel.filteredFollowers.last {
+                            if followingUser.userId == followViewModel.followingUsers.last?.userId {
                                 followViewModel.loadMoreFollowers()
                             }
                         }
@@ -35,13 +46,27 @@ struct MyFollowing: View {
                         .padding(.horizontal, 5)
                     }
                 }
+                .padding(.bottom, 10)
                 .listStyle(PlainListStyle())
+                .onAppear {
+                    if let currentUserId = AuthManager.shared.UUID {
+                        followViewModel.fetchFollowingList(userId: currentUserId)
+                    }
+                }
             }
             .navigationDestination(item: $selectedUserID) { userID in
-                OtherProfileView(userID: userID,
-                       isFollowing: followViewModel.isFollowing(userID),
-                                 userName: "", about: "",  hasStory: false, hasViewedStory: false,viewModel: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1), followViewModel: followViewModel
-                   )
+                if let intUserID = Int(userID) {
+                    OtherProfileView(
+                        userID: intUserID,
+                        isFollowing: followViewModel.isFollowing(String(userID)),
+                        userName: "",
+                        profileImageURL: nil,
+                        about: "",
+                        followersText: nil
+                    )
+                } else {
+                    Text("잘못된 유저 ID입니다.")
+                }
             }
         }
     }
