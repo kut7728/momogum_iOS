@@ -16,6 +16,9 @@ struct AppointView: View {
     
     @Binding var isTabBarHidden: Bool
     
+    /// 자세한 초대장 확인 뷰에 들어갈 데이터
+    @State var targetAppoint: Appoint = Appoint.DUMMY_APM
+    
     var body: some View {
         NavigationStack (path: $path) {
             ScrollView {
@@ -69,7 +72,7 @@ struct AppointView: View {
                     }
                     .frame(maxWidth: .infinity)
                     
-                    
+                    // MARK: - 미확정 약속 목록
                     VStack (alignment: .leading) {
                         Text("수락 대기 중인 약속")
                             .font(.mmg(.subheader3))
@@ -108,11 +111,15 @@ struct AppointView: View {
                             .scrollIndicators(.hidden)
                         }
                         
+                        
+                        // MARK: - 확정 약속 목록
                         Text("다가오는 식사 약속")
                             .font(.mmg(.subheader3))
                             .padding(.leading, 30)
                         
                         if (viewModel.confirmedAppoints.isEmpty) {
+                            
+                            // 확정 약속이 없는 경우
                             Rectangle()
                                 .foregroundStyle(.black_5)
                                 .frame(width: 336, height: 156)
@@ -124,14 +131,17 @@ struct AppointView: View {
                                         .foregroundStyle(.black_3)
                                 }
                                 .padding(.vertical, 20)
+                            
                         } else {
+                            
+                            // 확정 약속이 있는 경우
                             ScrollView (.horizontal, showsIndicators: true) {
                                 HStack {
                                     Spacer()
                                         .frame(width: 30)
                                     
                                     ForEach(viewModel.confirmedAppoints) { appoint in
-                                        NearAppointCellView(isPresented: $isPresented, appoint: appoint)
+                                        NearAppointCellView(isPresented: $isPresented, targetAppoint: $targetAppoint, appoint: appoint)
                                     }
                                 }
                             }
@@ -153,7 +163,7 @@ struct AppointView: View {
                 isTabBarHidden = false
             }
             .fullScreenCover(isPresented: $isPresented) {
-                AppointCheckingView(appoint: Appoint.DUMMY_APM)
+                AppointCheckingView(appoint: targetAppoint)
             }
         }
     }

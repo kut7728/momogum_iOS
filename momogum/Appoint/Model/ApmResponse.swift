@@ -21,10 +21,10 @@ struct ApmResponseResult: Codable {
     
     let name, menu, date: String
     let location : String
-    let notes: String
+    let notes: String?
     let createdAt: String?
     
-    let selectedCards: SelectedCard
+    let selectedCards: [SelectedCard]
     let invitedFriends: [Friend]
 }
 

@@ -39,15 +39,16 @@ struct Appoint: Codable, Identifiable {
             self.isConfirmed = isConfirmed
         }
     
+    /// 메인페이지 약속 로딩 API로 불러오는 경우
     init(from response: ApmResponseResult) {
         self.id = response.appointmentId
         self.senderId = response.senderId ?? 0
-        self.senderName = response.senderName ?? "temp"
+        self.senderName = response.senderName ?? "NULL"
         
         self.appointName = response.name
         self.menuName = response.menu
         self.placeName = response.location
-        self.note = response.notes
+        self.note = response.notes ?? ""
         
         // 🔥 날짜 변환: "2025-02-19T10:30:00" 형태일 경우 Date 타입으로 변환 필요
         let dateFormatter = ISO8601DateFormatter()
@@ -55,11 +56,12 @@ struct Appoint: Codable, Identifiable {
         self.pickedDate = dateFormatter.date(from: response.date) ?? Date()
         
         self.pickedFriends = response.invitedFriends
-        self.pickedCard = response.selectedCards.imageUrl
+        self.pickedCard = response.selectedCards[0].imageUrl
         
         self.isConfirmed = response.fixed?.lowercased() == "true"
     }
     
+    /// Whole 약속 업로드 API로 불러오는 경우
     init(from response: AppointCreateResponse) {
         let result = response.result
         

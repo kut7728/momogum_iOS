@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NearAppointCellView: View {
     @Binding var isPresented: Bool
+    @Binding var targetAppoint: Appoint
 
     let appoint: Appoint
     
@@ -31,17 +32,24 @@ struct NearAppointCellView: View {
                 .foregroundStyle(.black_4))
             .overlay {
                 VStack (alignment: .leading, spacing: 0) {
+                    
+                    // 약속 날짜
                     Text("\(appoint.pickedDate, formatter: dateFormatter())")
                         .font(.mmg(.Caption2))
                         .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    // 약속 장소
                     Text(appoint.placeName)
                         .font(.mmg(.Caption2))
 
                     Spacer()
                     
+                    // 약속 이름
                     Text(appoint.appointName)
                         .font(.mmg(.subheader3))
                         .padding(.bottom, 5)
+                    
+                    // 약속 메뉴
                     HStack {
                         Image("menu")
                             .resizable()
@@ -54,6 +62,7 @@ struct NearAppointCellView: View {
                     Spacer()
                     
                     Button {
+                        targetAppoint = appoint
                         isPresented = true
                         } label: {
                             Text("약속 자세히 보기")
@@ -77,5 +86,5 @@ struct NearAppointCellView: View {
 }
 
 #Preview {
-    NearAppointCellView(isPresented: .constant(false), appoint: Appoint.DUMMY_APM)
+    NearAppointCellView(isPresented: .constant(false), targetAppoint: .constant(Appoint.DUMMY_APM), appoint: Appoint.DUMMY_APM)
 }

@@ -61,6 +61,9 @@ class NewAppointViewModel {
                         case .success(let data):
                             continuation.resume(returning: data.result.appointmentID)
                             print("약속 고유 Id : \(data.result.appointmentID)")
+                            if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
+                                            print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
+                                        }
                         case .failure(let error):
                             continuation.resume(throwing: error)
                         }
