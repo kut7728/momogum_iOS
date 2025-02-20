@@ -49,7 +49,6 @@ struct SignupStartView: View {
         .padding(.top, 130)
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                print("Current path: \(path)")
                 path.append(.SignupStep1View) // path를 변경하여 화면 이동
             }
         }

@@ -8,12 +8,10 @@
 import SwiftUI
 
 struct LogoutPopupView: View {
-//    @Environment(SignupDataModel.self) var signupDataModel
     @Binding var showLogoutPopup: Bool
 //    @Environment(\.dismiss) var dismiss
-    
+    @StateObject var authViewModel = AuthViewModel(signupData: SignupDataModel())
     var body: some View {
-//        let authViewModel = AuthViewModel(signupData: signupDataModel) 
         VStack(spacing: 0) {
             // 로그아웃
             Text("지금 로그아웃합니다")
@@ -43,8 +41,7 @@ struct LogoutPopupView: View {
                 
                 // 로그아웃
                 Button {
-//                    authViewModel.handleKakaoLogout()
-//                    AuthManager.shared.isLoggedIn = false
+                    authViewModel.handleKakaoLogout()
                     showLogoutPopup = false
 //                    dismiss()
                 } label: {

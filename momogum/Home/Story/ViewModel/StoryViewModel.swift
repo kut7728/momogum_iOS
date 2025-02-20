@@ -99,7 +99,7 @@ class StoryViewModel: ObservableObject {
                     DispatchQueue.main.async {
                         self.Mystories = data.result
                         
-                        print("내 스토리 가져오기 성공: \(data.result)의 스토리")
+                        
                     }
                 case .failure(let error):
                     print(error)
