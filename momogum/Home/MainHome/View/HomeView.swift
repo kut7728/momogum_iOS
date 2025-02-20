@@ -27,10 +27,11 @@ struct HomeView: View {
                 Spacer().frame(height: 60)
                 categoryTitle()
                 categoryButtons()
+                foodDiaryGridView()
                 
-                if let _ = homeviewModel.selectedButtonIndex {
-                    foodDiaryGridView()
-                }
+//                if let _ = homeviewModel.selectedButtonIndex {
+//                    
+//                }
                 
                 Spacer()
             }
@@ -269,7 +270,6 @@ extension HomeView {
             }
             .padding(.top, 15)
             .padding(.horizontal, 16)
-            .border(.black)
 
         }
         .refreshable {
