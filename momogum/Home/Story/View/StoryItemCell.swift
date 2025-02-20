@@ -40,7 +40,7 @@ struct StoryItemCell: View {
                                 .frame(width: 90, height: 90)
                         } else {
                             Circle()
-                                .strokeBorder(Color.gray.opacity(0.5), lineWidth: 6)
+                                .strokeBorder(Color.black_4, lineWidth: 6)
                                 .frame(width: 90, height: 90)
                         }
                         

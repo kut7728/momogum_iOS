@@ -18,7 +18,7 @@ class KeywordSearchViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var currentPage: Int = 0
 
-    private let baseAPI = BaseAPI  // ✅ `Const.swift`의 BaseAPI 사용
+    private let baseAPI = BaseAPI 
 
     // 키워드 검색 API 호출
     func searchKeywords(reset: Bool = false) {
@@ -26,7 +26,6 @@ class KeywordSearchViewModel: ObservableObject {
             currentPage = 0
             hasMoreData = true
             keywordResults = []
-            print("🔄 [초기화] 검색어 초기화 및 첫 페이지 요청 시작")
         }
 
         guard !searchQuery.isEmpty, hasMoreData else {
@@ -40,18 +39,15 @@ class KeywordSearchViewModel: ObservableObject {
         let encodedQuery = searchQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "\(baseAPI)/search/mealdiary?request=\(encodedQuery)&page=\(currentPage)"
 
-        print("🌍 [API 요청] 최종 URL: \(urlString) (페이지: \(currentPage))")
 
         guard let url = URL(string: urlString) else {
             self.errorMessage = "잘못된 URL입니다."
             isLoading = false
-            print("❌ [오류] URL 생성 실패. URL 문자열: \(urlString)")
             return
         }
 
         URLSession.shared.dataTaskPublisher(for: url)
             .map { response in
-                print("✅ [응답 수신] HTTP 응답 상태 코드: \((response.response as? HTTPURLResponse)?.statusCode ?? 0)")
                 return response.data
             }
             .decode(type: KeywordSearchAPIResponse.self, decoder: JSONDecoder())
@@ -71,7 +67,6 @@ class KeywordSearchViewModel: ObservableObject {
                 } else {
                     self.keywordResults.append(contentsOf: response.result)
                     self.currentPage += 1  // 페이지 증가
-                    print("📌 [결과 저장] 새로운 데이터 \(newDataCount)개 추가 (총 \(self.keywordResults.count)개)")
                 }
             })
             .store(in: &cancellables)
@@ -84,6 +79,5 @@ class KeywordSearchViewModel: ObservableObject {
         self.errorMessage = nil
         self.currentPage = 0
         self.hasMoreData = true
-        print("🔹 [초기화] 검색어 및 결과 리스트 초기화 완료")
     }
 }

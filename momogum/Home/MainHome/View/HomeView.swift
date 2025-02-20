@@ -53,7 +53,7 @@ struct HomeView: View {
             }
             .onDisappear {
                 storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
-                  }
+            }
         }
     }
 }
@@ -73,20 +73,20 @@ extension HomeView {
             Spacer()
             
             NavigationLink(destination: SearchView().onAppear { isTabBarHidden = true }
-                .onDisappear { isTabBarHidden = false }) {
-                    Image(systemName: "magnifyingglass")
-                        .imageScale(.large)
-                        .foregroundStyle(.black)
-                        .padding(.trailing, 18)
-                        .padding(.top, 20)
-                }
+            ) {
+                Image(systemName: "magnifyingglass")
+                    .imageScale(.large)
+                    .foregroundStyle(.black)
+                    .padding(.trailing, 18)
+                    .padding(.top, 20)
+            }
             
             NavigationLink(destination: BellView().onAppear { isTabBarHidden = true }
                 .onDisappear { isTabBarHidden = false }) {
                     Image(systemName: "bell")
                         .imageScale(.large)
                         .foregroundStyle(.black)
-                        .padding(.trailing, 20)
+                        .padding(.trailing, 10)
                         .padding(.top, 20)
                 }
             
@@ -94,7 +94,7 @@ extension HomeView {
                 Circle()
                     .fill(Color.red)
                     .frame(width: 6, height: 6)
-                    .offset(x: -30, y: -10)
+                    .offset(x: -20, y: -10)
             }
         }
         .padding(.horizontal, 16)
@@ -104,8 +104,8 @@ extension HomeView {
     private func storyScrollView() -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack {
-
-
+                
+                
                 if let firstStory = storyViewModel.Mystories.first {
                     
                     let sortedStoryIDList = storyViewModel.MyStoryIDList()
@@ -121,7 +121,7 @@ extension HomeView {
                 }
                 
                 let sortedStories = storyViewModel.sortedGroupedStories //정렬이 끝난 스토리값
-
+                
                 ForEach(sortedStories, id:\.key){ (nickname , stories) in
                     
                     if !stories.isEmpty {
@@ -149,7 +149,7 @@ extension HomeView {
                                 print(firstUnviewedStory)
                                 print("📌 \(nickname) - \(stories.map { $0.viewed })")
                             }
-                          
+                            
                             
                             
                             // StoryItem 을 넣을 예정
@@ -194,10 +194,10 @@ extension HomeView {
                             .frame(width: 90, height: 90)
                     } else {
                         Circle()
-                            .strokeBorder(Color.gray.opacity(0.5), lineWidth: 6)
+                            .strokeBorder(Color.black_4, lineWidth: 6)
                             .frame(width: 90, height: 90)
                     }
-
+                    
                     if let url = URL(string: profileImage) {
                         AsyncImage(url: url) { image in
                             image.resizable()
@@ -221,7 +221,7 @@ extension HomeView {
         }
         .padding(.leading, 24)
     }
-
+    
     
     
     private func categoryTitle() -> some View {
@@ -263,6 +263,7 @@ extension HomeView {
                     FoodDiaryGridItemView(diary: diary, isTabBarHidden: $isTabBarHidden, homeviewModel: homeviewModel)
                 }
             }
+            .padding(.top, 15)
             .padding(.horizontal, 16)
         }
     }
@@ -272,7 +273,7 @@ extension HomeView {
         let diary: MealDiary
         @Binding var isTabBarHidden: Bool
         let homeviewModel: HomeViewModel // `let`으로 선언하여 값이 불변하도록 유지
-
+        
         var body: some View {
             NavigationLink(destination: OtherCardView(isTabBarHidden: $isTabBarHidden, mealDiaryId: diary.id)) {
                 VStack(spacing: 0) {
@@ -285,7 +286,7 @@ extension HomeView {
                                 .frame(width: 166, height: 166)
                         }
                         .frame(width: 166, height: 166)
-
+                        
                         if homeviewModel.selectedButtonIndex == 0 {
                             Image("good_fill")
                                 .resizable()
@@ -294,11 +295,11 @@ extension HomeView {
                                 .padding(.leading, 122)
                         }
                     }
-
+                    
                     ZStack {
                         Color.white
                             .frame(width: 166, height: 75)
-
+                        
                         HStack(spacing: 8) {
                             AsyncImage(url: URL(string: diary.userImageURL)) { image in
                                 image.resizable().scaledToFill()
@@ -308,11 +309,13 @@ extension HomeView {
                             }
                             .frame(width: 36, height: 36)
                             .clipShape(Circle())
-
+                            
                             Text(diary.keyWord)
                                 .font(.mmg(.Caption1))
                                 .foregroundColor(.black)
-
+                                .lineLimit(1) // 메뉴이름 길어지면 ...처리
+                                .truncationMode(.tail)
+                            
                             Spacer()
                         }
                         .frame(width: 144, height: 36)

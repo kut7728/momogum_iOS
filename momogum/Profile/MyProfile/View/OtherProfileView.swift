@@ -14,7 +14,11 @@ struct OtherProfileView: View {
     var userName: String //검색뷰에서 이름 받기
     var profileImageURL: String? //검색뷰에서 이미지 받기
     let about: String? // 한줄소개 넘겨받기
+    var hasStory: Bool  // 스토리 링
+    var hasViewedStory: Bool  // 스토리링
     var followersText: String? // 검색부에서 맞팔중인사람
+    var followerCount: Int?
+    var followingCount: Int?
     @State private var showReportPopup = false
     @State private var showReportDetailPopup = false
     
@@ -31,7 +35,6 @@ struct OtherProfileView: View {
             VStack{
                 VStack(alignment: .leading){
                     HStack(alignment: .center){
-                        
                         Button{
                             dismiss()
                         }label:{
@@ -63,12 +66,12 @@ struct OtherProfileView: View {
                     .padding(.bottom, 20)
                     
                     HStack(alignment: .center, spacing: 0) {
-                        // ✅ 서버에서 받은 프로필 이미지 표시
+                        // ✅ 스토리 유무에 따른 프로필 이미지 테두리 설정
                         if let imageUrl = profileImageURL, let url = URL(string: imageUrl) {
                             AsyncImage(url: url) { image in
                                 image.resizable()
                             } placeholder: {
-                                Image("defaultProfile") // 로딩 중 기본 이미지
+                                Image("defaultProfile")
                                     .resizable()
                             }
                             .aspectRatio(contentMode: .fill)
@@ -78,7 +81,27 @@ struct OtherProfileView: View {
                             .overlay(
                                 Circle()
                                     .stroke(lineWidth: 4)
-                                    .foregroundStyle(Color.black_4)
+                                    .foregroundStyle(
+                                        hasStory
+                                            ? (hasViewedStory
+                                                ? LinearGradient(
+                                                    gradient: Gradient(colors: [Color.black_4, Color.black_4]),
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                  )
+                                                : LinearGradient(
+                                                    gradient: Gradient(colors: [Color.Red_3, Color.momogumRed]),
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                  )
+                                              )
+                                            : LinearGradient(
+                                                gradient: Gradient(colors: [Color.clear, Color.clear]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                              )
+                                    )
+
                             )
                             .padding(.trailing, 38)
                         } else {
@@ -91,12 +114,32 @@ struct OtherProfileView: View {
                                 .overlay(
                                     Circle()
                                         .stroke(lineWidth: 4)
-                                        .foregroundStyle(Color.black_4)
+                                        .foregroundStyle(
+                                            hasStory
+                                                ? (hasViewedStory
+                                                    ? LinearGradient(
+                                                        gradient: Gradient(colors: [Color.black_4, Color.black_4]),
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                      )
+                                                    : LinearGradient(
+                                                        gradient: Gradient(colors: [Color.Red_3, Color.momogumRed]),
+                                                        startPoint: .topLeading,
+                                                        endPoint: .bottomTrailing
+                                                      )
+                                                  )
+                                                : LinearGradient(
+                                                    gradient: Gradient(colors: [Color.clear, Color.clear]),  
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                  )
+                                        )
+
                                 )
                                 .padding(.trailing, 38)
                         }
-                    
-
+                        
+                        
                         
                         // 이름 / 한 줄 소개
                         VStack(alignment: .leading){
@@ -138,7 +181,7 @@ struct OtherProfileView: View {
                                     .foregroundStyle(Color.black_1)
                                     .padding(.bottom, 16)
                                 
-                                Text("\(followViewModel.followerCount.formattedFollowerCount())")
+                                Text("\(followerCount?.formattedFollowerCount() ?? "0")") // followerCount 사용
                                     .font(.mmg(.subheader4))
                                     .foregroundStyle(Color.black_1)
                             }
@@ -154,12 +197,13 @@ struct OtherProfileView: View {
                                     .foregroundStyle(Color.black_1)
                                     .padding(.bottom, 16)
                                 
-                                Text("\(followViewModel.followingCount.formattedFollowerCount())")
+                                Text("\(followingCount?.formattedFollowerCount() ?? "0")") // followingCount 사용
                                     .font(.mmg(.subheader4))
                                     .foregroundStyle(Color.black_1)
                             }
                         }
                         .padding(.trailing, 67)
+
                         
                         // 팔로우 / 팔로잉 버튼
                         if followViewModel.isFollowing(userID) {
@@ -247,13 +291,13 @@ struct OtherProfileView: View {
                 
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 20) {
-//                        ForEach(0..<30, id: \.self) { index in
-//                            //                                NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
-//                            //                                    .onAppear { isTabBarHidden = true }
-//                            //                                    .onDisappear { isTabBarHidden = false }
-//                            //                                ) {
-//                            CardPostCell(selectedSegment: $selectedSegment)
-//                        }
+                        //                        ForEach(0..<30, id: \.self) { index in
+                        //                            //                                NavigationLink(destination: MyCardView(isTabBarHidden: $isTabBarHidden)
+                        //                            //                                    .onAppear { isTabBarHidden = true }
+                        //                            //                                    .onDisappear { isTabBarHidden = false }
+                        //                            //                                ) {
+                        //                            CardPostCell(selectedSegment: $selectedSegment)
+                        //                        }
                     }
                 }
                 .padding(.horizontal, 20)
