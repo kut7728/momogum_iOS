@@ -146,6 +146,8 @@ class CardViewModel: ObservableObject {
                         DispatchQueue.main.async {
                             let newComment = Comment(userProfileImagePath: self.card.userProfileImageLink, nickname: self.card.nickname, content: comment)
                             self.comments.append(newComment)
+                            self.card.commentCount += 1 // 댓글 개수 업데이트
+                            self.objectWillChange.send()
                         }
                     } else {
                         print("❌ 댓글 추가 실패: \(data.message)")
