@@ -60,8 +60,11 @@ struct StoryItemCell: View {
                     Text(nickname)
                         .foregroundColor(.black)
                         .font(.mmg(.Caption2))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
-                .padding(.leading, 24)
+                .padding(.horizontal,2)
             }
         }
     }

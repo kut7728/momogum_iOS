@@ -135,6 +135,7 @@ extension Story2View {
                     .resizable()
                     .frame(width: 38, height: 38)
                     .padding(.top, 22)
+                    .padding(.trailing, 13)
             }
             Spacer()
         }

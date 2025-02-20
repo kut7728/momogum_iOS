@@ -110,7 +110,7 @@ extension HomeView {
                     
                     let sortedStoryIDList = storyViewModel.MyStoryIDList()
                     storyItem(
-                        title: firstStory.nickname,
+                        title: "내 스토리",
                         viewed: firstStory.viewed,
                         nickname: firstStory.nickname,
                         profileImage: firstStory.profileImageLink,
@@ -142,6 +142,7 @@ extension HomeView {
                                 profileImageLink: story.profileImageLink,
                                 isTabBarHidden: $isTabBarHidden
                             )
+                            .padding(.horizontal,2)
                                                       
                             
                             
@@ -273,10 +274,11 @@ extension HomeView {
                 VStack(spacing: 0) {
                     ZStack(alignment: .topLeading) {
                         AsyncImage(url: URL(string: diary.foodImageURLs.first ?? "")) { image in
-                            image.resizable().scaledToFit()
+                            image.resizable().scaledToFill()
                         } placeholder: {
                             Image("post_image")
                                 .resizable()
+                                .scaledToFill()
                                 .frame(width: 166, height: 166)
                         }
                         .frame(width: 166, height: 166)
