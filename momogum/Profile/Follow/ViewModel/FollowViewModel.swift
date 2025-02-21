@@ -21,6 +21,8 @@ class FollowViewModel: ObservableObject {
     @Published var followUsers: [String] = [] // 팔로우한 유저 목록
     private var pendingUnfollow: [String] = [] // 언팔로우 예약된 유저 목록
     
+    @Published var isLoading: Bool = false
+    
     var userID: Int
     
     init(userId: Int) {
@@ -115,6 +117,52 @@ class FollowViewModel: ObservableObject {
         }
     }
     
+    func updateFollowingStatus() {
+        var newFollowingStatus: [String: Bool] = [:]
+        
+        for user in followingUsers {
+            newFollowingStatus["\(user.userId)"] = true
+        }
+        
+        for user in allFollowers where newFollowingStatus["\(user.userId)"] == nil {
+            newFollowingStatus["\(user.userId)"] = false
+        }
+        
+        DispatchQueue.main.async {
+            self.followingStatus = newFollowingStatus
+        }
+    }
+    
+    // MARK: - 팔로우/팔로잉 데이터 동시에 요청 (속도 개선)
+    func fetchFollowData(userId: Int) {
+        isLoading = true
+        let group = DispatchGroup()
+        
+        var fetchedFollowers: [Follower] = []
+        var fetchedFollowingUsers: [FollowingUser] = []
+        
+        group.enter()
+        fetchFollowerList(userId: userId) { followers in
+            fetchedFollowers = followers
+            group.leave()
+        }
+        
+        group.enter()
+        fetchFollowingList(userId: userId) { followingUsers in
+            fetchedFollowingUsers = followingUsers
+            group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            self.allFollowers = fetchedFollowers
+            self.followingUsers = fetchedFollowingUsers
+            self.followerCount = fetchedFollowers.count
+            self.followingCount = fetchedFollowingUsers.count
+            self.updateFollowingStatus()
+            self.isLoading = false  // 로딩 완료 후 UI 업데이트
+        }
+    }
+    
     
     //MARK: - Follow Toggle
     // 팔로우 토글
@@ -153,6 +201,9 @@ class FollowViewModel: ObservableObject {
                             userInfo: ["userID": targetUserId, "isFollowing": followingStatus]
                         )
                         
+                       
+                        
+                        
                         print("✅ 팔로우 상태 변경됨: \(targetUserId) - \(followingStatus ? "팔로우 중" : "언팔로우됨")")
                     } else {
                         print("❌ API 요청 실패: \(decodedResponse.message)")
@@ -186,9 +237,10 @@ class FollowViewModel: ObservableObject {
     
     
     // 팔로잉 목록 불러오기
-    func fetchFollowingList(userId: Int) {
+    func fetchFollowingList(userId: Int, completion: @escaping ([FollowingUser]) -> Void) {
         guard let url = URL(string: "\(BaseAPI)/follows/\(userId)/search/following") else {
             print("❌ 유효하지 않은 URL")
+            completion([])
             return
         }
         
@@ -199,29 +251,30 @@ class FollowViewModel: ObservableObject {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ 팔로잉 목록 요청 실패: \(error.localizedDescription)")
+                completion([])
                 return
             }
             
             guard let data = data else {
-                print("❌ 응답 데이터 없음")
+                completion([])
                 return
             }
             
             do {
-                let decodedResponse = try JSONDecoder().decode(FollowingListResponse.self, from: data)
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let decodedResponse = try decoder.decode(FollowingListResponse.self, from: data)
                 DispatchQueue.main.async {
                     if decodedResponse.isSuccess {
-                        self.followingUsers = decodedResponse.result
-                        self.followingCount = self.followingUsers.count
-                        
-                        // 팔로우 상태 저장
-                        self.updateFollowingStatus()
+                        completion(decodedResponse.result) // 성공적으로 데이터 반환
                     } else {
                         print("❌ API 요청 실패: \(decodedResponse.message)")
+                        completion([])
                     }
                 }
             } catch {
                 print("❌ JSON 디코딩 오류: \(error.localizedDescription)")
+                completion([])
             }
         }.resume()
     }
@@ -230,10 +283,12 @@ class FollowViewModel: ObservableObject {
     
     
     
+    
     // 팔로워 목록 불러오기
-    func fetchFollowerList(userId: Int) {
+    func fetchFollowerList(userId: Int, completion: @escaping ([Follower]) -> Void) {
         guard let url = URL(string: "\(BaseAPI)/follows/\(userId)/search/followers") else {
             print("❌ 유효하지 않은 URL")
+            completion([]) // 빈 배열 반환
             return
         }
         
@@ -244,42 +299,27 @@ class FollowViewModel: ObservableObject {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ 팔로워 목록 요청 실패: \(error.localizedDescription)")
+                completion([])
                 return
             }
             
             guard let data = data else {
-                print("❌ 응답 데이터 없음")
+                completion([])
                 return
             }
             
             do {
-                let decodedResponse = try JSONDecoder().decode(FollowerListResponse.self, from: data)
+                let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
+                let decodedResponse = try decoder.decode(FollowerListResponse.self, from: data)
                 DispatchQueue.main.async {
-                    if decodedResponse.isSuccess {
-                        self.allFollowers = decodedResponse.result
-                        self.followerCount = self.allFollowers.count
-
-                        // 팔로우 상태 저장
-                        self.updateFollowingStatus()
-                    } else {
-                        print("❌ API 요청 실패: \(decodedResponse.message)")
-                    }
+                    completion(decodedResponse.result)
                 }
             } catch {
                 print("❌ JSON 디코딩 오류: \(error.localizedDescription)")
+                completion([])
             }
         }.resume()
-    }
-    
-    func updateFollowingStatus() {
-        for user in followingUsers {
-            followingStatus["\(user.userId)"] = true
-        }
-        for user in allFollowers {
-            if followingStatus["\(user.userId)"] == nil {
-                followingStatus["\(user.userId)"] = false
-            }
-        }
     }
     
     // 팔로워 삭제
@@ -288,22 +328,22 @@ class FollowViewModel: ObservableObject {
             print("❌ 유효하지 않은 URL")
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("❌ 팔로워 삭제 실패: \(error.localizedDescription)")
                 return
             }
-
+            
             guard let data = data else {
                 print("❌ 응답 데이터 없음")
                 return
             }
-
+            
             do {
                 let decodedResponse = try JSONDecoder().decode(FollowResponse.self, from: data)
                 DispatchQueue.main.async {
@@ -318,6 +358,6 @@ class FollowViewModel: ObservableObject {
             }
         }.resume()
     }
-
-
+    
+    
 }

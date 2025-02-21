@@ -112,24 +112,22 @@ struct OtherProfileView: View {
                 viewModel.fetchMealDiaries(userId: userID)
                 viewModel.fetchBookmarkedMealDiaries(userId: userID)
                 
-                // 팔로워/팔로잉 정보 로드
-                followViewModel.fetchFollowerList(userId: userID)
-                followViewModel.fetchFollowingList(userId: userID)
+                // 팔로워 & 팔로잉 목록 동시 요청
+                followViewModel.fetchFollowData(userId: userID)
                 
-                // 현재 유저의 팔로우 상태 업데이트
                 DispatchQueue.main.async {
                     if let currentUserId = AuthManager.shared.UUID {
-                        // 팔로우 상태를 즉시 가져와 버튼 상태 반영
                         if let existingStatus = followViewModel.followingStatus["\(userID)"] {
                             self.isUserFollowing = existingStatus
                         }
                         
-                        // API 요청하여 최신 상태 가져오기 (이미 변경된 경우 업데이트 방지)
-                        followViewModel.fetchFollowingList(userId: currentUserId)
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            if let updatedStatus = followViewModel.followingStatus["\(userID)"], updatedStatus != self.isUserFollowing {
-                                self.isUserFollowing = updatedStatus
+                        // API 요청하여 최신 상태 가져오기
+                        followViewModel.fetchFollowingList(userId: currentUserId) { _ in
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                if let updatedStatus = followViewModel.followingStatus["\(userID)"],
+                                   updatedStatus != self.isUserFollowing {
+                                    self.isUserFollowing = updatedStatus
+                                }
                             }
                         }
                     }
@@ -409,18 +407,17 @@ private extension OtherProfileView {
         
         // API 요청 후 상태 업데이트
         DispatchQueue.main.asyncAfter(deadline: .now()) {
-            followViewModel.fetchFollowingList(userId: currentUserId)
-            
-            DispatchQueue.main.async {
-                if let status = followViewModel.followingStatus["\(userID)"] {
-                    if status != self.isUserFollowing {  //API 응답과 UI 상태가 다르면 보정
-                        self.isUserFollowing = status
+            followViewModel.fetchFollowingList(userId: currentUserId) { _ in
+                DispatchQueue.main.async {
+                    if let status = followViewModel.followingStatus["\(userID)"] {
+                        if status != self.isUserFollowing {
+                            self.isUserFollowing = status
+                        }
+                    } else {
+                        self.isUserFollowing = previousState
                     }
-                } else {
-                    self.isUserFollowing = previousState
                 }
             }
         }
     }
-    
 }

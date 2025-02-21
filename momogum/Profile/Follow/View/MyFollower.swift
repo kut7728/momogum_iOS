@@ -27,14 +27,15 @@ struct MyFollower: View {
                             showPopup: $showPopup,
                             popupUserID: $popupUserID,
                             follower: follower,
-                            followingUser: nil, 
+                            followingUser: nil,
                             isFollowerList: true
                         )
                         .onTapGesture {
                             profileUserID = "\(follower.userId)"
                         }
                         .onAppear {
-                            if follower.userId == followViewModel.filteredFollowers.last?.userId {
+                            if follower.userId == followViewModel.filteredFollowers.last?.userId &&
+                                followViewModel.filteredFollowers.count < followViewModel.allFollowers.count {
                                 followViewModel.loadMoreFollowers()
                             }
                         }
@@ -46,7 +47,13 @@ struct MyFollower: View {
                 .padding(.bottom, 10)
                 .listStyle(PlainListStyle())
                 .onAppear {
-                    followViewModel.fetchFollowerList(userId: followViewModel.userID)
+                    followViewModel.fetchFollowerList(userId: followViewModel.userID) { followers in
+                        DispatchQueue.main.async {
+                            followViewModel.allFollowers = followers
+                            followViewModel.followerCount = followers.count
+                            followViewModel.updateFollowingStatus()
+                        }
+                    }
                 }
                 
             }
@@ -61,7 +68,7 @@ struct MyFollower: View {
                         followersText: nil
                     )
                 } else {
-                    Text("잘못된 유저 ID입니다.") // ✅ 변환 실패 시 대비
+                    Text("잘못된 유저 ID입니다.") // 변환 실패 시 대비
                 }
             }
         }

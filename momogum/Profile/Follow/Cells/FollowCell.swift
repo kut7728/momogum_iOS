@@ -96,11 +96,7 @@ struct FollowCell: View {
             
         }
         .onAppear {
-            if let status = followViewModel.followingStatus["\(userId)"] {
-                self.isFollowing = status
-            } else {
-                self.isFollowing = false // 기본값
-            }
+            self.isFollowing = followViewModel.followingStatus["\(userId)"] ?? false
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("FollowStatusChanged"))) { notification in
             if let userInfo = notification.userInfo,
@@ -125,18 +121,15 @@ struct FollowCell: View {
         }
         
         // 현재 팔로우 상태를 가져오기
-        let wasFollowing = isFollowing
+        let wasFollowing = followViewModel.followingStatus["\(userId)"] ?? false
         
-        // UI 변경을 바로 하지 않고, 서버 응답 후 반영
-        followViewModel.toggleFollow(userId: currentUserId, targetUserId: "\(userId)")
-        
-        // 서버 응답을 받으면 업데이트 (API에서 성공 여부 확인)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { // API 응답 시점 반영
-            if let newStatus = self.followViewModel.followingStatus["\(userId)"] {
-                self.isFollowing = newStatus
-            } else {
-                self.isFollowing = !wasFollowing // 만약 API 응답이 없으면 원래 상태로 복원
+        //  UI를 즉시 변경
+        DispatchQueue.main.async {
+                self.isFollowing.toggle()
+                self.followViewModel.followingStatus["\(userId)"] = self.isFollowing
             }
-        }
+        
+        // 버에 팔로우 요청
+        followViewModel.toggleFollow(userId: currentUserId, targetUserId: "\(userId)")
     }
 }

@@ -29,7 +29,7 @@ struct FollowView: View {
         
         _selectedUserID = State(initialValue: userID)
     }
-
+    
     
     
     var body: some View {
@@ -69,7 +69,13 @@ struct FollowView: View {
                             .foregroundColor(selectedSegment == 0 ? Color.black_1 : Color.black_3)
                             .onTapGesture {
                                 selectedSegment = 0
-                                followViewModel.fetchFollowerList(userId: userID)
+                                followViewModel.fetchFollowerList(userId: userID) { followers in
+                                    DispatchQueue.main.async {
+                                        followViewModel.allFollowers = followers
+                                        followViewModel.followerCount = followers.count
+                                        followViewModel.updateFollowingStatus()
+                                    }
+                                }
                             }
                             .padding(.bottom, 15)
                         
@@ -87,8 +93,16 @@ struct FollowView: View {
                             .foregroundColor(selectedSegment == 1 ? Color.black_1 : Color.black_3)
                             .onTapGesture {
                                 selectedSegment = 1
-                                followViewModel.fetchFollowingList(userId: userID)
+                                followViewModel.updateFollowingStatus() // UI 즉시 업데이트
+                                followViewModel.fetchFollowingList(userId: userID) { followings in
+                                    DispatchQueue.main.async {
+                                        followViewModel.followingUsers = followings
+                                        followViewModel.followingCount = followings.count
+                                        followViewModel.updateFollowingStatus() // 데이터 가져온 후 다시 업데이트
+                                    }
+                                }
                             }
+
                             .padding(.bottom, 15)
                         
                         Rectangle()
@@ -143,8 +157,10 @@ struct FollowView: View {
             }
         }
         .onAppear {
-            followViewModel.fetchFollowerList(userId: userID)
-            followViewModel.fetchFollowingList(userId: userID)
+            if followViewModel.allFollowers.isEmpty && followViewModel.followingUsers.isEmpty {
+                followViewModel.fetchFollowData(userId: userID)
+            }
+            followViewModel.updateFollowingStatus() // 팔로우 상태 즉시 반영
         }
         
     }

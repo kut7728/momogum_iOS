@@ -22,15 +22,15 @@ struct MyProfileView: View {
     
     @StateObject var viewModel : ProfileViewModel
     @State var followViewModel: FollowViewModel = FollowViewModel(userId: AuthManager.shared.UUID ?? 1)
-
+    
     
     @Binding var isTabBarHidden: Bool
-
+    
     init(isTabBarHidden: Binding<Bool>) {
         self._isTabBarHidden = isTabBarHidden
         _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: AuthManager.shared.UUID ?? 1))
     }
-
+    
     
     let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
     
@@ -61,8 +61,22 @@ struct MyProfileView: View {
                         isTabBarHidden = false
                     }
                 }
-                .onAppear { // 밥일기 새로고침
-                    viewModel.refreshMealDiaries()
+                .onAppear {
+                    viewModel.refreshMealDiaries() // 밥일기 새로고침
+                    
+                    // 팔로워 데이터 가져오기
+                    followViewModel.fetchFollowerList(userId: AuthManager.shared.UUID ?? 1) { followers in
+                        DispatchQueue.main.async {
+                            followViewModel.followerCount = followers.count
+                        }
+                    }
+                    
+                    // 팔로잉 데이터 가져오기
+                    followViewModel.fetchFollowingList(userId: AuthManager.shared.UUID ?? 1) { followings in
+                        DispatchQueue.main.async {
+                            followViewModel.followingCount = followings.count
+                        }
+                    }
                 }
             }
             .disabled(showPopup) // 팝업이 보일 때 메인 화면 비활성화
@@ -177,11 +191,6 @@ private extension MyProfileView {
                     Text("\(followViewModel.followerCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
-                        .onAppear {
-                            if let currentUserId = AuthManager.shared.UUID {
-                                followViewModel.fetchFollowerList(userId: currentUserId) // 팔로워 목록 가져오기
-                            }
-                        }
                 }
             }
             .padding(.trailing, 67)
@@ -203,11 +212,6 @@ private extension MyProfileView {
                     Text("\(followViewModel.followingCount.formattedFollowerCount())")
                         .font(.mmg(.subheader4))
                         .foregroundStyle(Color.black_1)
-                        .onAppear {
-                            if let currentUserId = AuthManager.shared.UUID {
-                                followViewModel.fetchFollowingList(userId: currentUserId)
-                            }
-                        }
                 }
             }
             .padding(.trailing, 67)
@@ -245,7 +249,7 @@ private extension MyProfileView {
                     viewModel: ProfileViewModel(userId: Int(viewModel.userID) ?? AuthManager.shared.UUID ?? 1)
                 )
             }
-
+            
             .navigationDestination(for: String.self) { value in
                 switch value {
                 case "EditProfileView":
