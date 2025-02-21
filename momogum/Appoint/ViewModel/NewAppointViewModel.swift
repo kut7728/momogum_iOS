@@ -189,7 +189,7 @@ class NewAppointViewModel {
                         
                         self.newAppoint = Appoint(from: decodedResponse)
                         self.resetAppoint()
-                        //                            print("⚠️ 새 약속 로딩 응답: \(decodedResponse)")
+                        print("⚠️ 새 약속 로딩 응답: \(decodedResponse)")
                         
                     } catch {
                         print("⚠️ 새 약속 로딩 JSON 디코딩 실패: \(error)")
