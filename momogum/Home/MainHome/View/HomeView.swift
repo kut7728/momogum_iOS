@@ -22,14 +22,17 @@ struct HomeView: View {
         NavigationStack(path: $path) {
             VStack {
                 headerView()
-                Spacer().frame(height: 40)
-                storyScrollView()
-                Spacer().frame(height: 60)
-                categoryTitle()
-                categoryButtons()
-                foodDiaryGridView()
-                
-                Spacer()
+                Spacer().frame(height: 20)
+                ScrollView {
+                    storyScrollView()
+                    Spacer().frame(height: 30)
+                    categoryTitle()
+                    categoryButtons()
+                    foodDiaryGridView()
+                    
+                    Spacer()
+                }
+                .scrollIndicators(.hidden)
             }
             
             .onAppear{ //홈뷰가 나타났을떄 탭바 보이게

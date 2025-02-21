@@ -22,13 +22,13 @@ struct AppointPickedFriendCellView: View {
                         .frame(width: 50, height: 50)
                         .clipShape(Circle())
                 } placeholder: {
-                    Image("pixelsImage")
+                    Image("good")
                         .resizable()
                         .frame(width: 50, height: 50)
                     .clipShape(Circle())                }
                 
             } else {
-                Image("pixelsImage")
+                Image("good")
                     .resizable()
                     .frame(width: 50, height: 50)
                 .clipShape(Circle())
