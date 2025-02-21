@@ -117,6 +117,42 @@ class NewAppointViewModel {
         //        dateFormatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         let dateString = dateFormatter.string(from: self.pickedDate)  // 현재 시간을 ISO 8601 형식 문자열로 변환
         
+        var pickedCardUrl: String {
+            switch self.pickedCard {
+            case "basic01.png" :
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/basic01.png"
+
+            case "basic02.png" :
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/basic02.png"
+
+            case "basic03.png" :
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/basic03.png"
+
+            case "fun01.png" :
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/fun01.png"
+
+            case "fun02.png" :
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/fun02.png"
+
+            case "fun3.png" :                
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/fun3.png"
+
+                
+            case "event1.png" :
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/event1.png"
+                
+            case "event2.png" :
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/event2.png"
+
+            case "event3.png" :
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/event3.png"
+            
+            default:
+                return "https://momogum-bucket.s3.ap-northeast-2.amazonaws.com/basic/event2.png"
+
+            }
+        }
+        
         let mainRequest = AppointmentName(
             name: self.appointName,
             menu: self.menuName,
@@ -128,7 +164,7 @@ class NewAppointViewModel {
                                  appointmentId: self.appointId,
                                  userIds: self.pickedFriends.map { $0.userId ?? 0 },
                                  cardCategory: "BASIC",
-                                 selectedCardUrl: "https://s3.amazonaws.com/cards/basic1.jpg",
+                                 selectedCardUrl: pickedCardUrl,
                                  appointmentName: mainRequest)
         
         
@@ -139,25 +175,6 @@ class NewAppointViewModel {
                    parameters: parm,
                    encoder: JSONParameterEncoder.default,
                    headers: ["Content-Type": "application/json", "Accept": "application/json"])
-        //        .responseDecodable(of: AppointCreateResponse.self) { [self] response in
-        //
-        //            switch response.result {
-        //            case .success(let responseBody):
-        //                print("Response received successfully: \(responseBody)")
-        //                let responseData = responseBody
-        //                self.newAppoint = Appoint(from: responseData)
-        //                self.resetAppoint()
-        //
-        //            case .failure(let error):
-        //                print("Error: \(error.localizedDescription)")
-        //                print("⚠️ Error: \(response)")
-        //
-        //                if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-        //                    print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
-        //                }
-        //                return
-        //            }
-        //        }
         
         
         .responseData { response in
