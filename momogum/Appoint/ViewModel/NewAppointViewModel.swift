@@ -104,7 +104,6 @@ class NewAppointViewModel {
                 Friend(nickname: "hira1n", name: "세섬", userId: 13, profileImage: tempImage, status: "Pending"),
                 Friend(nickname: "yun_206", name: "도리", userId: 11, profileImage: tempImage, status: "Pending"),
                 Friend(nickname: "meoraeng", name: "머랭", userId: 10, profileImage: tempImage, status: "Pending"),
-                Friend(nickname: "잼", name: "이재민", userId: 1, profileImage: tempImage, status: "Pending"),
                 Friend(nickname: "yawn11", name: "픽스", userId: 9, profileImage: "https://s3.ap-northeast-2.amazonaws.com/momogum-bucket/user-profile-images/c92dba64-1b6a-45cf-93d6-01e602e3b6bc-%E1%84%91%E1%85%B5%E1%86%A8%E1%84%89%E1%85%B3.jpeg", status: "Pending")
             ]
         }

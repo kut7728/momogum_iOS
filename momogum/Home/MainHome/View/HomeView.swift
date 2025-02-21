@@ -33,6 +33,11 @@ struct HomeView: View {
                     Spacer()
                 }
                 .scrollIndicators(.hidden)
+                .refreshable {
+                    storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
+                    storyViewModel.fetchMyStory(for: AuthManager.shared.UUID ?? 1)
+                }
+                .padding(.horizontal, 20)
             }
             
             .onAppear{ //홈뷰가 나타났을떄 탭바 보이게
