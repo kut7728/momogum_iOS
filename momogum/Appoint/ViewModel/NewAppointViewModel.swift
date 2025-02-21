@@ -97,7 +97,7 @@ class NewAppointViewModel {
             }
         } catch {
             print("초대 가능 친구 GET 오류: \(error.localizedDescription)")
-            let tempImage = "https://s3.ap-northeast-2.amazonaws.com/momogum-bucket/user-profile-images/0cd51933-293d-4d1e-9951-72b58163abbc-profile.jpg"
+            let tempImage = "good"
             self.friends = [
                 Friend(nickname: "덕규", name: "박규민", userId: 1, profileImage: tempImage, status: "Pending"),
                 Friend(nickname: "쿠트", name: "의택", userId: 1, profileImage: tempImage, status: "Pending"),

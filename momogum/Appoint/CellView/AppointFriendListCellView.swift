@@ -20,7 +20,7 @@ struct AppointFriendListCellView: View {
                         .clipShape(Circle())
                         .padding(.trailing)
                 } placeholder: {
-                    Image("pixelsImage")
+                    Image("good")
                         .resizable()
                         .frame(width: 50, height: 50)
                         .clipShape(Circle())
@@ -28,7 +28,7 @@ struct AppointFriendListCellView: View {
                 }
                 
             } else {
-                Image("pixelsImage")
+                Image("good")
                     .resizable()
                     .frame(width: 50, height: 50)
                     .clipShape(Circle())
