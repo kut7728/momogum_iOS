@@ -22,9 +22,15 @@ struct AppointCreateResponse: Codable {
 
 // MARK: - Result
 struct ACRResult: Codable {
-    let name, menu, date, location: String
-    let notes, createdAt: String
+    let name: String
+    let menu: String
+    let date: String
+    let location: String
+    let notes: String?
+    let createdAt: String?
     let invitedFriends: [Friend]
-    let selectedCards: [SelectedCard]
+    let selectedCards: SelectedCard
     let appointmentId: Int
+    let senderId: Int
+    let senderName: String
 }

@@ -4,7 +4,7 @@ import Foundation
 // MARK: - new appoint api request
 struct NewApmRequest: Codable {
     let userId, appointmentId: Int
-    let nicknames: [String]
+    let userIds: [Int]
     let cardCategory, selectedCardUrl: String
     let appointmentName: AppointmentName
 }

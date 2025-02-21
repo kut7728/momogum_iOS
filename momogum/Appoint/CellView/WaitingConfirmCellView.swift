@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WaitingConfirmCellView: View {
     @Binding var isPresented: Bool
+    @Binding var targetAppoint: Appoint
 
     let appoint: Appoint
     
@@ -45,6 +46,7 @@ struct WaitingConfirmCellView: View {
                     
                     Spacer()
                     Button {
+                        targetAppoint = appoint
                         isPresented = true
                     } label: {
                         Text("초대장 열기")
@@ -65,5 +67,5 @@ struct WaitingConfirmCellView: View {
 }
 
 #Preview {
-    WaitingConfirmCellView(isPresented: .constant(false), appoint: Appoint.DUMMY_APM)
+    WaitingConfirmCellView(isPresented: .constant(false), targetAppoint: .constant(Appoint.DUMMY_APM), appoint: Appoint.DUMMY_APM)
 }

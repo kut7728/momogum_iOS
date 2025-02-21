@@ -29,10 +29,6 @@ struct HomeView: View {
                 categoryButtons()
                 foodDiaryGridView()
                 
-//                if let _ = homeviewModel.selectedButtonIndex {
-//                    
-//                }
-                
                 Spacer()
             }
             
@@ -44,6 +40,7 @@ struct HomeView: View {
             .onAppear{
                 storyViewModel.fetchStory(for: AuthManager.shared.UUID ?? 1)
                 storyViewModel.fetchMyStory(for: AuthManager.shared.UUID ?? 1)
+                homeviewModel.selectButton(index: 0, mealDiaryViewModel: mealDiaryViewModel)
                 
             }
             .onDisappear {
