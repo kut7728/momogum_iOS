@@ -70,7 +70,7 @@ class AppointViewModel {
                             print("✅ 미확정 약속 로딩 api - UTF-8 변환 후 디코딩 성공")
                             
                             self.pendingAppoints = decodedResponse.result.map { Appoint(from: $0) }
-                            print("⚠️ 확정 약속 응답: \(decodedResponse)")
+                            print("⚠️ 미확정 약속 응답: \(utf8String)")
                             
                         } catch {
                             print("⚠️ JSON 디코딩 실패: \(error)")

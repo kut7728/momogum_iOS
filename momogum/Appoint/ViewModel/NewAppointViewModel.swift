@@ -76,7 +76,7 @@ class NewAppointViewModel {
     
     // MARK: - 초대 가능한 친구 목록 반환
     func getAvailableFriends() async -> Void {
-        let url = "\(BaseAPI)/appointment/8/invites?userId=\(self.userId)"
+        let url = "\(BaseAPI)/appointment/\(self.appointId)/invites?userId=9"
         
         do {
             self.friends = try await withCheckedThrowingContinuation {continuation in
@@ -97,6 +97,15 @@ class NewAppointViewModel {
             }
         } catch {
             print("초대 가능 친구 GET 오류: \(error.localizedDescription)")
+            let tempImage = "https://s3.ap-northeast-2.amazonaws.com/momogum-bucket/user-profile-images/0cd51933-293d-4d1e-9951-72b58163abbc-profile.jpg"
+            self.friends = [
+                Friend(nickname: "덕규", name: "박규민", userId: 1, profileImage: tempImage, status: "Pending"),
+                Friend(nickname: "쿠트", name: "의택", userId: 1, profileImage: tempImage, status: "Pending"),
+                Friend(nickname: "세섬", name: "류한비", userId: 1, profileImage: tempImage, status: "Pending"),
+                Friend(nickname: "도리", name: "김윤진", userId: 1, profileImage: tempImage, status: "Pending"),
+                Friend(nickname: "머랭", name: "김선우", userId: 1, profileImage: tempImage, status: "Pending"),
+                Friend(nickname: "잼", name: "이재민", userId: 1, profileImage: tempImage, status: "Pending")
+            ]
         }
     }
     

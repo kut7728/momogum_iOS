@@ -155,6 +155,9 @@ struct AppointView: View {
                     }
                 }
             }
+            .onAppear {
+                viewModel.loadMyAppoints()
+            }
             .refreshable {
                 viewModel.loadMyAppoints()
             }
