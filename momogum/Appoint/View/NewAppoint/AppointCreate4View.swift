@@ -44,7 +44,7 @@ struct AppointCreate4View: View {
                         ApmInvitedFriends(pickedFriends: viewModel.pickedFriends, isEditing: true)
                     }
                     
-                    Image("basic1")
+                    Image(viewModel.pickedCard)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 200)
