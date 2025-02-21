@@ -36,14 +36,13 @@ struct MyFollowing: View {
                         .onTapGesture {
                             selectedUserID = "\(followingUser.userId)"
                         }
-//                        .onAppear {
-//                            if followingUser.userId == followViewModel.followingUsers.last?.userId {
-//                                followViewModel.loadMoreFollowers()
-//                            }
-//                        }
                         .onAppear {
-                            followViewModel.fetchFollowingList(userId: followViewModel.userID)
+                            if followingUser.userId == followViewModel.filteredFollowing.last?.userId &&
+                                followViewModel.filteredFollowing.count < followViewModel.followingUsers.count {
+                                followViewModel.loadMoreFollowers()
+                            }
                         }
+
                         .listRowSeparator(.hidden)
                         .buttonStyle(PlainButtonStyle())
                         .padding(.horizontal, 5)
@@ -52,8 +51,14 @@ struct MyFollowing: View {
                 .padding(.bottom, 10)
                 .listStyle(PlainListStyle())
                 .onAppear {
-                    if let currentUserId = AuthManager.shared.UUID {
-                        followViewModel.fetchFollowingList(userId: currentUserId)
+                    if followViewModel.followingUsers.isEmpty {
+                        followViewModel.fetchFollowingList(userId: followViewModel.userID) { followings in
+                            DispatchQueue.main.async {
+                                followViewModel.followingUsers = followings
+                                followViewModel.followingCount = followings.count
+                                followViewModel.updateFollowingStatus()
+                            }
+                        }
                     }
                 }
             }

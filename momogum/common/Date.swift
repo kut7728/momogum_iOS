@@ -52,7 +52,7 @@ extension Date {
                      calendar.isDate(self, inSameDayAs: twoDaysAgo) {
                return "엊그제"
            } else {
-               return self "오늘"
+               return "오늘"
            }
        }
 }
