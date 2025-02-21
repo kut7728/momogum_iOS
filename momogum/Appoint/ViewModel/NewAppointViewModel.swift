@@ -126,7 +126,7 @@ class NewAppointViewModel {
         
         let parm = NewApmRequest(userId: self.userId,
                                  appointmentId: self.appointId,
-                                 userIds: self.pickedFriends.map { $0.userId ?? 9 },
+                                 userIds: self.pickedFriends.map { $0.userId ?? 0 },
                                  cardCategory: "BASIC",
                                  selectedCardUrl: "https://s3.amazonaws.com/cards/basic1.jpg",
                                  appointmentName: mainRequest)
@@ -139,21 +139,51 @@ class NewAppointViewModel {
                    parameters: parm,
                    encoder: JSONParameterEncoder.default,
                    headers: ["Content-Type": "application/json", "Accept": "application/json"])
-        .responseDecodable(of: AppointCreateResponse.self) { [self] response in
-            
+        //        .responseDecodable(of: AppointCreateResponse.self) { [self] response in
+        //
+        //            switch response.result {
+        //            case .success(let responseBody):
+        //                print("Response received successfully: \(responseBody)")
+        //                let responseData = responseBody
+        //                self.newAppoint = Appoint(from: responseData)
+        //                self.resetAppoint()
+        //
+        //            case .failure(let error):
+        //                print("Error: \(error.localizedDescription)")
+        //                print("⚠️ Error: \(response)")
+        //
+        //                if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
+        //                    print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
+        //                }
+        //                return
+        //            }
+        //        }
+        
+        
+        .responseData { response in
             switch response.result {
-            case .success(let responseBody):
-                print("Response received successfully: \(responseBody)")
-                let responseData = responseBody
-                self.newAppoint = Appoint(from: responseData)
-                self.resetAppoint()
+            case .success(let data):
+                // UTF-8로 변환
+                if let utf8String = String(data: data, encoding: .utf8),
+                   let utf8Data = utf8String.data(using: .utf8) {
+                    do {
+                        let decodedResponse = try JSONDecoder().decode(AppointCreateResponse.self, from: utf8Data)
+                        print("✅ 새 약속 로딩 api - UTF-8 변환 후 디코딩 성공")
+                        
+                        self.newAppoint = Appoint(from: decodedResponse)
+                        self.resetAppoint()
+                        //                            print("⚠️ 새 약속 로딩 응답: \(decodedResponse)")
+                        
+                    } catch {
+                        print("⚠️ 새 약속 로딩 JSON 디코딩 실패: \(error)")
+                        print(" JSON 디코딩 실패 데이터 값: \(utf8String)")
+                    }
+                } else {
+                    print("❌ 새 약속 로딩 UTF-8 변환 실패")
+                }
                 
             case .failure(let error):
-                print("Error: \(error.localizedDescription)")
-                
-                if let data = response.data, let jsonString = String(data: data, encoding: .utf8) {
-                    print("📌 서버에서 받은 원본 JSON (디코딩 실패 원인 확인용):\n\(jsonString)")
-                }
+                print("❌ 요청 실패: \(error.localizedDescription)")
                 return
             }
         }
@@ -183,3 +213,4 @@ class NewAppointViewModel {
         print(pickedCard)
     }
 }
+

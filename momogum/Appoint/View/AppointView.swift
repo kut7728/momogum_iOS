@@ -153,10 +153,12 @@ struct AppointView: View {
                             .frame(height: 100)
                         
                     }
+                    .padding(.horizontal, 10)
                 }
             }
             .onAppear {
                 viewModel.loadMyAppoints()
+                newAppointViewModel.resetAppoint()
             }
             .refreshable {
                 viewModel.loadMyAppoints()
